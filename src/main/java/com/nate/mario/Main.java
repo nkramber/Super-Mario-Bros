@@ -15,7 +15,6 @@ import javax.swing.SwingUtilities;
 
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.state.GameState;
-import com.nate.mario.state.MarioGame;
 
 public class Main extends Canvas implements Runnable, KeyListener {
 
@@ -26,9 +25,9 @@ public class Main extends Canvas implements Runnable, KeyListener {
     private static final double TARGET_FPS = 60.0;
     private static final double TIME_BETWEEN_FRAMES = 1000000000 / TARGET_FPS;
 
-    private static JFrame frame;
-
-    private Random random;
+    private static JFrame FRAME;
+    private static Random RANDOM;
+    
     private BufferedImage display;
     private GameState currentState;
     private Screen screen;
@@ -38,7 +37,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
 
     private void init() {
         display = new BufferedImage(SCREEN_WIDTH, SCREEN_HEIGHT, BufferedImage.TYPE_INT_RGB);
-        random = new Random();
+        RANDOM = new Random();
         keys = new boolean[256];
 
         currentState = new MarioGame();
@@ -90,15 +89,15 @@ public class Main extends Canvas implements Runnable, KeyListener {
             main.setMaximumSize(new Dimension(SCREEN_WIDTH * SCREEN_SCALE, SCREEN_HEIGHT * SCREEN_SCALE));
             main.setPreferredSize(new Dimension(SCREEN_WIDTH * SCREEN_SCALE, SCREEN_HEIGHT * SCREEN_SCALE));
 
-            frame = new JFrame(TITLE);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setLayout(new BorderLayout());
-            frame.add(main);
-            frame.pack();
-            frame.setResizable(false);
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
-            frame.setIgnoreRepaint(true);
+            FRAME = new JFrame(TITLE);
+            FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            FRAME.setLayout(new BorderLayout());
+            FRAME.add(main);
+            FRAME.pack();
+            FRAME.setResizable(false);
+            FRAME.setLocationRelativeTo(null);
+            FRAME.setVisible(true);
+            FRAME.setIgnoreRepaint(true);
 
             main.start();
         });
@@ -107,7 +106,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
     public void setState(GameState state) { currentState = state; }
 
     public boolean[] getKeys() { return keys; }
-    public Random getRandom() { return random; }
+    public static Random getRandom() { return RANDOM; }
 
     @Override public void keyTyped(KeyEvent e) {}
     @Override public void keyPressed(KeyEvent e) { keys[e.getKeyCode()] = true; }
