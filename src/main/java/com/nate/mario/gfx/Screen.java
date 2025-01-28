@@ -11,11 +11,11 @@ public class Screen {
 
     public Screen(Graphics2D g) {
         this.g = g;
-        sprites = new SpriteSheet("sprites_to_load.txt").getSpriteSheet("/sprites/spritesheet.png");
+        sprites = new SpriteSheet("sprites_to_load.txt").getSprites("/sprites/spritesheet.png");
     }
 
     public void drawSprite(String spriteName, int x, int y) {
-        if (!sprites.containsKey(spriteName)) System.out.println(spriteName + " sprite not found!");
+        if (!sprites.containsKey(spriteName)) throw new IllegalArgumentException("Sprite name does not exist!");
         else g.drawImage(sprites.get(spriteName), x, y, null);
     }
 

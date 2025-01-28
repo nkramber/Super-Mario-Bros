@@ -15,7 +15,7 @@ public class SpriteSheet {
 
     private HashMap<String, int[]> spritesToLoad;
 
-    public SpriteSheet(String path) {
+    public SpriteSheet(String path) { //Path for our "sprites_to_load" file. File should be formatted as "sprite name, x coord, y coord, tile width, tile height"
         spritesToLoad = new HashMap<>();
 
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(path)) {
@@ -39,7 +39,7 @@ public class SpriteSheet {
         }
     }
 
-    public HashMap<String, BufferedImage> getSpriteSheet(String path) {
+    public HashMap<String, BufferedImage> getSprites(String path) {
         HashMap<String, BufferedImage> sprites = new HashMap<>();
         BufferedImage spriteSheet = null;
 
