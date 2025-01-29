@@ -1,6 +1,6 @@
 package com.nate.mario;
 
-import java.util.List;
+import java.util.HashMap;
 
 import com.nate.mario.entity.Player;
 import com.nate.mario.gfx.Screen;
@@ -10,7 +10,7 @@ import com.nate.mario.state.GameState;
 public class MarioGame extends GameState {
 
     private Player mario;
-    private List<Level> levels;
+    private HashMap<Integer, Level> levels;
     private Level currentLevel;
     private int currentLevelNumber = 0;
 

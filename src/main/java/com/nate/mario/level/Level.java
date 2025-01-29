@@ -2,11 +2,20 @@ package com.nate.mario.level;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
@@ -27,7 +36,6 @@ public class Level {
 
     public Level(BufferedImage levelImage, String levelName) {
         this.levelName = levelName;
-        this.levelNumber = getLevelNumber(levelName);
 
         int width = levelImage.getWidth();
         int height = levelImage.getHeight();
@@ -71,21 +79,45 @@ public class Level {
         return (worldNumber - 1) * 4 + levelNumber - 1;
     }
 
-    public static List<Level> loadLevels() {
-        List<Level> levels = new ArrayList<>();
-        URL url = Level.class.getResource("/levels");
-        File directory = new File(url.getPath());
-        File[] files = directory.listFiles();
+    public static HashMap<Integer, Level> loadLevels() {
+        HashMap<Integer, Level> levels = new HashMap<>();
 
-        for (File file : files) {
+        try {
+            URI uri = Level.class.getResource("/levels").toURI();
+            Path levelsPath;
+            FileSystem fileSystem = null;
+
             try {
-                String levelName = file.getName().replace(".png", "");
-                BufferedImage levelImage = ImageIO.read(file);
+                if (uri.getScheme().equals("jar")) {
+                    fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
+                    levelsPath = fileSystem.getPath("/levels");
+                } else {
+                    levelsPath = Paths.get(uri);
+                }
 
-                levels.add(new Level(levelImage, levelName));
-            } catch (IOException e) {
-                e.printStackTrace();
+                // Walk the path and load each PNG file
+                try (Stream<Path> walk = Files.walk(levelsPath, 1)) {
+                    walk.filter(path -> path.toString().toLowerCase().endsWith(".png"))
+                            .forEach(path -> {
+                                String fileName = path.getFileName().toString();
+                                try (InputStream in = Level.class.getResourceAsStream("/levels/" + fileName)) {
+                                    if (in != null) {
+                                        String levelName = fileName.replace(".png", "");
+                                        BufferedImage levelImage = ImageIO.read(in);
+                                        levels.put(getLevelNumber(levelName), new Level(levelImage, levelName));
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                }
+            } finally {
+                if (fileSystem != null) {
+                    fileSystem.close();
+                }
             }
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
         }
 
         return levels;
