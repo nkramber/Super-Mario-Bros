@@ -63,7 +63,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
     }
 
     private void tick() {
-        currentState.tick(this);
+        currentState.tick(keys);
     }
 
     private void render() {
@@ -105,7 +105,6 @@ public class Main extends Canvas implements Runnable, KeyListener {
 
     public void setState(GameState state) { currentState = state; }
 
-    public boolean[] getKeys() { return keys; }
     public static Random getRandom() { return RANDOM; }
 
     @Override public void keyTyped(KeyEvent e) {}

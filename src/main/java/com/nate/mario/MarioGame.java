@@ -1,17 +1,30 @@
 package com.nate.mario;
 
+import com.nate.mario.entity.Player;
 import com.nate.mario.gfx.Screen;
+import com.nate.mario.level.Level;
 import com.nate.mario.state.GameState;
 
 public class MarioGame extends GameState {
 
-    @Override
-    public void tick(Main main) {
+    private Player mario;
+    private Level currentLevel;
+    private Level[] levels;
 
+    public MarioGame() {   
+        mario = new Player(5, 10);
+
+        levels = new Level[Level.getLevelCount()];
+        
+    }
+
+    @Override
+    public void tick(boolean[] keys) {
+        mario.tick(keys);
     }
 
     @Override
     public void render(Screen screen) {
-        screen.drawSprite("small_mario_run2", Main.getRandom().nextInt(Main.SCREEN_WIDTH - 16), Main.getRandom().nextInt(Main.SCREEN_HEIGHT - 16));
+        mario.render(screen);
     }
 }
