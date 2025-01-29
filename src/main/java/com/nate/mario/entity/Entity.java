@@ -11,6 +11,6 @@ public class Entity {
         this.y = yTile * 16;
     }
 
-    public void tick(boolean[] keys) {}
+    public void tick() {}
     public void render(Screen screen) {}
 }

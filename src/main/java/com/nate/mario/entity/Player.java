@@ -3,7 +3,7 @@ package com.nate.mario.entity;
 import java.awt.event.KeyEvent;
 
 import com.nate.mario.gfx.Screen;
-import com.nate.mario.gfx.Sprite;
+import com.nate.mario.gfx.Sprites;
 
 public class Player extends Entity {
 
@@ -13,20 +13,18 @@ public class Player extends Entity {
     private final int jumpKey = KeyEvent.VK_BACK_SLASH;
     private final int actionKey = KeyEvent.VK_PERIOD;
 
-    private String currentSprite = Sprite.MARIO_SMALL_STILL;
+    private String currentSprite = Sprites.MARIO_SMALL_STILL;
 
     public Player(float xTile, float yTile) {
         super(xTile, yTile);
     }
 
-    @Override
     public void tick(boolean[] keys) {
-        if (keys[rightKey]) System.out.println("right");
+        if (keys[leftKey]) x--;
+        if (keys[rightKey]) x++;
     }
 
     public void render(Screen screen) {
         screen.drawSprite(currentSprite, (int) x, (int) y);
     }
-
-    public void test() {}
 }

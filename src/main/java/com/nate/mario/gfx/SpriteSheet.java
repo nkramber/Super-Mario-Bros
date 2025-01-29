@@ -58,7 +58,7 @@ public class SpriteSheet {
             int spriteWidth = coords[2];
             int spriteHeight = coords[3];
 
-            BufferedImage spriteImage = new BufferedImage(16 * spriteWidth, 16 * spriteHeight, BufferedImage.TYPE_INT_RGB);
+            BufferedImage spriteImage = new BufferedImage(16 * spriteWidth, 16 * spriteHeight, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = spriteImage.createGraphics();
 
             for (int x = 0; x < spriteWidth; x++) {
