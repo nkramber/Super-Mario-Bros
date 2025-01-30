@@ -6,28 +6,29 @@ import java.util.List;
 public abstract class Tile {
 
     public static List<Tile> tiles = new ArrayList<>() {{
-        add(new SkyTile(0, 0));
-        add(new GroundTile(255, 0));
+        add(new SkyTile(0, "sky", false));
+        add(new GroundTile(255, "ground", true));
     }};
 
-    public String name;
-    public int redID, greenID, blueID;
-    public boolean solid;
+    public final int id;
+    public final String name;
+    public final boolean solid;
 
-    public Tile(String name, int redID, int greenID, boolean solid) {
+    public Tile(int id, String name, boolean solid) {
+        this.id = id;
         this.name = name;
-        this.redID = redID;
-        this.greenID = greenID;
+        this.solid = solid;
+    }
+    
+    protected int x, y;
+
+    public Tile(int x, int y, int id, String name, boolean solid) {
+        this.x = x;
+        this.y = y;
+        this.id = id;
+        this.name = name;
         this.solid = solid;
     }
 
-    protected int x, y;
-
-    public Tile(int x, int y, String name) {
-        this.x = x;
-        this.y = y;
-        this.name = name;
-    }
-
-    public abstract Tile newTile(int xTile, int yTile, String name);
+    public abstract Tile newTile(int x, int y, int id, String name, boolean solid);
 }

@@ -47,8 +47,10 @@ public class Level {
             for (int y = 0; y < height; y++) {
                 Color color = new Color(levelImage.getRGB(x, y));
                 for (Tile tile : Tile.tiles) {
-                    if (color.getRed() == tile.redID && color.getGreen() == tile.greenID) {
-                        tiles[x][y] = tile.newTile(x, y, tile.name);
+                    System.out.println(tile.toString() + ", " + x + ", " + y);
+                    if (color.getRed() == tile.id) {
+                        tiles[x][y] = tile.newTile(x, y, tile.id, tile.name, tile.solid);
+                        break;
                     }
                 }
                 if (tiles[x][y] == null) throw new IllegalArgumentException("Tile does not exist at " + x + ", " + y + " on level " + levelName);

@@ -14,14 +14,21 @@ public class Player extends Entity {
     private final int actionKey = KeyEvent.VK_PERIOD;
 
     private String currentSprite = Sprites.MARIO_SMALL_STILL;
+    private int width, height = 1 * 16;
 
     public Player(float xTile, float yTile) {
-        super(xTile, yTile);
+        super(xTile, yTile, 0, 0);
     }
 
     public void tick(boolean[] keys) {
-        if (keys[leftKey]) x--;
-        if (keys[rightKey]) x++;
+        x += xDir;
+        y += yDir;
+
+        if (!keys[leftKey] && !keys[rightKey]) xDir = 0;
+        if (keys[leftKey]) xDir -= 0.1f;
+        if (keys[rightKey]) xDir += 0.1f;
+
+        System.out.println(xDir + ", " + yDir);
     }
 
     public void render(Screen screen) {
