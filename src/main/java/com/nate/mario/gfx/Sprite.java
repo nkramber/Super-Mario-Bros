@@ -1,6 +1,9 @@
 package com.nate.mario.gfx;
 
-public class Sprites {
+public class Sprite {
+
+    public static final int TILE_WIDTH = 16;
+    public static final int TILE_HEIGHT = 16;
 
     public static final String MARIO_SMALL_STILL = "mario_small_still";
     public static final String MARIO_SMALL_RUN1 = "mario_small_run1";
@@ -17,5 +20,5 @@ public class Sprites {
     public static final String MARIO_SMALL_SWIM4 = "mario_small_swim4";
     public static final String MARIO_SMALL_SWIM5 = "mario_small_swim5";
 
-    private Sprites() {}
+    private Sprite() {}
 }

@@ -18,7 +18,7 @@ public class MarioGame extends GameState {
         levels = Level.loadLevels();
         currentLevel = levels.get(currentLevelNumber);
 
-        mario = new Player(4, 11);
+        mario = new Player(4, 4);
         currentLevel.addPlayer(mario);
     }
 
