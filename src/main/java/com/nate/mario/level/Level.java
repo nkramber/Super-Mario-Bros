@@ -2,22 +2,8 @@ package com.nate.mario.level;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Stream;
-
-import javax.imageio.ImageIO;
 
 import com.nate.mario.MarioGame;
 import com.nate.mario.entity.Entity;
@@ -32,7 +18,7 @@ public class Level {
     public int levelNumber;
 
     private Player player;
-    private List<Entity> mobs;
+    private List<Entity> entities;
 
     public Level(BufferedImage levelImage, String levelName) {
         this.levelName = levelName;
@@ -41,15 +27,14 @@ public class Level {
         int height = levelImage.getHeight();
         
         tiles = new Tile[width][height];
-        mobs = new ArrayList<>();
+        entities = new ArrayList<>();
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Color color = new Color(levelImage.getRGB(x, y));
                 for (Tile tile : Tile.tiles) {
-                    System.out.println(tile.toString() + ", " + x + ", " + y);
-                    if (color.getRed() == tile.id) {
-                        tiles[x][y] = tile.newTile(x, y, tile.id, tile.name, tile.solid);
+                    if (color.getRed() == tile.getID()) {
+                        tiles[x][y] = tile.newTile(x, y, tile.getID(), tile.getName(), tile.isSolid());
                         break;
                     }
                 }
@@ -59,72 +44,48 @@ public class Level {
     }
 
     public void tick(MarioGame game, boolean[] keys) {
-        player.tick(keys);
-        for (Entity entity : mobs) entity.tick();
+        for (Entity entity : entities) {
+            entity.doTileCollisions(getCollisionTiles(entity));
+            entity.getMovement(keys);
+        }
     }
+
+    private Tile[][] getCollisionTiles(Entity entity) {
+        int xBoundLeft = (int) (entity.getX() + entity.getxDir() - 1) / 16;
+        int xBoundRight = (int) (entity.getX() + entity.getxDir() + 17) / 16;
+        int yBoundTop = (int) (entity.getY() + entity.getyDir() - 1 - (entity.getHeight() - 1) * 16) / 16;
+        int yBoundBottom = (int) (entity.getY() + entity.getyDir() + 17) / 16;
+        
+        Tile[][] collisionTiles = new Tile[xBoundRight - xBoundLeft + 1][yBoundBottom - yBoundTop + 1];
+
+        int x = 0;
+        for (int i = xBoundLeft; i <= xBoundRight; i++) {
+            int y = 0;
+            for (int j = yBoundTop; j <= yBoundBottom; j++) {
+                collisionTiles[x][y] = tiles[i][j];
+                y++;
+            }
+            x++;
+        }
+
+        return collisionTiles;
+    }
+
 
     public void render(Screen screen) {
         for (int x = 0; x < tiles.length; x++) {
             for (int y = 0; y < tiles[x].length; y++) {
-                screen.drawTile(tiles[x][y].name, x * 16, y * 16);
+                screen.drawTile(tiles[x][y].getName(), x * 16, y * 16);
             }
         }
 
-        for (Entity entity : mobs) entity.render(screen);
-        player.render(screen);
+        for (Entity entity : entities) entity.render(screen);
     }
 
-    public static int getLevelNumber(String levelName) {
-        int worldNumber = Integer.parseInt(Character.toString(levelName.charAt(0)));
-        int levelNumber = Integer.parseInt(Character.toString(levelName.charAt(2)));
-
-        return (worldNumber - 1) * 4 + levelNumber - 1;
+    public void addPlayer(Player player) { 
+        this.player = player;
+        entities.add(0, player);
     }
-
-    public static HashMap<Integer, Level> loadLevels() {
-        HashMap<Integer, Level> levels = new HashMap<>();
-
-        try {
-            URI uri = Level.class.getResource("/levels").toURI();
-            Path levelsPath;
-            FileSystem fileSystem = null;
-
-            try {
-                if (uri.getScheme().equals("jar")) {
-                    fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
-                    levelsPath = fileSystem.getPath("/levels");
-                } else {
-                    levelsPath = Paths.get(uri);
-                }
-
-                // Walk the path and load each PNG file
-                try (Stream<Path> walk = Files.walk(levelsPath, 1)) {
-                    walk.filter(path -> path.toString().toLowerCase().endsWith(".png"))
-                            .forEach(path -> {
-                                String fileName = path.getFileName().toString();
-                                try (InputStream in = Level.class.getResourceAsStream("/levels/" + fileName)) {
-                                    if (in != null) {
-                                        String levelName = fileName.replace(".png", "");
-                                        BufferedImage levelImage = ImageIO.read(in);
-                                        levels.put(getLevelNumber(levelName), new Level(levelImage, levelName));
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            });
-                }
-            } finally {
-                if (fileSystem != null) {
-                    fileSystem.close();
-                }
-            }
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-        }
-
-        return levels;
-    }
-
-    public void addPlayer(Player player) { this.player = player; }
-    public void addMob(Entity entity) { mobs.add(entity); }
+    
+    public void addMob(Entity entity) { entities.add(entity); }
 }

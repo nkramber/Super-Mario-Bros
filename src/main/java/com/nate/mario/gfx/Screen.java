@@ -1,10 +1,13 @@
 package com.nate.mario.gfx;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 public class Screen {
+
+    private static final int VERTICAL_OFFSET = 16;
 
     private Graphics2D g;
     private HashMap<String, BufferedImage> sprites;
@@ -18,12 +21,17 @@ public class Screen {
 
     public void drawSprite(String spriteName, int x, int y) {
         if (!sprites.containsKey(spriteName)) throw new IllegalArgumentException(spriteName + " - sprite name does not exist!");
-        else g.drawImage(sprites.get(spriteName), x, y + 16, null);
+        else g.drawImage(sprites.get(spriteName), x, y + VERTICAL_OFFSET, null);
     }
 
     public void drawTile(String tileName, int x, int y) {
         if (!tiles.containsKey(tileName)) throw new IllegalArgumentException(tileName + " - tile name does not exist!");
-        else g.drawImage(tiles.get(tileName), x, y + 16, null);
+        else g.drawImage(tiles.get(tileName), x, y + VERTICAL_OFFSET, null);
+    }
+
+    public void drawRect(Color color, int x, int y, int width, int height) {
+        g.setColor(color);
+        g.drawRect(x, y + VERTICAL_OFFSET, width, height);
     }
 
     public Graphics2D getGraphics() { return g; }

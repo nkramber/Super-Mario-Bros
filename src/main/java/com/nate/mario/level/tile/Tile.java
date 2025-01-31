@@ -10,9 +10,9 @@ public abstract class Tile {
         add(new GroundTile(255, "ground", true));
     }};
 
-    public final int id;
-    public final String name;
-    public final boolean solid;
+    protected final int id;
+    protected final String name;
+    protected final boolean solid;
 
     public Tile(int id, String name, boolean solid) {
         this.id = id;
@@ -31,4 +31,10 @@ public abstract class Tile {
     }
 
     public abstract Tile newTile(int x, int y, int id, String name, boolean solid);
+
+    public int getID() { return id; }
+    public String getName() { return name; }
+    public boolean isSolid() { return solid; }
+    public int getX() { return x; }
+    public int getY() { return y; }
 }
