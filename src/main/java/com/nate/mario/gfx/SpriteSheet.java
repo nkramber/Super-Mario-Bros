@@ -23,6 +23,7 @@ public class SpriteSheet {
                 String line;
 
                 while ((line = br.readLine()) != null) {
+                    if (line.startsWith("//")) continue;
                     String[] parts = line.split(",");
                     for (int i = 0; i < parts.length; i++) parts[i] = parts[i].trim();
 

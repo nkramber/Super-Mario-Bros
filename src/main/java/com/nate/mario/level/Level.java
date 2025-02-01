@@ -45,17 +45,18 @@ public class Level {
 
     public void tick(MarioGame game, boolean[] keys) {
         for (Entity entity : entities) {
-            entity.doTileCollisions(getCollisionTiles(entity));
             entity.getMovement(keys);
+            entity.doTileCollisions(getCollisionTiles(entity));
+            entity.move();
         }
     }
 
     private Tile[][] getCollisionTiles(Entity entity) {
-        int xBoundLeft = (int) (entity.getX() + entity.getxDir() - 1) / 16;
-        int xBoundRight = (int) (entity.getX() + entity.getxDir() + 17) / 16;
-        int yBoundTop = (int) (entity.getY() + entity.getyDir() - 1 - (entity.getHeight() - 1) * 16) / 16;
-        int yBoundBottom = (int) (entity.getY() + entity.getyDir() + 17) / 16;
-        
+        int xBoundLeft = (int) (entity.getX() - 16) / 16;
+        int xBoundRight = (int) (entity.getX() + 31) / 16;
+        int yBoundTop = (int) (entity.getY() - 16) / 16;
+        int yBoundBottom = (int) (entity.getY() + 31 + entity.getHeight() - 16) / 16;
+
         Tile[][] collisionTiles = new Tile[xBoundRight - xBoundLeft + 1][yBoundBottom - yBoundTop + 1];
 
         int x = 0;
@@ -71,8 +72,9 @@ public class Level {
         return collisionTiles;
     }
 
-
     public void render(Screen screen) {
+        screen.setScroll((int) player.getX());
+
         for (int x = 0; x < tiles.length; x++) {
             for (int y = 0; y < tiles[x].length; y++) {
                 screen.drawTile(tiles[x][y].getName(), x * 16, y * 16);

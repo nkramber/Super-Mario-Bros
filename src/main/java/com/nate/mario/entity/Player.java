@@ -6,6 +6,9 @@ import com.nate.mario.gfx.Sprite;
 
 public class Player extends Entity {
 
+    private static final int STARTING_SIZE = 2;
+    private static final String STARTING_SPRITE = Sprite.MARIO_TALL_STILL;
+
     private static final float HOR_DECEL_RATE = 0.2f;
     private static final float HOR_ACCEL_RATE = 0.1f;
     private static final float HOR_MAX_SPEED = 3.0f;
@@ -19,19 +22,18 @@ public class Player extends Entity {
     private final int rightKey = KeyEvent.VK_D;
     private final int leftKey = KeyEvent.VK_A;
     private final int crouchKey = KeyEvent.VK_S;
-    private final int jumpKey = KeyEvent.VK_SLASH;
-    private final int actionKey = KeyEvent.VK_PERIOD;
+    private final int jumpKey = KeyEvent.VK_SPACE;
+    private final int actionKey = KeyEvent.VK_ENTER;
 
     private boolean hasJumped = false;
 
     public Player(float xTile, float yTile) {
-        super(xTile, yTile, 0, 0, 1, 1, Sprite.MARIO_SMALL_STILL);
+        super(xTile, yTile, 0, 0, 1, STARTING_SIZE, STARTING_SPRITE);
     }
 
     @Override
     public void getMovement(boolean[] keys) {
-        x += xDir;
-        y += yDir;
+        if (yDir != 0) onGround = false;
 
         if (!onGround) {
             if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
@@ -51,36 +53,43 @@ public class Player extends Entity {
                 if (xDir - HOR_DECEL_RATE * SKID_RATE < 0) {
                     xDir = 0;
                 } else {
-                    xDir -= HOR_DECEL_RATE * SKID_RATE;
+                    if (hasJumped) xDir -= HOR_DECEL_RATE / 3;
+                    else xDir -= HOR_DECEL_RATE * SKID_RATE;
                 }
             } else if (xDir - HOR_ACCEL_RATE < -HOR_MAX_SPEED) {
                 xDir = -HOR_MAX_SPEED;
             } else {
-                xDir -= HOR_ACCEL_RATE;
+                if (hasJumped) xDir -= HOR_ACCEL_RATE / 3;
+                else xDir -= HOR_ACCEL_RATE;
             }
         } else if (keys[rightKey]) {
             if (xDir < 0) {
                 if (xDir + HOR_DECEL_RATE * SKID_RATE > 0) {
                     xDir = 0;
                 } else {
-                    xDir += HOR_DECEL_RATE * SKID_RATE;
+                    if (hasJumped) xDir += HOR_DECEL_RATE / 3;
+                    else xDir += HOR_DECEL_RATE * SKID_RATE;
                 }
             } else if (xDir + HOR_ACCEL_RATE > HOR_MAX_SPEED) {
                 xDir = HOR_MAX_SPEED;
             } else {
-                xDir += HOR_ACCEL_RATE;
+                if (hasJumped) xDir += HOR_ACCEL_RATE / 3;
+                else xDir += HOR_ACCEL_RATE;
             }
         }
 
-        if (keys[jumpKey] && onGround && !hasJumped) {
-            hasJumped = true;
+        if (x + xDir <= 0) {
+            xDir = 0;
+            x = 0.00001f;
+        }
+
+        if (keys[jumpKey] && !hasJumped && onGround) {
             onGround = false;
+            hasJumped = true;
             yDir = JUMP_VELOCITY;
         }
 
         if (!keys[jumpKey]) hasJumped = false;
-
-        isMoving = xDir != 0 || yDir != 0;
     }
 
     public void setHeight(int tiles) {

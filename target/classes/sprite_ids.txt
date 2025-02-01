@@ -1,3 +1,4 @@
+//sprite name, x coord, y coord, width, height
 mario_small_still, 1, 1, 1, 1
 mario_small_run1, 2, 0, 1, 1
 mario_small_run2, 3, 0, 1, 1
@@ -12,3 +13,4 @@ mario_small_swim2, 11, 0, 1, 1
 mario_small_swim3, 12, 0, 1, 1
 mario_small_swim4, 13, 0, 1, 1
 mario_small_swim5, 14, 0, 1, 1
+mario_tall_still, 1, 2, 1, 2

@@ -19,6 +19,7 @@ public class Sprite {
     public static final String MARIO_SMALL_SWIM3 = "mario_small_swim3";
     public static final String MARIO_SMALL_SWIM4 = "mario_small_swim4";
     public static final String MARIO_SMALL_SWIM5 = "mario_small_swim5";
+    public static final String MARIO_TALL_STILL = "mario_tall_still";
 
     private Sprite() {}
 }
