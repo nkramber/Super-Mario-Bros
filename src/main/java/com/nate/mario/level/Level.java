@@ -45,7 +45,7 @@ public class Level {
 
     public void tick(MarioGame game, boolean[] keys) {
         for (Entity entity : entities) {
-            entity.getMovement(keys);
+            entity.getMovement(keys, this);
             entity.doTileCollisions(getCollisionTiles(entity));
             entity.move();
         }
@@ -73,7 +73,7 @@ public class Level {
     }
 
     public void render(Screen screen) {
-        screen.setScroll((int) player.getX());
+        screen.setScroll((int) player.getX(), tiles.length);
 
         for (int x = 0; x < tiles.length; x++) {
             for (int y = 0; y < tiles[x].length; y++) {
@@ -90,4 +90,6 @@ public class Level {
     }
     
     public void addMob(Entity entity) { entities.add(entity); }
+
+    public Tile[][] getTiles() { return tiles; }
 }

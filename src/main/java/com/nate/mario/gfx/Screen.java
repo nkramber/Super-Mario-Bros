@@ -10,13 +10,14 @@ import com.nate.mario.Main;
 
 public class Screen {
 
-    private static final int VERTICAL_OFFSET = 0;
+    private static final int VERTICAL_OFFSET = -96;
+    private static final int HORIZONTAL_OFFSET = -32;
 
     private Graphics2D g;
     private HashMap<String, BufferedImage> sprites;
     private HashMap<String, BufferedImage> tiles;
 
-    private int xScroll = 0;
+    private int xScroll = HORIZONTAL_OFFSET;
 
     public Screen(Graphics2D g) {
         this.g = g;
@@ -44,10 +45,14 @@ public class Screen {
         g.drawRect(rect.x + xScroll, rect.y + VERTICAL_OFFSET, rect.width, rect.height);
     }
 
-    public void setScroll(int playerX) {
+    public void setScroll(int playerX, int levelWidth) {
         if (playerX + 8 > Main.SCREEN_WIDTH / 2) {
-            xScroll = -playerX - 8 + Main.SCREEN_WIDTH / 2;
+            int newXScroll = -playerX - 8 + Main.SCREEN_WIDTH / 2;
+            if (newXScroll < xScroll) xScroll = newXScroll;
         }
+
+        int maxXScroll = -levelWidth * 16 + 288;
+        if (xScroll < maxXScroll) xScroll = maxXScroll;
     }
 
     public Graphics2D getGraphics() { return g; }
