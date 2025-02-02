@@ -1,0 +1,1 @@
+add table of horizontal acceleration rates to better reflect horizontal momentum of actual game

@@ -10,23 +10,22 @@ public class Player extends Entity {
     private static final int STARTING_SIZE = 2;
     private static final String STARTING_SPRITE = Sprite.MARIO_TALL_STILL;
 
-    private static final float HOR_DECEL_RATE = 0.2f;
-    private static final float HOR_ACCEL_RATE = 0.1f;
+    private static final float HOR_DECEL_RATE = 0.1f;
+    private static final float HOR_ACCEL_RATE = 0.08f;
     private static final float HOR_MAX_SPEED = 3.0f;
 
     private static final float VER_DECEL_RATE = 0.35f;
     private static final float VER_MAX_SPEED = 7.0f;
 
-    private static final float SKID_RATE = 1.2f;
+    private static final float SKID_RATE = 1.4f;
     
     private static final float[] JUMP_ACCEL_RATE = {
-        0,
-        -4.0f,
-        -4.0f,
-        -4.0f,
-        -4.0f,
-        -4.0f,
-        -4.0f,
+        -3.9f,
+        -3.9f,
+        -3.9f,
+        -3.9f,
+        -3.9f,
+        -3.5f,
         -3.5f,
         -3.5f,
         -3.5f,
@@ -117,13 +116,13 @@ public class Player extends Entity {
         //Only update the maxX variable if the player has advanced further to the right, and the player hasn't
         //reached the right edge of the screen. Without this the ability of the player to retreat to the left
         //would be prevented once the camera stops scrolling to the right at the edge of the level
-        if (x > maxX && x < level.getTiles().length * 16 - 168) {
+        if (x > maxX && x < level.getTiles().length * 16 - 190) {
             maxX = (int) x;
         }
 
         //Prevent player from retreating backwards
-        if (x + xDir < maxX - 120) {
-            x = maxX - 120;
+        if (x + xDir < maxX - 96) {
+            x = maxX - 96;
             xDir = 0;
         }
 

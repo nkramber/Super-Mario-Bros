@@ -46,8 +46,8 @@ public class Screen {
     }
 
     public void setScroll(int playerX, int levelWidth) {
-        if (playerX + 8 > Main.SCREEN_WIDTH / 2) {
-            int newXScroll = -playerX - 8 + Main.SCREEN_WIDTH / 2;
+        if (playerX + 32 > Main.SCREEN_WIDTH / 2) {
+            int newXScroll = -playerX - 32 + Main.SCREEN_WIDTH / 2;
             if (newXScroll < xScroll) xScroll = newXScroll;
         }
 
