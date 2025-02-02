@@ -22,8 +22,8 @@ public class Player extends Entity {
     private final int rightKey = KeyEvent.VK_D;
     private final int leftKey = KeyEvent.VK_A;
     private final int crouchKey = KeyEvent.VK_S;
-    private final int jumpKey = KeyEvent.VK_SPACE;
-    private final int actionKey = KeyEvent.VK_ENTER;
+    private final int jumpKey = KeyEvent.VK_SLASH;
+    private final int actionKey = KeyEvent.VK_PERIOD;
 
     private boolean hasJumped = false;
 

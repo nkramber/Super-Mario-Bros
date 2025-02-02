@@ -10,7 +10,7 @@ import com.nate.mario.Main;
 
 public class Screen {
 
-    private static final int VERTICAL_OFFSET = 16;
+    private static final int VERTICAL_OFFSET = 0;
 
     private Graphics2D g;
     private HashMap<String, BufferedImage> sprites;

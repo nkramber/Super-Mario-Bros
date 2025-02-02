@@ -19,7 +19,7 @@ import com.nate.mario.state.GameState;
 public class Main extends Canvas implements Runnable, KeyListener {
 
     public static final int SCREEN_WIDTH = 256;
-    public static final int SCREEN_HEIGHT = 240;
+    public static final int SCREEN_HEIGHT = 224;
     private static final int SCREEN_SCALE = 3;
     private static final String TITLE = "Super Mario Bros.";
     private static final double TARGET_FPS = 60.0;
