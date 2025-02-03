@@ -25,6 +25,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
     private static final String TITLE = "Super Mario Bros.";
     private static final double TARGET_FPS = 60.0;
     private static final double TIME_BETWEEN_FRAMES = 1000000000 / TARGET_FPS;
+    private static boolean RUNNING;
 
     private static JFrame FRAME;
     private static Random RANDOM;
@@ -34,7 +35,6 @@ public class Main extends Canvas implements Runnable, KeyListener {
     private Screen screen;
 
     private boolean keys[];
-    private boolean running;
 
     private void init() {
         display = new BufferedImage(SCREEN_WIDTH, SCREEN_HEIGHT, BufferedImage.TYPE_INT_RGB);
@@ -52,15 +52,30 @@ public class Main extends Canvas implements Runnable, KeyListener {
         init();
 
         double lastUpdateTime = System.nanoTime();
-        while(running) {
+        while(RUNNING) {
             double currentTime = System.nanoTime();
             while (currentTime - lastUpdateTime > TIME_BETWEEN_FRAMES) {
+                measureFPS();
                 tick();
                 render();
                 lastUpdateTime += TIME_BETWEEN_FRAMES;
             }
         }
         System.exit(0);
+    }
+
+    private long lastFPSCheck;
+    private int currentFPS = 0;
+    private int frameCount = 0;
+
+    private void measureFPS() {
+        frameCount++;
+        if(System.currentTimeMillis() - lastFPSCheck >= 1000) {
+            currentFPS = frameCount;
+            if (currentFPS > 3) System.out.println("FPS: " + currentFPS);
+            frameCount = 0;
+            lastFPSCheck = System.currentTimeMillis();
+        }
     }
 
     private void tick() {
@@ -79,7 +94,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
 
     private void start() {
         super.requestFocus();
-        running = true;
+        RUNNING = true;
         new Thread(this).start();
     }
 
@@ -105,9 +120,10 @@ public class Main extends Canvas implements Runnable, KeyListener {
     }
 
     public void setState(GameState state) { currentState = state; }
+    public static void setNotRunning() { RUNNING = false; }
 
     public static Random getRandom() { return RANDOM; }
-
+    
     @Override public void keyTyped(KeyEvent e) {}
     @Override public void keyPressed(KeyEvent e) { keys[e.getKeyCode()] = true; }
     @Override public void keyReleased(KeyEvent e) { keys[e.getKeyCode()] = false; }

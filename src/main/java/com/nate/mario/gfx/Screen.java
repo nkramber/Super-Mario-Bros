@@ -46,19 +46,44 @@ public class Screen {
         else g.drawImage(items.get(itemName), x + xScroll, y + VERTICAL_OFFSET, null);
     }
 
-    public void drawText(String hudText, int xHalfTile, int yHalfTile) {
+    public void drawHud(int coinCount, int score, int timeInFramesRemaining, String levelName) {
+        drawHudBase(coinCount, score, levelName);
+        drawHudNumber(Integer.toString(timeInFramesRemaining), 3, 26, 3);
+    }
+
+    public void drawGameOver(int coinCount, int score, String levelName) {
+        drawHudBase(coinCount, score, levelName);
+        drawHudText("game over", 11, 16);
+    }
+
+    public void drawHudBase(int coinCount, int score, String levelName) {
+        drawHudIcon(new String[] {
+            "coin",
+            "x_icon",
+            Integer.toString(coinCount / 10), //coins tenths place
+            Integer.toString(coinCount % 10)  //coins ones place
+        }, 11, 3);
+
+        drawHudNumber(Integer.toString(score), 6, 3, 3);
+        drawHudText(levelName, 19, 3);
+        drawHudText("mario", 3, 2);
+        drawHudText("world", 18, 2);
+        drawHudText("time", 25, 2);
+    }
+
+    public void drawHudText(String hudText, int xHalfTile, int yHalfTile) {
         for (int i = 0; i < hudText.length(); i++) {
             g.drawImage(hud.get(String.valueOf(hudText.charAt(i))), (xHalfTile + i) * 8, yHalfTile * 8, null);
         }
     }
 
-    public void drawHud(String[] hudText, int xHalfTile, int yHalfTile) {
+    public void drawHudIcon(String[] hudText, int xHalfTile, int yHalfTile) {
         for (int i = 0; i < hudText.length; i++) {
             g.drawImage(hud.get(hudText[i]), (xHalfTile + i) * 8, yHalfTile * 8, null);
         }
     }
 
-    public void drawNumber(String score, int numberLength, int xHalfTile, int yHalfTile) {
+    public void drawHudNumber(String score, int numberLength, int xHalfTile, int yHalfTile) {
         if (score.length() < numberLength) {
             StringBuilder sb = new StringBuilder(score);
             while (sb.length() < numberLength) {
@@ -66,7 +91,7 @@ public class Screen {
             }
             score = sb.toString();
         }
-        drawText(score, xHalfTile, yHalfTile);
+        drawHudText(score, xHalfTile, yHalfTile);
     }
 
     public void drawRect(Color color, int x, int y, int width, int height) {

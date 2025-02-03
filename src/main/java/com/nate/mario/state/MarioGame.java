@@ -68,20 +68,7 @@ public class MarioGame extends GameState {
     public void render() {
         if (gameOver) {
             if (gameOverTimer.getElapsedTime() < 7000) {
-                screen.drawHud(new String[] {
-                    "coin",
-                    "x_icon",
-                    Integer.toString(player.getCoinCount() / 10), //coins tenths place
-                    Integer.toString(player.getCoinCount() % 10)  //coins ones place
-                }, 11, 3);
-        
-                screen.drawNumber(Integer.toString(player.getScore()), 6, 3, 3);
-                screen.drawText(currentLevel.getLevelName(), 19, 3);
-                screen.drawText("mario", 3, 2);
-                screen.drawText("world", 18, 2);
-                screen.drawText("time", 25, 2);
-
-                screen.drawText("game over", 11, 16);
+                screen.drawGameOver(player.getCoinCount(), player.getScore(), currentLevel.getLevelName());
             } else {
                 gameOver = false;
                 gameOverTimer = null;

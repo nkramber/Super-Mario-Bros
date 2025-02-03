@@ -15,6 +15,8 @@ import com.nate.mario.level.tile.Tile;
 
 public class Level {
 
+    private static final int TIME_TICK_INTERVAL = 400;
+
     public Tile[][] tiles;
     public List<Item> items;
     
@@ -24,7 +26,8 @@ public class Level {
     private Player player;
     private List<Entity> entities;
     
-    private int timeInFramesRemaining;
+    private long timeInMillis;
+    private int timeRemaining;
     private boolean levelFinished = false;
     private boolean gameOver = false;
 
@@ -42,6 +45,7 @@ public class Level {
             for (int y = 0; y < height; y++) {
                 Color color = new Color(levelImage.getRGB(x, y));
 
+                //Top left corner corresponds to our level type, should be the sky tile color
                 if (x == 0 && y == 0) {
                     if (color.getRGB() == LevelType.OVERWORLD.getRGB()) levelType = LevelType.OVERWORLD;
 
@@ -49,13 +53,15 @@ public class Level {
                     continue;
                 }
 
+                //Below level type is the starting level time, red + green = time units
                 if (x == 0 && y == 1) {
-                    timeInFramesRemaining = (color.getRed() + color.getGreen()) * 24 + 23;
+                    timeRemaining = (color.getRed() + color.getGreen());
 
                     tiles[x][y] = Tile.tiles.get(0);
                     continue;
                 }
 
+                //Red is the tile type
                 for (Tile tile : Tile.tiles) {
                     if (color.getRed() == tile.getID()) {
                         tiles[x][y] = tile.newTile(x, y, tile.getID(), tile.getName(), tile.isSolid());
@@ -63,11 +69,15 @@ public class Level {
                     }
                 }
 
+                //Green is the item type
                 for (Item item : Item.items) {
                     if (color.getGreen() == item.getID()) {
                         items.add(item.newItem(x * 16, y * 16, item.getID(), item.getName()));
+                        break;
                     }
                 }
+
+                //Blue will be the entity type
 
                 if (tiles[x][y] == null) throw new IllegalArgumentException("Valid tile does not exist at " + x + ", " + y + " on level " + levelName);
             }
@@ -75,16 +85,16 @@ public class Level {
     }
 
     public void tick(boolean[] keys) {
-        timeInFramesRemaining--;
-        if (timeInFramesRemaining == 0) gameOver = true;
+        decrementTime();
+        if (timeRemaining == 0) gameOver = true;
 
         for (Entity entity : entities) {
             entity.getMovement(keys, this);
-            entity.doTileCollisions(getCollisionTiles(entity));
+            entity.doTileCollisions(getLocalCollisionTiles(entity));
             entity.move();
         }
 
-        List<Item> collisionItems = getCollisionItems(player);
+        List<Item> collisionItems = getLocalCollisionItems(player);
         player.doItemCollisions(collisionItems);
         for (Item item : collisionItems) {
             if (item.isToBeDeleted()) {
@@ -111,7 +121,7 @@ public class Level {
         // }
     }
 
-    private Tile[][] getCollisionTiles(Entity entity) {
+    private Tile[][] getLocalCollisionTiles(Entity entity) {
         int xBoundLeft = (int) (entity.getX() - 16) / 16;
         int xBoundRight = (int) (entity.getX() + 31) / 16;
         int yBoundTop = (int) (entity.getY() - 16) / 16;
@@ -132,7 +142,7 @@ public class Level {
         return collisionTiles;
     }
 
-    private List<Item> getCollisionItems(Entity entity) {
+    private List<Item> getLocalCollisionItems(Entity entity) {
         int xBoundLeft = (int) (entity.getX() - 16);
         int xBoundRight = (int) (entity.getX() + 31);
         int yBoundTop = (int) (entity.getY() - 16);
@@ -147,6 +157,18 @@ public class Level {
         }
 
         return collisionItems;
+    }
+
+    private void decrementTime() {
+        if (timeInMillis == 0) {
+            timeInMillis = System.currentTimeMillis();
+        } else {
+            long currentTimeInMillis = System.currentTimeMillis();
+            if (currentTimeInMillis - timeInMillis >= TIME_TICK_INTERVAL) {
+                timeRemaining--;
+                timeInMillis += TIME_TICK_INTERVAL;
+            }
+        }
     }
 
     public void render(Screen screen) {
@@ -165,20 +187,7 @@ public class Level {
 
         for (Item item : items) screen.drawItem(item.getName(), item.getX(), item.getY());
 
-        //Draw coin count
-        screen.drawHud(new String[] {
-            "coin",
-            "x_icon",
-            Integer.toString(player.getCoinCount() / 10), //coins tenths place
-            Integer.toString(player.getCoinCount() % 10)  //coins ones place
-        }, 11, 3);
-
-        screen.drawNumber(Integer.toString(player.getScore()), 6, 3, 3);
-        screen.drawNumber(Integer.toString(timeInFramesRemaining / 24), 3, 26, 3);
-        screen.drawText(levelName, 19, 3);
-        screen.drawText("mario", 3, 2);
-        screen.drawText("world", 18, 2);
-        screen.drawText("time", 25, 2);
+        screen.drawHud(player.getCoinCount(), player.getScore(), timeRemaining, levelName);
 
         for (Entity entity : entities) entity.render(screen);
     }
