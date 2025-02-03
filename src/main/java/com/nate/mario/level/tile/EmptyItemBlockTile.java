@@ -19,12 +19,19 @@ public class EmptyItemBlockTile extends Tile {
         return new ItemBlockTile(x, y, id, name, solid);
     }
 
-    public void doneAnimating() { doneAnimating = true; }
-    public void increaseAnimationFrame() { animationFrame++; }
-    public void decreaseAnimationFrame() { animationFrame--; }
-    public void setAnimatingDown() { animatingDown = true; }
+    public void tick() {
+        if (!doneAnimating) {
+            if (animationFrame < 0) {
+                doneAnimating = true;
+            } else if (animatingDown) {
+                animationFrame--;
+            } else if (!animatingDown) {
+                if (animationFrame == 4) animatingDown = true;
+                else animationFrame++;
+            }
+        }
+    }
 
+    public boolean isAnimating() { return !doneAnimating; }
     public int getAnimationFrame() { return animationFrame; }
-    public boolean isAnimatingDown() { return animatingDown; }
-    public boolean isDoneAnimating() { return doneAnimating; }
 }

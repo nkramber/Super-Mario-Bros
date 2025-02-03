@@ -177,11 +177,7 @@ public class Player extends Entity {
     }
 
     public void topTileCollide(Tile tile) {
-        if (tile instanceof ItemBlockTile) {
-            System.out.println("Collided with item block tile from below");
-            ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
-            itemBlockTile.toBeDeleted();
-        }
+        if (tile instanceof ItemBlockTile) ((ItemBlockTile)tile).toBeDeleted();
     }
 
     private void increaseCoinCount() {

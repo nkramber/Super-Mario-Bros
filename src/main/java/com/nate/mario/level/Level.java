@@ -84,22 +84,7 @@ public class Level {
             for (int y = 0; y < tiles[0].length; y++) {
                 Tile tile = tiles[x][y];
 
-                if (tile instanceof EmptyItemBlockTile) {
-                    EmptyItemBlockTile emptyItemBlockTile = (EmptyItemBlockTile) tile;
-                    
-                    if (!emptyItemBlockTile.isDoneAnimating()) {
-                        int animationFrame = emptyItemBlockTile.getAnimationFrame();
-
-                        if (animationFrame < 0) {
-                            emptyItemBlockTile.doneAnimating();
-                        } else if (emptyItemBlockTile.isAnimatingDown()) {
-                            emptyItemBlockTile.decreaseAnimationFrame();
-                        } else if (!emptyItemBlockTile.isAnimatingDown()) {
-                            if (animationFrame == 4) emptyItemBlockTile.setAnimatingDown();
-                            else emptyItemBlockTile.increaseAnimationFrame();
-                        }
-                    }
-                }
+                if (tile instanceof EmptyItemBlockTile) ((EmptyItemBlockTile)tile).tick();
 
                 if (tile.isToBeDeleted() && tile instanceof ItemBlockTile) {
                     tiles[tile.getxTile()][tile.getyTile()] = new EmptyItemBlockTile(tile.getxTile(), tile.getyTile(), -1, "emptyitemblock", true);
@@ -153,7 +138,7 @@ public class Level {
         for (int x = 0; x < tiles.length; x++) {
             for (int y = 0; y < tiles[x].length; y++) {
                 Tile tile = tiles[x][y];
-                if (tile instanceof EmptyItemBlockTile && !((EmptyItemBlockTile)tile).isDoneAnimating()) {
+                if (tile instanceof EmptyItemBlockTile && ((EmptyItemBlockTile)tile).isAnimating()) {
                     screen.drawTile(tile.getName(), x * 16, y * 16 - ((EmptyItemBlockTile)tile).getAnimationFrame());
                 }
                 else screen.drawTile(tile.getName(), x * 16, y * 16);
