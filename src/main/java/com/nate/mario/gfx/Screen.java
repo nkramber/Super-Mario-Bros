@@ -27,8 +27,6 @@ public class Screen {
         tiles = new SpriteSheet("map_tile_ids.txt").getSprites("/sprites/tile_sprites.png", 16);
         items = new SpriteSheet("item_tile_ids.txt").getSprites("/sprites/item_sprites.png", 16);
         hud = new SpriteSheet("hud_tile_ids.txt").getSprites("/sprites/hud_sprites.png", 8);
-
-        System.out.println(hud.keySet());
     }
 
     public void drawSprite(String spriteName, int x, int y) {
@@ -95,6 +93,8 @@ public class Screen {
         g.setColor(color);
         g.fillRect(0, 0, Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
     }
+
+    public void resetScroll() { xScroll = HORIZONTAL_OFFSET; }
 
     public Graphics2D getGraphics() { return g; }
 }

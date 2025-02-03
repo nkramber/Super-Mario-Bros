@@ -18,6 +18,7 @@ public abstract class Tile {
 
     protected int xTile, yTile;
     protected boolean toBeDeleted = false;
+    protected boolean animating = false;
 
     public Tile(int id, String name, boolean solid) {
         this.id = id;
@@ -40,6 +41,7 @@ public abstract class Tile {
     public int getID() { return id; }
     public String getName() { return name; }
     public boolean isSolid() { return solid; }
+    public boolean isAnimating() { return animating; }
     public int getxTile() { return xTile; }
     public int getyTile() { return yTile; }
 }

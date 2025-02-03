@@ -41,8 +41,8 @@ public class Main extends Canvas implements Runnable, KeyListener {
         RANDOM = new Random();
         keys = new boolean[256];
 
-        currentState = new MarioGame();
         screen = new Screen((Graphics2D) display.getGraphics());
+        currentState = new MarioGame(screen);
 
         addKeyListener(this);
     }
@@ -72,7 +72,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-        currentState.render(screen);
+        currentState.render();
 
         getGraphics().drawImage(display, 0, 0, SCREEN_WIDTH * SCREEN_SCALE, SCREEN_HEIGHT * SCREEN_SCALE, this);
     }
@@ -83,7 +83,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
         new Thread(this).start();
     }
 
-    public static void main( String[] args ) {
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             Main main = new Main();
             main.setMinimumSize(new Dimension(SCREEN_WIDTH * SCREEN_SCALE, SCREEN_HEIGHT * SCREEN_SCALE));

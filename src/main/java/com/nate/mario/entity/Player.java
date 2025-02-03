@@ -68,8 +68,9 @@ public class Player extends Entity {
     private int coinCount = 0;
     private int maxX;
 
-    public Player(float xTile, float yTile) {
+    public Player(float xTile, float yTile, int score) {
         super(xTile, yTile, 0, 0, 1, STARTING_SIZE, STARTING_SPRITE);
+        this.score = score;
         maxX = (int) xTile * 16;
     }
 

@@ -12,7 +12,6 @@ import com.nate.mario.item.Item;
 import com.nate.mario.level.tile.EmptyItemBlockTile;
 import com.nate.mario.level.tile.ItemBlockTile;
 import com.nate.mario.level.tile.Tile;
-import com.nate.mario.state.MarioGame;
 
 public class Level {
 
@@ -24,8 +23,10 @@ public class Level {
     
     private Player player;
     private List<Entity> entities;
-
+    
     private int timeInFramesRemaining;
+    private boolean levelFinished = false;
+    private boolean gameOver = false;
 
     public Level(BufferedImage levelImage, String levelName) {
         this.levelName = levelName;
@@ -73,8 +74,9 @@ public class Level {
         }
     }
 
-    public void tick(MarioGame game, boolean[] keys) {
+    public void tick(boolean[] keys) {
         timeInFramesRemaining--;
+        if (timeInFramesRemaining == 0) gameOver = true;
 
         for (Entity entity : entities) {
             entity.getMovement(keys, this);
@@ -94,13 +96,19 @@ public class Level {
             for (int y = 0; y < tiles[0].length; y++) {
                 Tile tile = tiles[x][y];
 
-                if (tile instanceof EmptyItemBlockTile) ((EmptyItemBlockTile)tile).tick();
+                if (tile instanceof EmptyItemBlockTile && tile.isAnimating()) {
+                    ((EmptyItemBlockTile)tile).animate();
+                }
 
-                if (tile.isToBeDeleted() && tile instanceof ItemBlockTile) {
+                if (tile instanceof ItemBlockTile && tile.isToBeDeleted()) {
                     tiles[tile.getxTile()][tile.getyTile()] = new EmptyItemBlockTile(tile.getxTile(), tile.getyTile(), -1, "emptyitemblock", true);
                 }
             }
         }
+
+        // if (player.getCoinCount() == 3) {
+            // levelFinished = true;
+        // }
     }
 
     private Tile[][] getCollisionTiles(Entity entity) {
@@ -183,4 +191,7 @@ public class Level {
     public void addMob(Entity entity) { entities.add(entity); }
 
     public Tile[][] getTiles() { return tiles; }
+    public boolean isLevelFinished() { return levelFinished; }
+    public boolean isGameOver() { return gameOver; }
+    public String getLevelName() { return levelName; }
 }
