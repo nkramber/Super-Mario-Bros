@@ -1,4 +1,4 @@
-package com.nate.mario;
+package com.nate.mario.state;
 
 import java.util.HashMap;
 
@@ -6,7 +6,6 @@ import com.nate.mario.entity.Player;
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.level.Level;
 import com.nate.mario.level.LevelLoader;
-import com.nate.mario.state.GameState;
 
 public class MarioGame extends GameState {
 

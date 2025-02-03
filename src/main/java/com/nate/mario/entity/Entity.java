@@ -1,6 +1,5 @@
 package com.nate.mario.entity;
 
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.HashSet;
 
@@ -41,7 +40,6 @@ public class Entity {
     public void doTileCollisions(Tile[][] tiles) {
         int yOffset = 4;
         int xOffset = 2;
-        // if (Math.abs(yDir) > 1.0f) yOffset = 1;
 
         float newX = x;
         float newY = y;
@@ -53,21 +51,26 @@ public class Entity {
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[0].length; j++) {
                 Tile tile = tiles[i][j];
-                Rectangle tileRect = new Rectangle(tile.getX() * 16, tile.getY() * 16, 16, 16);
-                Rectangle tileFloorObserverRect = new Rectangle(tile.getX() * 16, tile.getY() * 16 - 1, 16, 16);
+                Rectangle tileRect = new Rectangle(tile.getxTile() * 16, tile.getyTile() * 16, 16, 16);
+                Rectangle tileFloorObserverRect = new Rectangle(tile.getxTile() * 16, tile.getyTile() * 16 - 1, 16, 16);
 
-                if (tile.getY() * 16 == y + height && verticalEntityRect.intersects(tileFloorObserverRect)) {
+                if (tile.getyTile() * 16 == y + height && verticalEntityRect.intersects(tileFloorObserverRect)) {
                     floorTiles.add(tile);
                 }
 
                 if (tile.isSolid()) {
                     if (verticalEntityRect.intersects(tileRect)) {
                         yDir = 0;
-                        if (tile.getY() * 16 < newY) {
-                            newY = tile.getY() * 16 + 16 - yOffset;
+                        if (tile.getyTile() * 16 < newY) {
+                            if (this instanceof Player) {
+                                Player player = (Player) this;
+                                player.topTileCollide(tile);
+                            }
+
+                            newY = tile.getyTile() * 16 + 16 - yOffset;
                             jumpTick = 0;
                         } else {
-                            newY = tile.getY() * 16 - height;
+                            newY = tile.getyTile() * 16 - height;
                             onGround = true;
                         }
 
@@ -79,8 +82,8 @@ public class Entity {
     
                     if (horizontalEntityRect.intersects(tileRect)) {
                         xDir = 0;
-                        if (tile.getX() * 16 < newX) newX = tile.getX() * 16 + 16 - xOffset;
-                        else newX = tile.getX() * 16 - width + xOffset;
+                        if (tile.getxTile() * 16 < newX) newX = tile.getxTile() * 16 + 16 - xOffset;
+                        else newX = tile.getxTile() * 16 - width + xOffset;
                         horizontalEntityRect = new Rectangle((int) (newX + xDir + xOffset), (int) y + yOffset, width - xOffset * 2, height - yOffset);
                     }
                 }

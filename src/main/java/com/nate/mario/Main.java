@@ -15,6 +15,7 @@ import javax.swing.SwingUtilities;
 
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.state.GameState;
+import com.nate.mario.state.MarioGame;
 
 public class Main extends Canvas implements Runnable, KeyListener {
 

@@ -1,14 +1,20 @@
 package com.nate.mario.entity;
 
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
-import com.nate.mario.gfx.Sprite;
+import com.nate.mario.gfx.EntitySprite;
+import com.nate.mario.item.CoinItem;
+import com.nate.mario.item.Item;
 import com.nate.mario.level.Level;
+import com.nate.mario.level.tile.ItemBlockTile;
+import com.nate.mario.level.tile.Tile;
 
 public class Player extends Entity {
 
     private static final int STARTING_SIZE = 2;
-    private static final String STARTING_SPRITE = Sprite.MARIO_TALL_STILL;
+    private static final String STARTING_SPRITE = EntitySprite.MARIO_TALL_STILL;
 
     private static final float HOR_DECEL_RATE = 0.1f;
     private static final float HOR_ACCEL_RATE = 0.08f;
@@ -51,13 +57,14 @@ public class Player extends Entity {
 
     private final int rightKey = KeyEvent.VK_D;
     private final int leftKey = KeyEvent.VK_A;
-    private final int crouchKey = KeyEvent.VK_S;
+    // private final int crouchKey = KeyEvent.VK_S;
     private final int jumpKey = KeyEvent.VK_SLASH;
     private final int jumpKey2 = KeyEvent.VK_SPACE;
-    private final int actionKey = KeyEvent.VK_PERIOD;
+    // private final int actionKey = KeyEvent.VK_PERIOD;
 
     private boolean hasJumped = false;
     
+    private int coinCount = 0;
     private int maxX;
 
     public Player(float xTile, float yTile) {
@@ -155,7 +162,35 @@ public class Player extends Entity {
         }
     }
 
-    public void setHeight(int tiles) {
-        height = tiles * Sprite.TILE_HEIGHT;
+    public void doItemCollisions(List<Item> items) {
+        for (Item item : items) {
+            Rectangle playerRect = new Rectangle((int) x, (int) y, width, height);
+            Rectangle itemRect = new Rectangle(item.getX(), item.getY(), 16, 16);
+            
+            if (playerRect.intersects(itemRect)) {
+                if (item instanceof CoinItem) {
+                    increaseCoinCount();
+                    item.toBeDeleted();
+                }
+            }
+        }
     }
+
+    public void topTileCollide(Tile tile) {
+        if (tile instanceof ItemBlockTile) {
+            System.out.println("Collided with item block tile from below");
+            ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
+            itemBlockTile.toBeDeleted();
+        }
+    }
+
+    private void increaseCoinCount() {
+        coinCount++;
+    }
+
+    public void setHeight(int tiles) {
+        height = tiles * EntitySprite.TILE_HEIGHT;
+    }
+
+    public int getCoinCount() { return coinCount; }
 }

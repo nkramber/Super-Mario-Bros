@@ -6,8 +6,8 @@ public class SkyTile extends Tile {
         super(id, name, solid);
     }
 
-    public SkyTile(int x, int y, int id, String name, boolean solid) {
-        super(x, y, id, name, solid);
+    public SkyTile(int xTile, int yTile, int id, String name, boolean solid) {
+        super(xTile, yTile, id, name, solid);
     }
 
     @Override
