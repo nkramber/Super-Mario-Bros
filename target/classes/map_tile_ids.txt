@@ -1,4 +1,4 @@
-ground, 1, 1, 1, 1
-sky, 2, 1, 1, 1
-itemblock, 3, 1, 1, 1
-emptyitemblock, 4, 1, 1, 1
+ground, 1, 1
+sky, 2, 1
+itemblock, 3, 1
+emptyitemblock, 4, 1

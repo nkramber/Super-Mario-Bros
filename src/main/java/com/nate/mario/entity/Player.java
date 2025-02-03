@@ -64,6 +64,7 @@ public class Player extends Entity {
 
     private boolean hasJumped = false;
     
+    private int score = 0;
     private int coinCount = 0;
     private int maxX;
 
@@ -182,6 +183,7 @@ public class Player extends Entity {
 
     private void increaseCoinCount() {
         coinCount++;
+        score = score + 200;
     }
 
     public void setHeight(int tiles) {
@@ -189,4 +191,5 @@ public class Player extends Entity {
     }
 
     public int getCoinCount() { return coinCount; }
+    public int getScore() { return score; }
 }

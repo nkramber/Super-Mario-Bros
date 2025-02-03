@@ -19,12 +19,13 @@ public class Level {
     public Tile[][] tiles;
     public List<Item> items;
     
-    public String levelName;
-    public int levelNumber;
+    private String levelName;
     private Color levelType;
     
     private Player player;
     private List<Entity> entities;
+
+    private int timeInFramesRemaining;
 
     public Level(BufferedImage levelImage, String levelName) {
         this.levelName = levelName;
@@ -42,6 +43,13 @@ public class Level {
 
                 if (x == 0 && y == 0) {
                     if (color.getRGB() == LevelType.OVERWORLD.getRGB()) levelType = LevelType.OVERWORLD;
+
+                    tiles[x][y] = Tile.tiles.get(0);
+                    continue;
+                }
+
+                if (x == 0 && y == 1) {
+                    timeInFramesRemaining = (color.getRed() + color.getGreen()) * 24 + 23;
 
                     tiles[x][y] = Tile.tiles.get(0);
                     continue;
@@ -66,6 +74,8 @@ public class Level {
     }
 
     public void tick(MarioGame game, boolean[] keys) {
+        timeInFramesRemaining--;
+
         for (Entity entity : entities) {
             entity.getMovement(keys, this);
             entity.doTileCollisions(getCollisionTiles(entity));
@@ -145,11 +155,22 @@ public class Level {
             }
         }
 
-        for (Item item : items) {
-            screen.drawItem(item.getName(), item.getX(), item.getY());
-        }
+        for (Item item : items) screen.drawItem(item.getName(), item.getX(), item.getY());
 
-        // screen.drawText(); //draw coin count and other GUI
+        //Draw coin count
+        screen.drawHud(new String[] {
+            "coin",
+            "x_icon",
+            Integer.toString(player.getCoinCount() / 10), //coins tenths place
+            Integer.toString(player.getCoinCount() % 10)  //coins ones place
+        }, 11, 3);
+
+        screen.drawNumber(Integer.toString(player.getScore()), 6, 3, 3);
+        screen.drawNumber(Integer.toString(timeInFramesRemaining / 24), 3, 26, 3);
+        screen.drawText(levelName, 19, 3);
+        screen.drawText("mario", 3, 2);
+        screen.drawText("world", 18, 2);
+        screen.drawText("time", 25, 2);
 
         for (Entity entity : entities) entity.render(screen);
     }
