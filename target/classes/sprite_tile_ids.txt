@@ -1,16 +1,33 @@
 //sprite name, x coord, y coord, width, height
 mario_small_still, 1, 1
-mario_small_run1, 2, 0
-mario_small_run2, 3, 0
-mario_small_run3, 4, 0
-mario_small_turn, 5, 0
-mario_small_jump, 6, 0
-mario_small_die, 7, 0
-mario_small_climb1, 8, 0
-mario_small_climb2, 9, 0
-mario_small_swim1, 10, 0
-mario_small_swim2, 11, 0
-mario_small_swim3, 12, 0
-mario_small_swim4, 13, 0
-mario_small_swim5, 14, 0
-mario_tall_still, 1, 2, 1, 2
+mario_small_run1, 2, 1
+mario_small_run2, 3, 1
+mario_small_run3, 4, 1
+mario_small_turn, 5, 1
+mario_small_jump, 6, 1
+mario_small_die, 7, 1
+mario_small_climb1, 8, 1
+mario_small_climb2, 9, 1
+mario_small_swim1, 10, 1
+mario_small_swim2, 11, 1
+mario_small_swim3, 12, 1
+mario_small_swim4, 13, 1
+mario_small_swim5, 14, 1
+
+mario_big_still, 1, 2, 1, 2
+mario_big_run1, 2, 2, 1, 2
+mario_big_run2, 3, 2, 1, 2
+mario_big_run3, 4, 2, 1, 2
+mario_big_turn, 5, 2, 1, 2
+mario_big_jump, 6, 2, 1, 2
+mario_big_die, 7, 2, 1, 2
+mario_big_climb1, 8, 2, 1, 2
+mario_big_climb2, 9, 2, 1, 2
+mario_big_swim1, 10, 2, 1, 2
+mario_big_swim2, 11, 2, 1, 2
+mario_big_swim3, 12, 2, 1, 2
+mario_big_swim4, 13, 2, 1, 2
+mario_big_swim5, 14, 2, 1, 2
+
+mario_transition1, 16, 1, 1, 2
+mario_transition2, 16, 1, 1, 2

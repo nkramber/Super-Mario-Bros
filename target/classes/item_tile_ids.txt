@@ -1,1 +1,2 @@
 coin, 1, 1
+mushroom, 2, 1

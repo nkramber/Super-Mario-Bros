@@ -6,11 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.nate.mario.entity.Entity;
-import com.nate.mario.entity.Player;
+import com.nate.mario.entity.player.Player;
 import com.nate.mario.gfx.Screen;
+import com.nate.mario.item.CoinItem;
 import com.nate.mario.item.Item;
+import com.nate.mario.item.MushroomItem;
+import com.nate.mario.item.PowerUpItem;
 import com.nate.mario.level.tile.EmptyItemBlockTile;
 import com.nate.mario.level.tile.ItemBlockTile;
+import com.nate.mario.level.tile.SkyTile;
 import com.nate.mario.level.tile.Tile;
 
 public class Level {
@@ -81,7 +85,8 @@ public class Level {
                 //Green is the item type
                 for (Item item : Item.items) {
                     if (color.getGreen() == item.getID()) {
-                        items.add(item.newItem(x * 16, y * 16, item.getID(), item.getName()));
+                        if (item instanceof CoinItem) items.add(item.newItem(x * 16, y * 16, item.getID(), item.getName()));
+                        else if (tiles[x][y] instanceof ItemBlockTile) ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(item);
                         break;
                     }
                 }
@@ -98,16 +103,34 @@ public class Level {
         if (timeRemaining == 0) gameOver = true;
 
         for (Entity entity : entities) {
-            entity.getMovement(keys, this);
+            if (entity instanceof Player) {
+                ((Player) entity).getMovement(keys, this);
+            }
+
             entity.doTileCollisions(getLocalCollisionTiles(entity));
             entity.move();
+
+            if (entity instanceof Player) {
+                List<Item> collisionItems = getLocalCollisionItems((Player) entity);
+                ((Player) entity).doItemCollisions(collisionItems);
+                for (Item item : collisionItems) {
+                    if (item.isToBeDeleted()) {
+                        items.remove(item);
+                    }
+                }
+            }
+
+            entity.updateAnimation();
         }
 
-        List<Item> collisionItems = getLocalCollisionItems(player);
-        player.doItemCollisions(collisionItems);
-        for (Item item : collisionItems) {
-            if (item.isToBeDeleted()) {
-                items.remove(item);
+        for (Item item : items) {
+            if (item instanceof MushroomItem) {
+                MushroomItem mushroomItem = (MushroomItem) item;
+                mushroomItem.getMovement();
+                if (!mushroomItem.inSpawnAnimation()) {
+                    mushroomItem.doTileCollisions(getLocalCollisionTiles(item));
+                }
+                mushroomItem.move();
             }
         }
 
@@ -116,18 +139,21 @@ public class Level {
                 Tile tile = tiles[x][y];
 
                 if (tile instanceof EmptyItemBlockTile && tile.isAnimating()) {
-                    ((EmptyItemBlockTile)tile).animate();
+                    ((EmptyItemBlockTile) tile).animate();
                 }
 
-                if (tile instanceof ItemBlockTile && tile.isToBeDeleted()) {
-                    tiles[tile.getxTile()][tile.getyTile()] = new EmptyItemBlockTile(tile.getxTile(), tile.getyTile(), -1, "emptyitemblock", true);
+                if (tile instanceof ItemBlockTile) {
+                    ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
+                    if (itemBlockTile.readyToCreateItem()) {
+                        items.add(itemBlockTile.getItemToCreate().newItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16, itemBlockTile.getItemToCreate().getID(), itemBlockTile.getItemToCreate().getName()));
+                    }
+
+                    if (itemBlockTile.isToBeDeleted()) {
+                        tiles[itemBlockTile.getxTile()][itemBlockTile.getyTile()] = new EmptyItemBlockTile(itemBlockTile.getxTile(), itemBlockTile.getyTile(), -1, "emptyitemblock", true);
+                    }
                 }
             }
         }
-
-        // if (player.getCoinCount() == 3) {
-            // levelFinished = true;
-        // }
     }
 
     private Tile[][] getLocalCollisionTiles(Entity entity) {
@@ -135,6 +161,27 @@ public class Level {
         int xBoundRight = (int) (entity.getX() + 31) / 16;
         int yBoundTop = (int) (entity.getY() - 16) / 16;
         int yBoundBottom = (int) (entity.getY() + 31 + entity.getHeight() - 16) / 16;
+
+        Tile[][] collisionTiles = new Tile[xBoundRight - xBoundLeft + 1][yBoundBottom - yBoundTop + 1];
+
+        int x = 0;
+        for (int i = xBoundLeft; i <= xBoundRight; i++) {
+            int y = 0;
+            for (int j = yBoundTop; j <= yBoundBottom; j++) {
+                collisionTiles[x][y] = tiles[i][j];
+                y++;
+            }
+            x++;
+        }
+
+        return collisionTiles;
+    }
+
+    private Tile[][] getLocalCollisionTiles(Item item) {
+        int xBoundLeft = (int) (item.getX() - 16) / 16;
+        int xBoundRight = (int) (item.getX() + 31) / 16;
+        int yBoundTop = (int) (item.getY() - 16) / 16;
+        int yBoundBottom = (int) (item.getY() + 31) / 16;
 
         Tile[][] collisionTiles = new Tile[xBoundRight - xBoundLeft + 1][yBoundBottom - yBoundTop + 1];
 
@@ -160,7 +207,10 @@ public class Level {
         List<Item> collisionItems = new ArrayList<>();
 
         for (Item item : items) {
-            if (item.getX() > xBoundLeft && item.getX() < xBoundRight && item.getY() > yBoundTop && item.getY() < yBoundBottom) {
+            int itemX = (int) item.getX();
+            int itemY = (int) item.getY();
+
+            if (itemX > xBoundLeft && itemX < xBoundRight && itemY > yBoundTop && itemY < yBoundBottom) {
                 collisionItems.add(item);
             }
         }
@@ -184,21 +234,29 @@ public class Level {
         screen.setScroll((int) player.getX(), tiles.length);
         screen.setBackgroundColor(levelType);
 
+        for (Item item : items) {
+            screen.drawItem(item.getName(), (int) item.getX(), (int) item.getY());
+            if (item instanceof PowerUpItem) {
+                PowerUpItem powerUpItem = (PowerUpItem) item;
+                if (powerUpItem.inSpawnAnimation()) screen.drawTile("sky", (int) powerUpItem.getX(), powerUpItem.getInitialY());
+            }
+        }
+
         for (int x = 0; x < tiles.length; x++) {
             for (int y = 0; y < tiles[x].length; y++) {
                 Tile tile = tiles[x][y];
                 if (tile instanceof EmptyItemBlockTile && ((EmptyItemBlockTile)tile).isAnimating()) {
                     screen.drawTile(tile.getName(), x * 16, y * 16 - ((EmptyItemBlockTile)tile).getAnimationFrame());
                 }
-                else screen.drawTile(tile.getName(), x * 16, y * 16);
+                else if (!(tile instanceof SkyTile)) screen.drawTile(tile.getName(), x * 16, y * 16);
             }
         }
 
-        for (Item item : items) screen.drawItem(item.getName(), item.getX(), item.getY());
-
         screen.drawHud(player.getCoinCount(), player.getScore(), timeRemaining, levelName);
 
-        for (Entity entity : entities) entity.render(screen);
+        for (Entity entity : entities) {
+            entity.render(screen);
+        }
     }
 
     public void addPlayer(Player player) { 

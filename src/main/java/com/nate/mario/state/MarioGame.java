@@ -2,7 +2,7 @@ package com.nate.mario.state;
 
 import java.util.HashMap;
 
-import com.nate.mario.entity.Player;
+import com.nate.mario.entity.player.Player;
 import com.nate.mario.gfx.EntitySprite;
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.level.Level;

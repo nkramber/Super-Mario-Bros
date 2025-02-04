@@ -3,8 +3,11 @@ package com.nate.mario.gfx;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.nate.mario.Main;
 
@@ -15,6 +18,7 @@ public class Screen {
 
     private Graphics2D g;
     private HashMap<String, BufferedImage> sprites;
+    private HashMap<String, BufferedImage> leftFacingSprites;
     private HashMap<String, BufferedImage> tiles;
     private HashMap<String, BufferedImage> items;
     private HashMap<String, BufferedImage> hud;
@@ -27,11 +31,27 @@ public class Screen {
         tiles = new SpriteSheet("map_tile_ids.txt").getSprites("/sprites/tile_sprites.png", 16);
         items = new SpriteSheet("item_tile_ids.txt").getSprites("/sprites/item_sprites.png", 16);
         hud = new SpriteSheet("hud_tile_ids.txt").getSprites("/sprites/hud_sprites.png", 8);
+
+        leftFacingSprites = new HashMap<>();
+        for (Map.Entry<String, BufferedImage> sprite : sprites.entrySet()) {
+            String name = sprite.getKey();
+            BufferedImage spriteImage = sprite.getValue();
+
+            AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+            tx.translate(-spriteImage.getWidth(null), 0);
+            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+            leftFacingSprites.put(name, op.filter(spriteImage, null));
+        }
     }
 
-    public void drawSprite(EntitySprite sprite, int x, int y) {
-        if (!sprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - sprite name does not exist!");
-        else g.drawImage(sprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
+    public void drawSprite(EntitySprite sprite, boolean facingLeft, int x, int y) {
+        if (!facingLeft) {
+            if (!sprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - sprite name does not exist!");
+            else g.drawImage(sprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
+        } else {
+            if (!leftFacingSprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - sprite name does not exist!");
+            else g.drawImage(leftFacingSprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
+        }
     }
 
     public void drawTile(String tileName, int x, int y) {

@@ -6,12 +6,12 @@ public class CoinItem extends Item {
         super(id, name);
     }
 
-    public CoinItem(int xTile, int yTile, int id, String name) {
-        super(xTile, yTile, id, name);
+    public CoinItem(float x, float y, int id, String name) {
+        super(x, y, id, name);
     }
 
     @Override
-    public Item newItem(int xTile, int yTile, int id, String name) {
-        return new CoinItem(xTile, yTile, id, name);
+    public Item newItem(float x, float y, int id, String name) {
+        return new CoinItem(x, y, id, name);
     }
 }

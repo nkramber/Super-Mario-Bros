@@ -3,9 +3,9 @@ package com.nate.mario.entity;
 import java.awt.Rectangle;
 import java.util.HashSet;
 
+import com.nate.mario.entity.player.Player;
 import com.nate.mario.gfx.EntitySprite;
 import com.nate.mario.gfx.Screen;
-import com.nate.mario.level.Level;
 import com.nate.mario.level.tile.Tile;
 
 public class Entity {
@@ -16,6 +16,8 @@ public class Entity {
     protected int jumpTick = 0;
     protected EntitySprite currentSprite;
     protected boolean onGround = false;
+    protected boolean falling = false;
+    protected boolean facingLeft = true;
 
     public Entity(float xTile, float yTile, float xDir, float yDir, int width, EntitySprite currentSprite) {
         this.x = xTile * 16;
@@ -27,15 +29,13 @@ public class Entity {
         this.currentSprite = currentSprite;
     }
 
-    public void getMovement(boolean[] keys, Level level) {}
-
     public void move() {
         x += xDir;
         y += yDir;
     }
 
     public void render(Screen screen) {
-        screen.drawSprite(currentSprite, (int) x, (int) y);
+        screen.drawSprite(currentSprite, facingLeft, (int) x, (int) y);
     }
 
     public void doTileCollisions(Tile[][] tiles) {
@@ -75,7 +75,8 @@ public class Entity {
                             onGround = true;
                         }
 
-                        verticalEntityRect = new Rectangle((int) (newX) + xOffset, (int) (newY + yDir + yOffset), width - xOffset * 2, height - yOffset);
+                        verticalEntityRect = new Rectangle((int) (newX) + xOffset, (int) (newY + yOffset), width - xOffset * 2, height - yOffset);
+                        
                         if (horizontalEntityRect.intersects(tileRect)) {
                             continue;
                         }
@@ -85,7 +86,7 @@ public class Entity {
                         xDir = 0;
                         if (tile.getxTile() * 16 < newX) newX = tile.getxTile() * 16 + 16 - xOffset;
                         else newX = tile.getxTile() * 16 - width + xOffset;
-                        horizontalEntityRect = new Rectangle((int) (newX + xDir + xOffset), (int) y + yOffset, width - xOffset * 2, height - yOffset);
+                        horizontalEntityRect = new Rectangle((int) (newX + xOffset), (int) y + yOffset, width - xOffset * 2, height - yOffset);
                     }
                 }
             }
@@ -93,15 +94,19 @@ public class Entity {
 
         if (!floorTiles.isEmpty()) {
             onGround = false;
+            falling = true;
             for (Tile floorTile : floorTiles) {
                 if (!floorTile.isSolid()) continue;
                 onGround = true;
+                falling = false;
             }
         }
 
         x = newX;
         y = newY;
     }
+
+    public void updateAnimation() {}
 
     public float getX() { return x; }
     public float getY() { return y; }
