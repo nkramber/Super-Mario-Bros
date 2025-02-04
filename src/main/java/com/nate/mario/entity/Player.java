@@ -13,9 +13,6 @@ import com.nate.mario.level.tile.Tile;
 
 public class Player extends Entity {
 
-    private static final int STARTING_SIZE = 2;
-    private static final String STARTING_SPRITE = EntitySprite.MARIO_TALL_STILL;
-
     private static final float HOR_DECEL_RATE = 0.1f;
     private static final float HOR_ACCEL_RATE = 0.08f;
     private static final float HOR_MAX_SPEED = 3.0f;
@@ -68,8 +65,8 @@ public class Player extends Entity {
     private int coinCount = 0;
     private int maxX;
 
-    public Player(float xTile, float yTile, int score) {
-        super(xTile, yTile, 0, 0, 1, STARTING_SIZE, STARTING_SPRITE);
+    public Player(float xTile, float yTile, int score, EntitySprite sprite) {
+        super(xTile, yTile, 0, 0, 1, sprite);
         this.score = score;
         maxX = (int) xTile * 16;
     }

@@ -3,6 +3,7 @@ package com.nate.mario.entity;
 import java.awt.Rectangle;
 import java.util.HashSet;
 
+import com.nate.mario.gfx.EntitySprite;
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.level.Level;
 import com.nate.mario.level.tile.Tile;
@@ -13,16 +14,16 @@ public class Entity {
     protected float xDir, yDir;
     protected int width, height;
     protected int jumpTick = 0;
-    protected String currentSprite;
+    protected EntitySprite currentSprite;
     protected boolean onGround = false;
 
-    public Entity(float xTile, float yTile, float xDir, float yDir, int width, int height, String currentSprite) {
+    public Entity(float xTile, float yTile, float xDir, float yDir, int width, EntitySprite currentSprite) {
         this.x = xTile * 16;
         this.y = yTile * 16;
         this.xDir = xDir;
         this.yDir = yDir;
         this.width = width * 16;
-        this.height = height * 16;
+        this.height = currentSprite.getHeight() * 16;
         this.currentSprite = currentSprite;
     }
 
@@ -108,4 +109,5 @@ public class Entity {
     public float getyDir() { return yDir; }
     public int getWidth() { return width; }
     public int getHeight() { return height; }
+    public EntitySprite getSprite() { return currentSprite; }
 }

@@ -29,9 +29,9 @@ public class Screen {
         hud = new SpriteSheet("hud_tile_ids.txt").getSprites("/sprites/hud_sprites.png", 8);
     }
 
-    public void drawSprite(String spriteName, int x, int y) {
-        if (!sprites.containsKey(spriteName)) throw new IllegalArgumentException(spriteName + " - sprite name does not exist!");
-        else g.drawImage(sprites.get(spriteName), x + xScroll, y + VERTICAL_OFFSET, null);
+    public void drawSprite(EntitySprite sprite, int x, int y) {
+        if (!sprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - sprite name does not exist!");
+        else g.drawImage(sprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
     }
 
     public void drawTile(String tileName, int x, int y) {

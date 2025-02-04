@@ -24,6 +24,7 @@ public class Level {
     private Color levelType;
     
     private Player player;
+    private int playerSpawnX, playerSpawnY;
     private List<Entity> entities;
     
     private long timeInMillis;
@@ -59,6 +60,14 @@ public class Level {
 
                     tiles[x][y] = Tile.tiles.get(0);
                     continue;
+                }
+
+                //Below starting level time is player spawn position
+                if (x == 0 && y == 2) {
+                    playerSpawnX = color.getRed();
+                    playerSpawnY = color.getGreen();
+
+                    tiles[x][y] = Tile.tiles.get(0);
                 }
 
                 //Red is the tile type
@@ -203,4 +212,6 @@ public class Level {
     public boolean isLevelFinished() { return levelFinished; }
     public boolean isGameOver() { return gameOver; }
     public String getLevelName() { return levelName; }
+    public int getPlayerSpawnX() { return playerSpawnX; }
+    public int getPlayerSpawnY() { return playerSpawnY; }
 }

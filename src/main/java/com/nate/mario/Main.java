@@ -55,7 +55,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
         while(RUNNING) {
             double currentTime = System.nanoTime();
             while (currentTime - lastUpdateTime > TIME_BETWEEN_FRAMES) {
-                measureFPS();
+                // measureFPS();
                 tick();
                 render();
                 lastUpdateTime += TIME_BETWEEN_FRAMES;

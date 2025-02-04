@@ -3,6 +3,7 @@ package com.nate.mario.state;
 import java.util.HashMap;
 
 import com.nate.mario.entity.Player;
+import com.nate.mario.gfx.EntitySprite;
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.level.Level;
 import com.nate.mario.level.LevelLoader;
@@ -22,9 +23,10 @@ public class MarioGame extends GameState {
 
     public MarioGame(Screen screen) {
         this.screen = screen;
+        player = new Player(0, 0, 0, EntitySprite.MARIO_SMALL_STILL);
 
         levels = LevelLoader.loadLevels();
-        setLevel(0, 4, 10, 0);
+        setLevel(0);
     }
 
     @Override
@@ -38,7 +40,7 @@ public class MarioGame extends GameState {
 
             if (currentLevel.isLevelFinished()) {
                 if (currentLevelNumber + 1 < levels.size()) {
-                    setLevel(currentLevelNumber + 1, 2, 11, player.getScore());
+                    setLevel(currentLevelNumber + 1);
                 } else {
                     setGameOver(); //change to "win" condition later
                 }
@@ -51,17 +53,17 @@ public class MarioGame extends GameState {
         gameOverTimer = new Timer();
     }
 
-    private void setLevel(int levelNumber, int playerX, int playerY, int score) {
+    private void setLevel(int levelNumber) {
         currentLevel = levels.get(levelNumber);
         currentLevelNumber = levelNumber;
-        player = new Player(playerX, playerY, score);
+        player = new Player(currentLevel.getPlayerSpawnX(), currentLevel.getPlayerSpawnY(), player.getScore(), player.getSprite());
         currentLevel.addPlayer(player);
         screen.resetScroll();
     }
 
     private void newGame() {
         levels = LevelLoader.loadLevels();
-        setLevel(0, 4, 10, 0);
+        setLevel(0);
     }
 
     @Override
