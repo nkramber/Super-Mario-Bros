@@ -78,7 +78,7 @@ public class Entity {
                         verticalEntityRect = new Rectangle((int) (newX) + xOffset, (int) (newY + yOffset), width - xOffset * 2, height - yOffset);
                         
                         if (horizontalEntityRect.intersects(tileRect)) {
-                            continue;
+                            // continue;
                         }
                     }
     

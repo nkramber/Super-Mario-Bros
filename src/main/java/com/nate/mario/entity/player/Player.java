@@ -291,7 +291,7 @@ public class Player extends Entity {
             }
         }
 
-        if (Math.abs(oldX - x) < 0.21f && Math.abs(oldY - y) < 0.21f && onGround) {
+        if (xDir < 0.22f && xDir > -0.22f && yDir == 0 && onGround) {
             time = 0;
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = EntitySprite.MARIO_SMALL_STILL;
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = EntitySprite.MARIO_BIG_STILL;
