@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.nate.mario.Main;
 import com.nate.mario.entity.Entity;
 import com.nate.mario.entity.player.Player;
 import com.nate.mario.gfx.EntitySprite;
@@ -107,7 +108,7 @@ public class Level {
 
         for (Entity entity : entities) {
             if (entity instanceof Player) {
-                if (player.getY() > tiles[0].length * 16 - 32) {
+                if (player.getY() > tiles[0].length * 16 - 16 - player.getHeight()) {
                     gameOver = true;
                     return;
                 }

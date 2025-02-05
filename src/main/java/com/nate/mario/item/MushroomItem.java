@@ -11,7 +11,7 @@ public class MushroomItem extends PowerUpItem {
     private static final float VER_ACCEL_RATE = 0.35f;
     private static final float VER_MAX_SPEED = 4.0f;
 
-    private float xDir = 0.5f;
+    private float xDir = 0.75f;
     private float yDir = 0;
     private boolean onGround = true;
 
