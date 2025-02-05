@@ -36,5 +36,5 @@ public abstract class Item {
     public float getY() { return y; }
     public boolean isToBeDeleted() { return toBeDeleted; }
 
-    public void toBeDeleted() { toBeDeleted = true; }
+    public void setToBeDeleted() { toBeDeleted = true; }
 }

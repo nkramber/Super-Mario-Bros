@@ -10,11 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.nate.mario.Main;
+import com.nate.mario.item.Item;
 
 public class Screen {
 
     private static final int VERTICAL_OFFSET = -96;
-    private static final int HORIZONTAL_OFFSET = -32;
+
+    private static final int SCREEN_LEFT_PADDING = -32;
 
     private Graphics2D g;
     private HashMap<String, BufferedImage> sprites;
@@ -23,7 +25,7 @@ public class Screen {
     private HashMap<String, BufferedImage> items;
     private HashMap<String, BufferedImage> hud;
 
-    private int xScroll = HORIZONTAL_OFFSET;
+    private int xScroll = SCREEN_LEFT_PADDING;
 
     public Screen(Graphics2D g) {
         this.g = g;
@@ -139,7 +141,11 @@ public class Screen {
         g.fillRect(0, 0, Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
     }
 
-    public void resetScroll() { xScroll = HORIZONTAL_OFFSET; }
+    public boolean isOffScreen(Item item) {
+        return (item.getX() + xScroll < -16 || item.getX() + xScroll >= Main.SCREEN_WIDTH || item.getY() > Main.SCREEN_HEIGHT - VERTICAL_OFFSET);
+    }
+
+    public void resetScroll() { xScroll = SCREEN_LEFT_PADDING; }
 
     public Graphics2D getGraphics() { return g; }
 }

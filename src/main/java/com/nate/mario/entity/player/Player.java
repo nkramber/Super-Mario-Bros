@@ -227,13 +227,15 @@ public class Player extends Entity {
             
             if (playerRect.intersects(itemRect)) {
                 if (item instanceof CoinItem) {
-                    item.toBeDeleted();
+                    item.setToBeDeleted();
                     increaseCoinCount();
+                    addToScore(200);
                 }
 
                 if (item instanceof MushroomItem) {
-                    item.toBeDeleted();
+                    item.setToBeDeleted();
                     changePowerUpState(PowerUpState.BIG);
+                    addToScore(1000);
                 }
             }
         }
@@ -290,7 +292,7 @@ public class Player extends Entity {
             }
         }
 
-        if (Math.abs(oldX - x) < 0.32f && Math.abs(oldY - y) < 0.32f && onGround) {
+        if (Math.abs(oldX - x) < 0.21f && Math.abs(oldY - y) < 0.21f && onGround) {
             time = 0;
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = EntitySprite.MARIO_SMALL_STILL;
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = EntitySprite.MARIO_BIG_STILL;
@@ -341,7 +343,10 @@ public class Player extends Entity {
 
     private void increaseCoinCount() {
         coinCount++;
-        score = score + 200;
+    }
+
+    private void addToScore(int amountToAdd) {
+        score = score + amountToAdd;
     }
 
     public void setHeight(int tiles) {

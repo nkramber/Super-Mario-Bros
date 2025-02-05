@@ -104,7 +104,11 @@ public class Level {
 
         for (Entity entity : entities) {
             if (entity instanceof Player) {
-                ((Player) entity).getMovement(keys, this);
+                if (player.getY() > tiles[0].length * 16 - 32) {
+                    gameOver = true;
+                    return;
+                }
+                player.getMovement(keys, this);
             }
 
             entity.doTileCollisions(getLocalCollisionTiles(entity));
@@ -112,18 +116,19 @@ public class Level {
 
             if (entity instanceof Player) {
                 List<Item> collisionItems = getLocalCollisionItems((Player) entity);
-                ((Player) entity).doItemCollisions(collisionItems);
-                for (Item item : collisionItems) {
-                    if (item.isToBeDeleted()) {
-                        items.remove(item);
-                    }
-                }
+                player.doItemCollisions(collisionItems);
             }
 
             entity.updateAnimation();
         }
 
+        List<Item> itemsToRemove = new ArrayList<>();
         for (Item item : items) {
+            if (item.isToBeDeleted()) {
+                itemsToRemove.add(item);
+                continue;
+            }
+
             if (item instanceof MushroomItem) {
                 MushroomItem mushroomItem = (MushroomItem) item;
                 mushroomItem.getMovement();
@@ -133,6 +138,8 @@ public class Level {
                 mushroomItem.move();
             }
         }
+
+        for (Item item : itemsToRemove) items.remove(item);
 
         for (int x = 0; x < tiles.length; x++) {
             for (int y = 0; y < tiles[0].length; y++) {
@@ -235,6 +242,12 @@ public class Level {
         screen.setBackgroundColor(levelType);
 
         for (Item item : items) {
+            if (item instanceof PowerUpItem) {
+                if (screen.isOffScreen(item)) {
+                    item.setToBeDeleted();
+                    continue;
+                }
+            }
             screen.drawItem(item.getName(), (int) item.getX(), (int) item.getY());
             if (item instanceof PowerUpItem) {
                 PowerUpItem powerUpItem = (PowerUpItem) item;
