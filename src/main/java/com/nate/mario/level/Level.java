@@ -259,7 +259,7 @@ public class Level {
             screen.drawItem(item.getSprite(), (int) item.getX(), (int) item.getY());
             if (item instanceof PowerUpItem) {
                 PowerUpItem powerUpItem = (PowerUpItem) item;
-                if (screen.isOffScreen(powerUpItem)) {
+                if (screen.isOffScreen((int) powerUpItem.getX(), (int) powerUpItem.getY())) {
                     powerUpItem.setToBeDeleted();
                     continue;
                 }

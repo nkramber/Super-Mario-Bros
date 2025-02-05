@@ -47,25 +47,31 @@ public class Screen {
     }
 
     public void drawSprite(EntitySprite sprite, boolean facingLeft, int x, int y) {
-        if (!facingLeft) {
-            if (!sprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - sprite name does not exist!");
-            else g.drawImage(sprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
-        } else {
-            if (!leftFacingSprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - sprite name does not exist!");
-            else g.drawImage(leftFacingSprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
+        if (!isOffScreen(x, y)) {
+            if (!facingLeft) {
+                if (!sprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - sprite name does not exist!");
+                else g.drawImage(sprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
+            } else {
+                if (!leftFacingSprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - sprite name does not exist!");
+                else g.drawImage(leftFacingSprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
+            }
         }
     }
 
     public void drawTile(String tileName, int x, int y) {
-        if (!tiles.containsKey(tileName)) throw new IllegalArgumentException(tileName + " - tile name does not exist!");
-        else {
-            g.drawImage(tiles.get(tileName), x + xScroll, y + VERTICAL_OFFSET, null);
+        if (!isOffScreen(x, y)) {
+            if (!tiles.containsKey(tileName)) throw new IllegalArgumentException(tileName + " - tile name does not exist!");
+            else {
+                g.drawImage(tiles.get(tileName), x + xScroll, y + VERTICAL_OFFSET, null);
+            }
         }
     }
 
     public void drawItem(ItemSprite sprite, int x, int y) {
-        if (!items.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - item name does not exist!");
-        else g.drawImage(items.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
+        if (!isOffScreen(x, y)) {
+            if (!items.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - item name does not exist!");
+            else g.drawImage(items.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
+        }
     }
 
     public void drawHud(int coinCount, int score, int timeInFramesRemaining, String levelName) {
@@ -116,15 +122,15 @@ public class Screen {
         drawHudText(score, xHalfTile, yHalfTile);
     }
 
-    public void drawRect(Color color, int x, int y, int width, int height) {
-        g.setColor(color);
-        g.drawRect(x + xScroll, y + VERTICAL_OFFSET, width, height);
-    }
+    // public void drawRect(Color color, int x, int y, int width, int height) {
+        // g.setColor(color);
+        // g.drawRect(x + xScroll, y + VERTICAL_OFFSET, width, height);
+    // }
 
-    public void drawRect(Color color, Rectangle rect) {
-        g.setColor(color);
-        g.drawRect(rect.x + xScroll, rect.y + VERTICAL_OFFSET, rect.width, rect.height);
-    }
+    // public void drawRect(Color color, Rectangle rect) {
+        // g.setColor(color);
+        // g.drawRect(rect.x + xScroll, rect.y + VERTICAL_OFFSET, rect.width, rect.height);
+    // }
 
     public void setScroll(int playerX, int levelWidth) {
         if (playerX + 32 > Main.SCREEN_WIDTH / 2) {
@@ -141,8 +147,8 @@ public class Screen {
         g.fillRect(0, 0, Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
     }
 
-    public boolean isOffScreen(Item item) {
-        return (item.getX() + xScroll < -16 || item.getX() + xScroll >= Main.SCREEN_WIDTH || item.getY() > Main.SCREEN_HEIGHT - VERTICAL_OFFSET);
+    public boolean isOffScreen(int x, int y) {
+        return (x + xScroll < -17 || x + xScroll >= Main.SCREEN_WIDTH + 1 || y < -33 || y > Main.SCREEN_HEIGHT - VERTICAL_OFFSET + 1);
     }
 
     public void resetScroll() { xScroll = SCREEN_LEFT_PADDING; }
