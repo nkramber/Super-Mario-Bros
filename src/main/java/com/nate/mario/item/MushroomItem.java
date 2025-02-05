@@ -3,6 +3,7 @@ package com.nate.mario.item;
 import java.awt.Rectangle;
 import java.util.HashSet;
 
+import com.nate.mario.gfx.ItemSprite;
 import com.nate.mario.level.tile.Tile;
 
 public class MushroomItem extends PowerUpItem {
@@ -14,17 +15,17 @@ public class MushroomItem extends PowerUpItem {
     private float yDir = 0;
     private boolean onGround = true;
 
-    public MushroomItem(int id, String name) {
-        super(id, name);
+    public MushroomItem(int id, ItemSprite sprite) {
+        super(id, sprite);
     }
 
-    public MushroomItem(float x, float y, int id, String name) {
-        super(x, y, id, name);
+    public MushroomItem(float x, float y, int id, ItemSprite sprite) {
+        super(x, y, id, sprite);
     }
     
     @Override
-    public Item newItem(float x, float y, int id, String name) {
-        return new MushroomItem(x, y, id, name);
+    public Item newItem(float x, float y, int id, ItemSprite sprite) {
+        return new MushroomItem(x, y, id, sprite);
     }
 
     public void getMovement() {

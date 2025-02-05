@@ -63,9 +63,9 @@ public class Screen {
         }
     }
 
-    public void drawItem(String itemName, int x, int y) {
-        if (!items.containsKey(itemName)) throw new IllegalArgumentException(itemName + " - item name does not exist!");
-        else g.drawImage(items.get(itemName), x + xScroll, y + VERTICAL_OFFSET, null);
+    public void drawItem(ItemSprite sprite, int x, int y) {
+        if (!items.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - item name does not exist!");
+        else g.drawImage(items.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
     }
 
     public void drawHud(int coinCount, int score, int timeInFramesRemaining, String levelName) {

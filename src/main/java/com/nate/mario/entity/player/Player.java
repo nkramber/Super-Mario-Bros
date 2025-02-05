@@ -2,14 +2,15 @@ package com.nate.mario.entity.player;
 
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.nate.mario.entity.Entity;
 import com.nate.mario.gfx.EntitySprite;
 import com.nate.mario.item.CoinItem;
+import com.nate.mario.item.FireFlowerItem;
 import com.nate.mario.item.Item;
 import com.nate.mario.item.MushroomItem;
+import com.nate.mario.item.PowerUpItem;
 import com.nate.mario.level.Level;
 import com.nate.mario.level.tile.ItemBlockTile;
 import com.nate.mario.level.tile.Tile;
@@ -212,29 +213,27 @@ public class Player extends Entity {
     public void doItemCollisions(List<Item> items) {
         powerUpStateChanged = false;
         for (Item item : items) {
-            Rectangle playerRect = new Rectangle((int) x, (int) y, width, height);
-            Rectangle itemRect;
-
             int itemX = (int) item.getX();
             int itemY = (int) item.getY();
 
-            if (item instanceof CoinItem) itemRect = new Rectangle(itemX + 3, itemY, 10, 16);
-            else if (item instanceof MushroomItem) {
-                if (((MushroomItem)item).inSpawnAnimation()) itemRect = new Rectangle(itemX, itemY, 16, 12);
-                else itemRect = new Rectangle(itemX, itemY, 16, 16);
+            Rectangle playerRect = new Rectangle((int) x, (int) y, width, height);
+            Rectangle itemRect = new Rectangle(itemX, itemY, 12, 16);
+
+            if (item instanceof PowerUpItem) {
+                if (((PowerUpItem)item).inSpawnAnimation()) itemRect = new Rectangle(itemX, itemY, 12, 12);
             }
-            else itemRect = new Rectangle(itemX, itemY, 16, 16);
             
             if (playerRect.intersects(itemRect)) {
+                item.setToBeDeleted();
                 if (item instanceof CoinItem) {
-                    item.setToBeDeleted();
                     increaseCoinCount();
                     addToScore(200);
-                }
-
-                if (item instanceof MushroomItem) {
-                    item.setToBeDeleted();
+                } else if (item instanceof MushroomItem) {
                     changePowerUpState(PowerUpState.BIG);
+                    addToScore(1000);
+                } else if (item instanceof FireFlowerItem) {
+                    if (EntitySprite.MARIO_BIG.contains(currentSprite)) changePowerUpState(PowerUpState.FIRE);
+                    else changePowerUpState(PowerUpState.BIG);
                     addToScore(1000);
                 }
             }
@@ -278,16 +277,16 @@ public class Player extends Entity {
             if (powerUpState.equals(PowerUpState.BIG)) {
                 spriteIndex = EntitySprite.MARIO_SMALL.indexOf(currentSprite);
                 currentSprite = EntitySprite.MARIO_BIG.get(spriteIndex);
-            // } else if (powerUpState.equals(PowerUpState.FIRE)) {
-                // spriteIndex = EntitySprite.MARIO_BIG.indexOf(currentSprite);
-                // currentSprite = EntitySprite.MARIO_FIRE.get(spriteIndex);
+            } else if (powerUpState.equals(PowerUpState.FIRE)) {
+                spriteIndex = EntitySprite.MARIO_BIG.indexOf(currentSprite);
+                currentSprite = EntitySprite.MARIO_FIRE.get(spriteIndex);
             } else if (powerUpState.equals(PowerUpState.SMALL)) {
                 if (EntitySprite.MARIO_BIG.contains(currentSprite)) {
                     spriteIndex = EntitySprite.MARIO_BIG.indexOf(currentSprite);
                     currentSprite = EntitySprite.MARIO_SMALL.get(spriteIndex);
                 } else {
-                    // spriteIndex = EntitySprite.MARIO_FIRE.indexOf(currentSprite);
-                    // currentSprite = EntitySprite.MARIO_SMALL.get(spriteIndex);
+                    spriteIndex = EntitySprite.MARIO_FIRE.indexOf(currentSprite);
+                    currentSprite = EntitySprite.MARIO_SMALL.get(spriteIndex);
                 }
             }
         }
@@ -296,18 +295,18 @@ public class Player extends Entity {
             time = 0;
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = EntitySprite.MARIO_SMALL_STILL;
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = EntitySprite.MARIO_BIG_STILL;
-            // else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = EntitySprite.MARIO_FIRE_STILL;
+            else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = EntitySprite.MARIO_FIRE_STILL;
             runSprite = 0;
         } else if (hasJumped && !falling) {
             time = 0;
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = EntitySprite.MARIO_SMALL_JUMP;
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = EntitySprite.MARIO_BIG_JUMP;
-            // else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = EntitySprite.MARIO_FIRE_JUMP;
+            else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = EntitySprite.MARIO_FIRE_JUMP;
         } else if (skidding) {
             time = 0;
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = EntitySprite.MARIO_SMALL_TURN;
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = EntitySprite.MARIO_BIG_TURN;
-            // else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = EntitySprite.MARIO_FIRE_TURN;
+            else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = EntitySprite.MARIO_FIRE_TURN;
         } else if (falling) {
             time = 0;
             return;
@@ -337,7 +336,7 @@ public class Player extends Entity {
 
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = EntitySprite.MARIO_SMALL_RUN[runSprite];
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = EntitySprite.MARIO_BIG_RUN[runSprite];
-            // else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = EntitySprite.MARIO_FIRE_RUN[runSprite];
+            else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = EntitySprite.MARIO_FIRE_RUN[runSprite];
         }
     }
 

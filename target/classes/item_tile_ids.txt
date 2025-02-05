@@ -1,2 +1,6 @@
 coin, 1, 1
 mushroom, 2, 1
+fire_flower_1, 3, 1
+fire_flower_2, 4, 1
+fire_flower_3, 5, 1
+fire_flower_4, 6, 1

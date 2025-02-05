@@ -29,5 +29,20 @@ mario_big_swim3, 12, 2, 1, 2
 mario_big_swim4, 13, 2, 1, 2
 mario_big_swim5, 14, 2, 1, 2
 
+mario_fire_still, 1, 4, 1, 2
+mario_fire_run1, 2, 4, 1, 2
+mario_fire_run2, 3, 4, 1, 2
+mario_fire_run3, 4, 4, 1, 2
+mario_fire_turn, 5, 4, 1, 2
+mario_fire_jump, 6, 4, 1, 2
+mario_fire_die, 7, 4, 1, 2
+mario_fire_climb1, 8, 4, 1, 2
+mario_fire_climb2, 9, 4, 1, 2
+mario_fire_swim1, 10, 4, 1, 2
+mario_fire_swim2, 11, 4, 1, 2
+mario_fire_swim3, 12, 4, 1, 2
+mario_fire_swim4, 13, 4, 1, 2
+mario_fire_swim5, 14, 4, 1, 2
+
 mario_transition1, 16, 1, 1, 2
 mario_transition2, 16, 1, 1, 2

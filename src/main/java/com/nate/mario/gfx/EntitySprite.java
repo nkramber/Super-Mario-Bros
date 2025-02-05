@@ -14,7 +14,6 @@ public class EntitySprite {
         new EntitySprite("mario_small_run2"),
         new EntitySprite("mario_small_run3")
     };
-
     public static final EntitySprite MARIO_SMALL_STILL = new EntitySprite("mario_small_still");
     public static final EntitySprite MARIO_SMALL_TURN = new EntitySprite("mario_small_turn");
     public static final EntitySprite MARIO_SMALL_JUMP = new EntitySprite("mario_small_jump");
@@ -43,7 +42,6 @@ public class EntitySprite {
         MARIO_SMALL_SWIM4,
         MARIO_SMALL_SWIM5
     ));
-
     public static final EntitySprite[] MARIO_BIG_RUN = {
         new EntitySprite("mario_big_run1", 2),
         new EntitySprite("mario_big_run2", 2),
@@ -78,9 +76,43 @@ public class EntitySprite {
         MARIO_BIG_SWIM4,
         MARIO_BIG_SWIM5
     ));
+    public static final EntitySprite[] MARIO_FIRE_RUN = {
+        new EntitySprite("mario_fire_run1", 2),
+        new EntitySprite("mario_fire_run2", 2),
+        new EntitySprite("mario_fire_run3", 2)
+    };
 
-    private String name;
-    private int height;
+    public static final EntitySprite MARIO_FIRE_STILL = new EntitySprite("mario_fire_still", 2);
+    public static final EntitySprite MARIO_FIRE_TURN = new EntitySprite("mario_fire_turn", 2);
+    public static final EntitySprite MARIO_FIRE_JUMP = new EntitySprite("mario_fire_jump", 2);
+    public static final EntitySprite MARIO_FIRE_DIE = new EntitySprite("mario_fire_die", 2);
+    public static final EntitySprite MARIO_FIRE_CLIMB1 = new EntitySprite("mario_fire_climb1", 2);
+    public static final EntitySprite MARIO_FIRE_CLIMB2 = new EntitySprite("mario_fire_climb2", 2);
+    public static final EntitySprite MARIO_FIRE_SWIM1 = new EntitySprite("mario_fire_swim1", 2);
+    public static final EntitySprite MARIO_FIRE_SWIM2 = new EntitySprite("mario_fire_swim2", 2);
+    public static final EntitySprite MARIO_FIRE_SWIM3 = new EntitySprite("mario_fire_swim3", 2);
+    public static final EntitySprite MARIO_FIRE_SWIM4 = new EntitySprite("mario_fire_swim4", 2);
+    public static final EntitySprite MARIO_FIRE_SWIM5 = new EntitySprite("mario_fire_swim5", 2);
+
+    public static final List<EntitySprite> MARIO_FIRE = new ArrayList<>(Arrays.asList(
+        MARIO_FIRE_RUN[0],
+        MARIO_FIRE_RUN[1],
+        MARIO_FIRE_RUN[2],
+        MARIO_FIRE_STILL,
+        MARIO_FIRE_TURN,
+        MARIO_FIRE_JUMP,
+        MARIO_FIRE_DIE,
+        MARIO_FIRE_CLIMB1,
+        MARIO_FIRE_CLIMB2,
+        MARIO_FIRE_SWIM1,
+        MARIO_FIRE_SWIM2,
+        MARIO_FIRE_SWIM3,
+        MARIO_FIRE_SWIM4,
+        MARIO_FIRE_SWIM5
+    ));
+
+    private final String name;
+    private final int height;
 
     public EntitySprite(String name) {
         this.name = name;

@@ -7,8 +7,11 @@ import java.util.List;
 
 import com.nate.mario.entity.Entity;
 import com.nate.mario.entity.player.Player;
+import com.nate.mario.gfx.EntitySprite;
 import com.nate.mario.gfx.Screen;
+import com.nate.mario.item.AnimatedPowerUpItem;
 import com.nate.mario.item.CoinItem;
+import com.nate.mario.item.FireFlowerItem;
 import com.nate.mario.item.Item;
 import com.nate.mario.item.MushroomItem;
 import com.nate.mario.item.PowerUpItem;
@@ -83,9 +86,9 @@ public class Level {
                 }
 
                 //Green is the item type
-                for (Item item : Item.items) {
+                for (Item item : Item.items.values()) {
                     if (color.getGreen() == item.getID()) {
-                        if (item instanceof CoinItem) items.add(item.newItem(x * 16, y * 16, item.getID(), item.getName()));
+                        if (item instanceof CoinItem) items.add(item.newItem(x * 16, y * 16, item.getID(), item.getSprite()));
                         else if (tiles[x][y] instanceof ItemBlockTile) ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(item);
                         break;
                     }
@@ -135,8 +138,10 @@ public class Level {
                 if (!mushroomItem.inSpawnAnimation()) {
                     mushroomItem.doTileCollisions(getLocalCollisionTiles(item));
                 }
-                mushroomItem.move();
             }
+
+            if (item instanceof AnimatedPowerUpItem) ((AnimatedPowerUpItem) item).updateAnimationFrame();
+            if (item instanceof PowerUpItem) ((PowerUpItem) item).move();
         }
 
         for (Item item : itemsToRemove) items.remove(item);
@@ -152,7 +157,15 @@ public class Level {
                 if (tile instanceof ItemBlockTile) {
                     ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
                     if (itemBlockTile.readyToCreateItem()) {
-                        items.add(itemBlockTile.getItemToCreate().newItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16, itemBlockTile.getItemToCreate().getID(), itemBlockTile.getItemToCreate().getName()));
+                        Item itemToCreate = itemBlockTile.getItemToCreate();
+                        if (itemToCreate instanceof MushroomItem) {
+                            if (EntitySprite.MARIO_SMALL.contains(player.getSprite())) items.add(itemToCreate.newItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16, itemToCreate.getID(), itemToCreate.getSprite()));
+                            else {
+                                FireFlowerItem fireFlowerItem = (FireFlowerItem) Item.items.get("fire_flower");
+                                items.add(fireFlowerItem.newAnimatedItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16, itemToCreate.getID(), fireFlowerItem.getSprites()));
+                            }
+                        }
+                        else items.add(itemToCreate.newItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16, itemToCreate.getID(), itemToCreate.getSprite()));
                     }
 
                     if (itemBlockTile.isToBeDeleted()) {
@@ -242,15 +255,13 @@ public class Level {
         screen.setBackgroundColor(levelType);
 
         for (Item item : items) {
-            if (item instanceof PowerUpItem) {
-                if (screen.isOffScreen(item)) {
-                    item.setToBeDeleted();
-                    continue;
-                }
-            }
-            screen.drawItem(item.getName(), (int) item.getX(), (int) item.getY());
+            screen.drawItem(item.getSprite(), (int) item.getX(), (int) item.getY());
             if (item instanceof PowerUpItem) {
                 PowerUpItem powerUpItem = (PowerUpItem) item;
+                if (screen.isOffScreen(powerUpItem)) {
+                    powerUpItem.setToBeDeleted();
+                    continue;
+                }
                 if (powerUpItem.inSpawnAnimation()) screen.drawTile("sky", (int) powerUpItem.getX(), powerUpItem.getInitialY());
             }
         }
