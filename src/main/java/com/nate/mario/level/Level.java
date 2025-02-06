@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.nate.mario.Main;
 import com.nate.mario.entity.Entity;
 import com.nate.mario.entity.player.Player;
 import com.nate.mario.gfx.EntitySprite;

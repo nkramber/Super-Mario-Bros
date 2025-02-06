@@ -78,15 +78,11 @@ public class Player extends Entity {
     private int coinCount = 0;
     private int maxX;
 
-    private float oldX, oldY;
-
     public Player(int xTile, int yTile, int score, EntitySprite sprite) {
         super(xTile, yTile, 0, 0, 1, sprite);
         this.score = score;
         maxX = (int) xTile * 16;
         facingLeft = false;
-        oldX = (int) xTile * 16;
-        oldY = (int) yTile * 16;
     }
 
     public void getMovement(boolean[] keys, Level level) {
@@ -204,8 +200,6 @@ public class Player extends Entity {
 
     @Override
     public void move() {
-        oldX = x;
-        oldY = y;
         x += xDir;
         y += yDir;
     }

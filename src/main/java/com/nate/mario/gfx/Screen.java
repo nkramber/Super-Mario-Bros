@@ -2,7 +2,6 @@ package com.nate.mario.gfx;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -10,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.nate.mario.Main;
-import com.nate.mario.item.Item;
 
 public class Screen {
 
