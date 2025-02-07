@@ -105,6 +105,12 @@ public class Level {
         decrementTime();
         if (timeRemaining == 0) gameOver = true;
 
+        if (player.isAnimating()) {
+            player.updateAnimation();
+            return;
+        }
+
+
         for (Entity entity : entities) {
             if (entity instanceof Player) {
                 if (player.getY() > tiles[0].length * 16 - 16 - player.getHeight()) {
@@ -239,6 +245,11 @@ public class Level {
     }
 
     private void decrementTime() {
+        if (player.isAnimating()) {
+            timeInMillis = System.currentTimeMillis();
+            return;
+        }
+
         if (timeInMillis == 0) {
             timeInMillis = System.currentTimeMillis();
         } else {

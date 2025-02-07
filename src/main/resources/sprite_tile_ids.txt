@@ -44,5 +44,9 @@ mario_fire_swim3, 12, 4, 1, 2
 mario_fire_swim4, 13, 4, 1, 2
 mario_fire_swim5, 14, 4, 1, 2
 
-mario_transition1, 16, 1, 1, 2
-mario_transition2, 16, 1, 1, 2
+mario_grow1, 16, 1, 1, 2
+mario_grow2, 17, 1, 1, 2
+
+mario_fire_animation_green, 15, 4, 1, 2
+mario_fire_animation_red, 16, 4, 1, 2
+mario_fire_animation_black, 17, 4, 1, 2

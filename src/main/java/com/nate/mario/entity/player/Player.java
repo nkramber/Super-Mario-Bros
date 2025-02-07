@@ -69,10 +69,12 @@ public class Player extends Entity {
     private float currentHorMaxSpeed = WALK_MAX_SPEED;
 
     private PowerUpState powerUpState = PowerUpState.SMALL;
-    private boolean powerUpStateChanged = false;
     private boolean hasJumped = false;
     private boolean sprinting = false;
     private boolean skidding = false;
+    private boolean growing = false;
+    private boolean shrinking = false;
+    private boolean gainedFireFlower = false;
     
     private int score = 0;
     private int coinCount = 0;
@@ -205,7 +207,6 @@ public class Player extends Entity {
     }
 
     public void doItemCollisions(List<Item> items) {
-        powerUpStateChanged = false;
         for (Item item : items) {
             int itemX = (int) item.getX();
             int itemY = (int) item.getY();
@@ -237,14 +238,14 @@ public class Player extends Entity {
     private void changePowerUpState(PowerUpState state) {
         if (powerUpState.equals(state)) return;
 
-        powerUpStateChanged = true;
-
         if (state.equals(PowerUpState.BIG)) {
+            growing = true;
             y -= 16;
             setHeight(2);
         } else if (state.equals(PowerUpState.SMALL)) {
-            y += 16;
-            setHeight(1);
+            shrinking = true;
+        } else if (state.equals(PowerUpState.FIRE)) {
+            gainedFireFlower = true;
         }
 
         powerUpState = state;
@@ -259,29 +260,44 @@ public class Player extends Entity {
         }
     }
 
-    int runSprite = 0;
+    int animationFrame = 0;
+    int runSpriteFrame = 0;
     long time = 0;
 
     @Override
     public void updateAnimation() {
         if (time == 0) time = System.currentTimeMillis();
 
-        if (powerUpStateChanged) {
-            int spriteIndex;
-            if (powerUpState.equals(PowerUpState.BIG)) {
-                spriteIndex = EntitySprite.MARIO_SMALL.indexOf(currentSprite);
-                currentSprite = EntitySprite.MARIO_BIG.get(spriteIndex);
-            } else if (powerUpState.equals(PowerUpState.FIRE)) {
-                spriteIndex = EntitySprite.MARIO_BIG.indexOf(currentSprite);
-                currentSprite = EntitySprite.MARIO_FIRE.get(spriteIndex);
-            } else if (powerUpState.equals(PowerUpState.SMALL)) {
-                if (EntitySprite.MARIO_BIG.contains(currentSprite)) {
-                    spriteIndex = EntitySprite.MARIO_BIG.indexOf(currentSprite);
-                    currentSprite = EntitySprite.MARIO_SMALL.get(spriteIndex);
-                } else {
-                    spriteIndex = EntitySprite.MARIO_FIRE.indexOf(currentSprite);
-                    currentSprite = EntitySprite.MARIO_SMALL.get(spriteIndex);
-                }
+        if (growing) {
+            animationFrame++;
+            currentSprite = EntitySprite.MARIO_GROW_ANIMATION.get(animationFrame / 5);
+            if (animationFrame >= EntitySprite.MARIO_GROW_ANIMATION.size() * 5 - 1) {
+                currentSprite = EntitySprite.MARIO_BIG_STILL;
+                growing = false;
+                animationFrame = 0;
+            }
+            return;
+        } else if (shrinking) {
+            animationFrame++;
+            currentSprite = EntitySprite.MARIO_SHRINK_ANIMATION.get(animationFrame / 5);
+            if (animationFrame >= EntitySprite.MARIO_SHRINK_ANIMATION.size() * 5 - 1) {
+                currentSprite = EntitySprite.MARIO_SMALL_STILL;
+                shrinking = false;
+                y += 16;
+                setHeight(1);
+                animationFrame = 0;
+            } else {
+                return;
+            }
+        } else if (gainedFireFlower) {
+            animationFrame++;
+            currentSprite = EntitySprite.MARIO_FIRE_ANIMATION.get(animationFrame / 5);
+            if (animationFrame >= EntitySprite.MARIO_FIRE_ANIMATION.size() * 5 - 1) {
+                currentSprite = EntitySprite.MARIO_FIRE_STILL;
+                gainedFireFlower = false;
+                animationFrame = 0;
+            } else {
+                return;
             }
         }
 
@@ -290,7 +306,7 @@ public class Player extends Entity {
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = EntitySprite.MARIO_SMALL_STILL;
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = EntitySprite.MARIO_BIG_STILL;
             else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = EntitySprite.MARIO_FIRE_STILL;
-            runSprite = 0;
+            runSpriteFrame = 0;
         } else if (hasJumped && !falling) {
             time = 0;
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = EntitySprite.MARIO_SMALL_JUMP;
@@ -324,13 +340,13 @@ public class Player extends Entity {
 
             if (currentTime - time > spriteCycleTime) {
                 time += spriteCycleTime;
-                if (runSprite < 2) runSprite++;
-                else runSprite = 0;
+                if (runSpriteFrame < 2) runSpriteFrame++;
+                else runSpriteFrame = 0;
             }
 
-            if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = EntitySprite.MARIO_SMALL_RUN[runSprite];
-            else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = EntitySprite.MARIO_BIG_RUN[runSprite];
-            else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = EntitySprite.MARIO_FIRE_RUN[runSprite];
+            if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = EntitySprite.MARIO_SMALL_RUN[runSpriteFrame];
+            else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = EntitySprite.MARIO_BIG_RUN[runSpriteFrame];
+            else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = EntitySprite.MARIO_FIRE_RUN[runSpriteFrame];
         }
     }
 
@@ -348,4 +364,5 @@ public class Player extends Entity {
 
     public int getCoinCount() { return coinCount; }
     public int getScore() { return score; }
+    public boolean isAnimating() { return growing || shrinking || gainedFireFlower; }
 }

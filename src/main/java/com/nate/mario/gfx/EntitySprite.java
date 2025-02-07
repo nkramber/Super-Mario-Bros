@@ -25,7 +25,6 @@ public class EntitySprite {
     public static final EntitySprite MARIO_SMALL_SWIM3 = new EntitySprite("mario_small_swim3");
     public static final EntitySprite MARIO_SMALL_SWIM4 = new EntitySprite("mario_small_swim4");
     public static final EntitySprite MARIO_SMALL_SWIM5 = new EntitySprite("mario_small_swim5");
-
     public static final List<EntitySprite> MARIO_SMALL = new ArrayList<>(Arrays.asList(
         MARIO_SMALL_RUN[0],
         MARIO_SMALL_RUN[1],
@@ -42,12 +41,12 @@ public class EntitySprite {
         MARIO_SMALL_SWIM4,
         MARIO_SMALL_SWIM5
     ));
+
     public static final EntitySprite[] MARIO_BIG_RUN = {
         new EntitySprite("mario_big_run1", 2),
         new EntitySprite("mario_big_run2", 2),
         new EntitySprite("mario_big_run3", 2)
     };
-
     public static final EntitySprite MARIO_BIG_STILL = new EntitySprite("mario_big_still", 2);
     public static final EntitySprite MARIO_BIG_TURN = new EntitySprite("mario_big_turn", 2);
     public static final EntitySprite MARIO_BIG_JUMP = new EntitySprite("mario_big_jump", 2);
@@ -59,7 +58,6 @@ public class EntitySprite {
     public static final EntitySprite MARIO_BIG_SWIM3 = new EntitySprite("mario_big_swim3", 2);
     public static final EntitySprite MARIO_BIG_SWIM4 = new EntitySprite("mario_big_swim4", 2);
     public static final EntitySprite MARIO_BIG_SWIM5 = new EntitySprite("mario_big_swim5", 2);
-
     public static final List<EntitySprite> MARIO_BIG = new ArrayList<>(Arrays.asList(
         MARIO_BIG_RUN[0],
         MARIO_BIG_RUN[1],
@@ -76,12 +74,12 @@ public class EntitySprite {
         MARIO_BIG_SWIM4,
         MARIO_BIG_SWIM5
     ));
+
     public static final EntitySprite[] MARIO_FIRE_RUN = {
         new EntitySprite("mario_fire_run1", 2),
         new EntitySprite("mario_fire_run2", 2),
         new EntitySprite("mario_fire_run3", 2)
     };
-
     public static final EntitySprite MARIO_FIRE_STILL = new EntitySprite("mario_fire_still", 2);
     public static final EntitySprite MARIO_FIRE_TURN = new EntitySprite("mario_fire_turn", 2);
     public static final EntitySprite MARIO_FIRE_JUMP = new EntitySprite("mario_fire_jump", 2);
@@ -93,7 +91,6 @@ public class EntitySprite {
     public static final EntitySprite MARIO_FIRE_SWIM3 = new EntitySprite("mario_fire_swim3", 2);
     public static final EntitySprite MARIO_FIRE_SWIM4 = new EntitySprite("mario_fire_swim4", 2);
     public static final EntitySprite MARIO_FIRE_SWIM5 = new EntitySprite("mario_fire_swim5", 2);
-
     public static final List<EntitySprite> MARIO_FIRE = new ArrayList<>(Arrays.asList(
         MARIO_FIRE_RUN[0],
         MARIO_FIRE_RUN[1],
@@ -109,6 +106,59 @@ public class EntitySprite {
         MARIO_FIRE_SWIM3,
         MARIO_FIRE_SWIM4,
         MARIO_FIRE_SWIM5
+    ));
+
+    public static final EntitySprite MARIO_FIRE_ANIMATION_GREEN = new EntitySprite("mario_fire_animation_green", 2);
+    public static final EntitySprite MARIO_FIRE_ANIMATION_RED = new EntitySprite("mario_fire_animation_red", 2);
+    public static final EntitySprite MARIO_FIRE_ANIMATION_BLACK = new EntitySprite("mario_fire_animation_black", 2);
+    public static final List<EntitySprite> MARIO_FIRE_ANIMATION = new ArrayList<>(Arrays.asList(
+        MARIO_BIG_STILL,
+        MARIO_FIRE_STILL,
+        MARIO_FIRE_ANIMATION_BLACK,
+        MARIO_FIRE_STILL,
+        MARIO_FIRE_ANIMATION_GREEN,
+        MARIO_FIRE_ANIMATION_RED,
+        MARIO_FIRE_ANIMATION_BLACK,
+        MARIO_FIRE_STILL,
+        MARIO_FIRE_ANIMATION_GREEN,
+        MARIO_FIRE_ANIMATION_RED,
+        MARIO_FIRE_ANIMATION_BLACK,
+        MARIO_FIRE_STILL,
+        MARIO_FIRE_ANIMATION_GREEN,
+        MARIO_FIRE_ANIMATION_RED,
+        MARIO_FIRE_ANIMATION_BLACK,
+        MARIO_FIRE_STILL,
+        MARIO_FIRE_ANIMATION_GREEN,
+        MARIO_FIRE_ANIMATION_RED,
+        MARIO_FIRE_STILL
+    ));
+
+    public static final EntitySprite MARIO_GROW1 = new EntitySprite("mario_grow1", 2);
+    public static final EntitySprite MARIO_GROW2 = new EntitySprite("mario_grow2", 2);
+    public static final List<EntitySprite> MARIO_GROW_ANIMATION = new ArrayList<>(Arrays.asList(
+        MARIO_GROW1,
+        MARIO_GROW2,
+        MARIO_GROW1,
+        MARIO_GROW2,
+        MARIO_GROW1,
+        MARIO_GROW2,
+        MARIO_GROW1,
+        MARIO_GROW2,
+        MARIO_BIG_STILL,
+        MARIO_BIG_STILL
+    ));
+
+    public static final List<EntitySprite> MARIO_SHRINK_ANIMATION = new ArrayList<>(Arrays.asList(
+        MARIO_BIG_STILL,
+        MARIO_GROW1,
+        MARIO_BIG_STILL,
+        MARIO_GROW1,
+        MARIO_BIG_STILL,
+        MARIO_GROW1,
+        MARIO_BIG_STILL,
+        MARIO_GROW1,
+        MARIO_BIG_STILL,
+        MARIO_GROW1
     ));
 
     private final String name;
