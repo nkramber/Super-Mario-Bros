@@ -2,11 +2,12 @@ package com.nate.mario.entity.player;
 
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.util.HashSet;
 import java.util.List;
 
 import com.nate.mario.entity.Entity;
+import com.nate.mario.entity.Goomba;
 import com.nate.mario.gfx.sprite.PlayerSprite;
-import com.nate.mario.gfx.sprite.Sprite;
 import com.nate.mario.item.CoinItem;
 import com.nate.mario.item.FireFlowerItem;
 import com.nate.mario.item.Item;
@@ -77,6 +78,7 @@ public class Player extends Entity {
     private boolean shrinking = false;
     private boolean gainedFireFlower = false;
     
+    private int lives = 3;
     private int score = 0;
     private int coinCount = 0;
     private int maxX;
@@ -88,6 +90,7 @@ public class Player extends Entity {
         facingLeft = false;
     }
 
+    @Override
     public void getMovement(boolean[] keys, Level level) {
         skidding = false;
         if (yDir != 0 && onGround) onGround = false;
@@ -207,6 +210,91 @@ public class Player extends Entity {
         y += yDir;
     }
 
+    @Override
+    public void doTileCollisions(Tile[][] tiles) {
+        int yOffset = 4;
+        int xOffset = 2;
+
+        float newX = x;
+        float newY = y;
+
+        Rectangle verticalEntityRect = new Rectangle((int) (x) + xOffset, (int) (y + yDir + yOffset), width - xOffset * 2, height - yOffset);
+        Rectangle horizontalEntityRect = new Rectangle((int) (x + xDir + xOffset), (int) (y + yOffset), width - xOffset * 2, height - yOffset);
+        HashSet<Tile> floorTiles = new HashSet<>();
+
+        for (int i = 0; i < tiles.length; i++) {
+            for (int j = 0; j < tiles[0].length; j++) {
+                Tile tile = tiles[i][j];
+                Rectangle tileRect = new Rectangle(tile.getxTile() * 16, tile.getyTile() * 16, 16, 16);
+                Rectangle tileFloorObserverRect = new Rectangle(tile.getxTile() * 16, tile.getyTile() * 16 - 1, 16, 16);
+
+                if (tile.getyTile() * 16 == y + height && verticalEntityRect.intersects(tileFloorObserverRect)) {
+                    floorTiles.add(tile);
+                }
+
+                if (tile.isSolid()) {
+                    if (verticalEntityRect.intersects(tileRect)) {
+                        yDir = 0;
+                        if (tile.getyTile() * 16 < newY) { //Collide with tile above
+                            if (tile instanceof ItemBlockTile) {
+                                ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
+                                itemBlockTile.toBeDeleted();
+                    
+                                if (itemBlockTile.containsItem()) itemBlockTile.createItem();
+                            }
+                            newY = tile.getyTile() * 16 + 16 - yOffset;
+                            jumpTick = 0;
+                        } else { //Collide with tile below
+                            newY = tile.getyTile() * 16 - height;
+                            onGround = true;
+                        }
+
+                        verticalEntityRect = new Rectangle((int) (newX) + xOffset, (int) (newY + yOffset), width - xOffset * 2, height - yOffset);
+                    }
+    
+                    if (horizontalEntityRect.intersects(tileRect)) {
+                        xDir = 0;
+                        if (tile.getxTile() * 16 < newX) { //Collide with tile to the left
+                            newX = tile.getxTile() * 16 + 16 - xOffset;
+                        } else { //Collide with tile to the right
+                            newX = tile.getxTile() * 16 - width + xOffset;
+                        }
+                        horizontalEntityRect = new Rectangle((int) (newX + xOffset), (int) y + yOffset, width - xOffset * 2, height - yOffset);
+                    }
+                }
+            }
+        }
+
+        if (!floorTiles.isEmpty()) {
+            onGround = false;
+            falling = true;
+            for (Tile floorTile : floorTiles) {
+                if (!floorTile.isSolid()) continue;
+                onGround = true;
+                falling = false;
+            }
+        }
+
+        x = newX;
+        y = newY;
+    }
+
+    @Override
+    public void doEntityCollisions(List<Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity.equals(this)) continue;
+            Rectangle localCollisionRectangle = new Rectangle((int) getX(), (int) getY(), getWidth(), getHeight());
+            Rectangle otherCollisionRectangle = new Rectangle((int) entity.getX(), (int) entity.getY(), entity.getWidth(), entity.getHeight());
+
+            if (localCollisionRectangle.intersects(otherCollisionRectangle)) {
+                if (entity instanceof Goomba) {
+                    entity.setToBeDeleted();
+                    addToScore(250); //Change score to whatever goombas give
+                }
+            }
+        }
+    }
+
     public void doItemCollisions(List<Item> items) {
         for (Item item : items) {
             int itemX = (int) item.getX();
@@ -250,15 +338,6 @@ public class Player extends Entity {
         }
 
         powerUpState = state;
-    }
-
-    public void topTileCollide(Tile tile) {
-        if (tile instanceof ItemBlockTile) {
-            ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
-            itemBlockTile.toBeDeleted();
-
-            if (itemBlockTile.containsItem()) itemBlockTile.createItem();
-        }
     }
 
     int animationFrame = 0;
@@ -365,7 +444,10 @@ public class Player extends Entity {
 
     public int getCoinCount() { return coinCount; }
     public int getScore() { return score; }
+    public int getLives() { return lives; }
     public boolean isAnimating() { return growing || shrinking || gainedFireFlower; }
+
+    public void reduceLives() { lives--; }
 
     @Override
     public Entity newEntity(int xTile, int yTile) {

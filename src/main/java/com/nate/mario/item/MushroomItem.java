@@ -69,10 +69,6 @@ public class MushroomItem extends PowerUpItem {
                         onGround = true;
 
                         verticalItemRect = new Rectangle((int) (newX), (int) (newY), 16, 16);
-                        
-                        if (horizontalItemRect.intersects(tileRect)) {
-                            continue;
-                        }
                     }
 
                     if (horizontalItemRect.intersects(tileRect)) {

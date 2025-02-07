@@ -119,10 +119,7 @@ public class PlayerSprite extends Sprite {
         MARIO_FIRE_STILL,
         MARIO_FIRE_ANIMATION_GREEN,
         MARIO_FIRE_ANIMATION_RED,
-        MARIO_FIRE_ANIMATION_BLACK,
         MARIO_FIRE_STILL,
-        MARIO_FIRE_ANIMATION_GREEN,
-        MARIO_FIRE_ANIMATION_RED,
         MARIO_FIRE_STILL
     ));
 

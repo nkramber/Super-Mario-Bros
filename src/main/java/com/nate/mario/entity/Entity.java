@@ -2,11 +2,13 @@ package com.nate.mario.entity;
 
 import java.awt.Rectangle;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import com.nate.mario.entity.player.Player;
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.gfx.sprite.Sprite;
+import com.nate.mario.level.Level;
 import com.nate.mario.level.tile.Tile;
 
 public abstract class Entity {
@@ -15,7 +17,11 @@ public abstract class Entity {
         "goomba", new Goomba(255)
     );
 
+    private static final float VER_ACCEL_RATE = 0.35f;
+    private static final float VER_MAX_SPEED = 4.0f;
+
     private int id;
+    private boolean isToBeDeleted;
 
     protected float x, y;
     protected float xDir, yDir;
@@ -23,9 +29,9 @@ public abstract class Entity {
     protected int height;
     protected int jumpTick = 0;
     protected Sprite currentSprite;
-    protected boolean onGround = false;
-    protected boolean falling = false;
-    protected boolean facingLeft = true;
+    protected boolean onGround;
+    protected boolean falling;
+    protected boolean facingLeft;
 
     public Entity(int id) {
         this.id = id;
@@ -38,6 +44,15 @@ public abstract class Entity {
         this.yDir = yDir;
         this.height = currentSprite.getHeight() * 16;
         this.currentSprite = currentSprite;
+    }
+
+    public void getMovement(boolean[] keys, Level level) { getMovement(); }
+
+    public void getMovement() {
+        if (!onGround) {
+            if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
+            else yDir += VER_ACCEL_RATE;
+        }
     }
 
     public void move() {
@@ -73,31 +88,26 @@ public abstract class Entity {
                 if (tile.isSolid()) {
                     if (verticalEntityRect.intersects(tileRect)) {
                         yDir = 0;
-                        if (tile.getyTile() * 16 < newY) {
-                            if (this instanceof Player) {
-                                Player player = (Player) this;
-                                player.topTileCollide(tile);
-                            }
-
+                        if (tile.getyTile() * 16 < newY) { //Collide with tile above
+                            yDir = 0;
                             newY = tile.getyTile() * 16 + 16 - yOffset;
                             jumpTick = 0;
-                        } else {
+                        } else { //Collide with tile below
                             newY = tile.getyTile() * 16 - height;
                             onGround = true;
                         }
 
                         verticalEntityRect = new Rectangle((int) (newX) + xOffset, (int) (newY + yOffset), width - xOffset * 2, height - yOffset);
-                        
-                        // if (horizontalEntityRect.intersects(tileRect)) {
-                            // continue;
-                        // }
                     }
     
                     if (horizontalEntityRect.intersects(tileRect)) {
-                        System.out.println("Horizontal collision " + this.getClass());
-                        xDir = 0;
-                        if (tile.getxTile() * 16 < newX) newX = tile.getxTile() * 16 + 16 - xOffset;
-                        else newX = tile.getxTile() * 16 - width + xOffset;
+                        xDir = 0 - xDir;
+                        if (tile.getxTile() * 16 < newX) { //Collide with tile to the left
+                            newX = tile.getxTile() * 16 + 16 - xOffset;
+                        } else { //Collide with tile to the right
+                            newX = tile.getxTile() * 16 - width + xOffset;
+                        }
+                        
                         horizontalEntityRect = new Rectangle((int) (newX + xOffset), (int) y + yOffset, width - xOffset * 2, height - yOffset);
                     }
                 }
@@ -118,9 +128,23 @@ public abstract class Entity {
         y = newY;
     }
 
+    public void doEntityCollisions(List<Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity.equals(this)) continue;
+            Rectangle localCollisionRectangle = new Rectangle((int) getX(), (int) getY(), getWidth(), getHeight());
+            Rectangle otherCollisionRectangle = new Rectangle((int) entity.getX(), (int) entity.getY(), entity.getWidth(), entity.getHeight());
+
+            if (localCollisionRectangle.intersects(otherCollisionRectangle)) {
+                if (entity instanceof Player) continue;
+                else System.out.println("Goomba collision!"); //Handle enemy on enemy collision here. Check game for what happens
+            }
+        }
+    }
+
     public abstract Entity newEntity(int xTile, int yTile);
 
     public void updateAnimation() {}
+    public void setToBeDeleted() { isToBeDeleted = true; }
 
     public float getX() { return x; }
     public float getY() { return y; }
@@ -129,5 +153,6 @@ public abstract class Entity {
     public int getWidth() { return width; }
     public int getHeight() { return height; }
     public int getID() { return id; }
+    public boolean isToBeDeleted() { return isToBeDeleted; }
     public Sprite getSprite() { return currentSprite; }
 }

@@ -64,19 +64,19 @@ public class Main extends Canvas implements Runnable, KeyListener {
         System.exit(0);
     }
 
-    private long lastFPSCheck;
-    private int currentFPS = 0;
-    private int frameCount = 0;
-
-    private void measureFPS() {
-        frameCount++;
-        if(System.currentTimeMillis() - lastFPSCheck >= 1000) {
-            currentFPS = frameCount;
-            if (currentFPS > 3) System.out.println("FPS: " + currentFPS);
-            frameCount = 0;
-            lastFPSCheck = System.currentTimeMillis();
-        }
-    }
+    // private long lastFPSCheck;
+    // private int currentFPS = 0;
+    // private int frameCount = 0;
+    //
+    // private void measureFPS() {
+    //     frameCount++;
+    //     if(System.currentTimeMillis() - lastFPSCheck >= 1000) {
+    //         currentFPS = frameCount;
+    //         if (currentFPS > 3) System.out.println("FPS: " + currentFPS);
+    //         frameCount = 0;
+    //         lastFPSCheck = System.currentTimeMillis();
+    //     }
+    // }
 
     private void tick() {
         currentState.tick(keys);

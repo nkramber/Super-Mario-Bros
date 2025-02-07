@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import com.nate.mario.entity.player.Player;
 import com.nate.mario.gfx.Screen;
-import com.nate.mario.gfx.sprite.PlayerSprite;
 import com.nate.mario.level.Level;
 import com.nate.mario.level.LevelLoader;
 import com.nate.mario.util.Timer;

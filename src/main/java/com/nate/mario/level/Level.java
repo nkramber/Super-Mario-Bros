@@ -117,20 +117,23 @@ public class Level {
             return;
         }
 
+        List<Entity> entitiesToRemove = new ArrayList<>();
         for (Entity entity : entities) {
+            if (entity.isToBeDeleted()) {
+                entitiesToRemove.add(entity);
+            }
+
             if (entity instanceof Player) {
                 if (player.getY() > tiles[0].length * 16 - 16 - player.getHeight()) {
                     gameOver = true;
                     return;
                 }
-                player.getMovement(keys, this);
             }
-
-            //change how entities collide, add player/entity collisions
-
-
+            
             if (onScreenEntities.contains(entity) || entity instanceof Player) {
+                entity.getMovement(keys, this);
                 entity.doTileCollisions(getLocalCollisionTiles(entity));
+                entity.doEntityCollisions(entities);
                 entity.move();
             }
 
@@ -141,6 +144,8 @@ public class Level {
 
             entity.updateAnimation();
         }
+
+        for (Entity entity : entitiesToRemove) entities.remove(entity); //add death animation to goombas
 
         List<Item> itemsToRemove = new ArrayList<>();
         for (Item item : items) {
