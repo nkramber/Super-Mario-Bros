@@ -1,19 +1,19 @@
 package com.nate.mario.item;
 
-import com.nate.mario.gfx.ItemSprite;
+import com.nate.mario.gfx.sprite.ItemSprite;
 
 public class CoinItem extends Item {
 
-    public CoinItem(int id, ItemSprite sprite) {
-        super(id, sprite);
+    public CoinItem(int id) {
+        super(id);
     }
 
-    public CoinItem(float x, float y, int id, ItemSprite sprite) {
-        super(x, y, id, sprite);
+    public CoinItem(float x, float y) {
+        super(x, y, ItemSprite.COIN);
     }
 
     @Override
-    public Item newItem(float x, float y, int id, ItemSprite sprite) {
-        return new CoinItem(x, y, id, sprite);
+    public Item newItem(float x, float y) {
+        return new CoinItem(x, y);
     }
 }

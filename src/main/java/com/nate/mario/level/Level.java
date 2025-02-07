@@ -7,8 +7,8 @@ import java.util.List;
 
 import com.nate.mario.entity.Entity;
 import com.nate.mario.entity.player.Player;
-import com.nate.mario.gfx.EntitySprite;
 import com.nate.mario.gfx.Screen;
+import com.nate.mario.gfx.sprite.PlayerSprite;
 import com.nate.mario.item.AnimatedPowerUpItem;
 import com.nate.mario.item.CoinItem;
 import com.nate.mario.item.FireFlowerItem;
@@ -33,6 +33,7 @@ public class Level {
     private Player player;
     private int playerSpawnX, playerSpawnY;
     private List<Entity> entities;
+    private List<Entity> onScreenEntities;
     
     private long timeInMillis;
     private int timeRemaining;
@@ -48,6 +49,7 @@ public class Level {
         tiles = new Tile[width][height];
         items = new ArrayList<>();
         entities = new ArrayList<>();
+        onScreenEntities = new ArrayList<>();
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -88,13 +90,18 @@ public class Level {
                 //Green is the item type
                 for (Item item : Item.items.values()) {
                     if (color.getGreen() == item.getID()) {
-                        if (item instanceof CoinItem) items.add(item.newItem(x * 16, y * 16, item.getID(), item.getSprite()));
+                        if (item instanceof CoinItem) items.add(item.newItem(x * 16, y * 16));
                         else if (tiles[x][y] instanceof ItemBlockTile) ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(item);
                         break;
                     }
                 }
 
-                //Blue will be the entity type
+                //Blue is the entity type
+                for (Entity entity : Entity.entities.values()) {
+                    if (color.getBlue() == entity.getID()) {
+                        entities.add(entity.newEntity(x, y));
+                    }
+                }
 
                 if (tiles[x][y] == null) throw new IllegalArgumentException("Valid tile does not exist at " + x + ", " + y + " on level " + levelName);
             }
@@ -110,7 +117,6 @@ public class Level {
             return;
         }
 
-
         for (Entity entity : entities) {
             if (entity instanceof Player) {
                 if (player.getY() > tiles[0].length * 16 - 16 - player.getHeight()) {
@@ -120,8 +126,13 @@ public class Level {
                 player.getMovement(keys, this);
             }
 
-            entity.doTileCollisions(getLocalCollisionTiles(entity));
-            entity.move();
+            //change how entities collide, add player/entity collisions
+
+
+            if (onScreenEntities.contains(entity) || entity instanceof Player) {
+                entity.doTileCollisions(getLocalCollisionTiles(entity));
+                entity.move();
+            }
 
             if (entity instanceof Player) {
                 List<Item> collisionItems = getLocalCollisionItems((Player) entity);
@@ -165,13 +176,14 @@ public class Level {
                     if (itemBlockTile.readyToCreateItem()) {
                         Item itemToCreate = itemBlockTile.getItemToCreate();
                         if (itemToCreate instanceof MushroomItem) {
-                            if (EntitySprite.MARIO_SMALL.contains(player.getSprite())) items.add(itemToCreate.newItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16, itemToCreate.getID(), itemToCreate.getSprite()));
-                            else {
+                            if (PlayerSprite.MARIO_SMALL.contains(player.getSprite())) {
+                                items.add(itemToCreate.newItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16));
+                            } else {
                                 FireFlowerItem fireFlowerItem = (FireFlowerItem) Item.items.get("fire_flower");
-                                items.add(fireFlowerItem.newAnimatedItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16, itemToCreate.getID(), fireFlowerItem.getSprites()));
+                                items.add(fireFlowerItem.newItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16));
                             }
                         }
-                        else items.add(itemToCreate.newItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16, itemToCreate.getID(), itemToCreate.getSprite()));
+                        else items.add(itemToCreate.newItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16));
                     }
 
                     if (itemBlockTile.isToBeDeleted()) {
@@ -289,8 +301,12 @@ public class Level {
 
         screen.drawHud(player.getCoinCount(), player.getScore(), timeRemaining, levelName);
 
+        onScreenEntities.clear();
         for (Entity entity : entities) {
-            entity.render(screen);
+            if (!screen.isOffScreen((int) entity.getX(), (int) entity.getY())) {
+                onScreenEntities.add(entity);
+                entity.render(screen);
+            }
         }
     }
 

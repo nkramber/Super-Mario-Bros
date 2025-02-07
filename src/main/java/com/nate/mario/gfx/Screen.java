@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.nate.mario.Main;
+import com.nate.mario.gfx.sprite.ItemSprite;
+import com.nate.mario.gfx.sprite.PlayerSprite;
+import com.nate.mario.gfx.sprite.Sprite;
 
 public class Screen {
 
@@ -17,7 +20,7 @@ public class Screen {
     private static final int SCREEN_LEFT_PADDING = -32;
 
     private Graphics2D g;
-    private HashMap<String, BufferedImage> sprites;
+    private HashMap<String, BufferedImage> entitySprites;
     private HashMap<String, BufferedImage> leftFacingSprites;
     private HashMap<String, BufferedImage> tiles;
     private HashMap<String, BufferedImage> items;
@@ -27,13 +30,14 @@ public class Screen {
 
     public Screen(Graphics2D g) {
         this.g = g;
-        sprites = new SpriteSheet("sprite_tile_ids.txt").getSprites("/sprites/entity_sprites.png", 16);
+        entitySprites = new SpriteSheet("player_sprite_tile_ids.txt").getSprites("/sprites/player_sprites.png", 16);
+        entitySprites.putAll(new SpriteSheet("enemy_sprite_tile_ids.txt").getSprites("/sprites/enemy_sprites.png", 16));
         tiles = new SpriteSheet("map_tile_ids.txt").getSprites("/sprites/tile_sprites.png", 16);
         items = new SpriteSheet("item_tile_ids.txt").getSprites("/sprites/item_sprites.png", 16);
         hud = new SpriteSheet("hud_tile_ids.txt").getSprites("/sprites/hud_sprites.png", 8);
 
         leftFacingSprites = new HashMap<>();
-        for (Map.Entry<String, BufferedImage> sprite : sprites.entrySet()) {
+        for (Map.Entry<String, BufferedImage> sprite : entitySprites.entrySet()) {
             String name = sprite.getKey();
             BufferedImage spriteImage = sprite.getValue();
 
@@ -44,11 +48,11 @@ public class Screen {
         }
     }
 
-    public void drawSprite(EntitySprite sprite, boolean facingLeft, int x, int y) {
+    public void drawSprite(Sprite sprite, boolean facingLeft, int x, int y) {
         if (!isOffScreen(x, y)) {
             if (!facingLeft) {
-                if (!sprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - sprite name does not exist!");
-                else g.drawImage(sprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
+                if (!entitySprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - sprite name does not exist!");
+                else g.drawImage(entitySprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
             } else {
                 if (!leftFacingSprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - sprite name does not exist!");
                 else g.drawImage(leftFacingSprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);

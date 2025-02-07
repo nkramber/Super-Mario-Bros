@@ -1,4 +1,4 @@
-package com.nate.mario.gfx;
+package com.nate.mario.gfx.sprite;
 
 public class ItemSprite {
 

@@ -2,29 +2,40 @@ package com.nate.mario.entity;
 
 import java.awt.Rectangle;
 import java.util.HashSet;
+import java.util.Map;
 
 import com.nate.mario.entity.player.Player;
-import com.nate.mario.gfx.EntitySprite;
 import com.nate.mario.gfx.Screen;
+import com.nate.mario.gfx.sprite.Sprite;
 import com.nate.mario.level.tile.Tile;
 
-public class Entity {
+public abstract class Entity {
+
+    public static Map<String, Entity> entities = Map.of(
+        "goomba", new Goomba(255)
+    );
+
+    private int id;
 
     protected float x, y;
     protected float xDir, yDir;
-    protected int width, height;
+    protected int width = 16;
+    protected int height;
     protected int jumpTick = 0;
-    protected EntitySprite currentSprite;
+    protected Sprite currentSprite;
     protected boolean onGround = false;
     protected boolean falling = false;
     protected boolean facingLeft = true;
 
-    public Entity(float xTile, float yTile, float xDir, float yDir, int width, EntitySprite currentSprite) {
+    public Entity(int id) {
+        this.id = id;
+    }
+
+    public Entity(float xTile, float yTile, float xDir, float yDir, Sprite currentSprite) {
         this.x = xTile * 16;
         this.y = yTile * 16;
         this.xDir = xDir;
         this.yDir = yDir;
-        this.width = width * 16;
         this.height = currentSprite.getHeight() * 16;
         this.currentSprite = currentSprite;
     }
@@ -77,12 +88,13 @@ public class Entity {
 
                         verticalEntityRect = new Rectangle((int) (newX) + xOffset, (int) (newY + yOffset), width - xOffset * 2, height - yOffset);
                         
-                        if (horizontalEntityRect.intersects(tileRect)) {
+                        // if (horizontalEntityRect.intersects(tileRect)) {
                             // continue;
-                        }
+                        // }
                     }
     
                     if (horizontalEntityRect.intersects(tileRect)) {
+                        System.out.println("Horizontal collision " + this.getClass());
                         xDir = 0;
                         if (tile.getxTile() * 16 < newX) newX = tile.getxTile() * 16 + 16 - xOffset;
                         else newX = tile.getxTile() * 16 - width + xOffset;
@@ -106,6 +118,8 @@ public class Entity {
         y = newY;
     }
 
+    public abstract Entity newEntity(int xTile, int yTile);
+
     public void updateAnimation() {}
 
     public float getX() { return x; }
@@ -114,5 +128,6 @@ public class Entity {
     public float getyDir() { return yDir; }
     public int getWidth() { return width; }
     public int getHeight() { return height; }
-    public EntitySprite getSprite() { return currentSprite; }
+    public int getID() { return id; }
+    public Sprite getSprite() { return currentSprite; }
 }

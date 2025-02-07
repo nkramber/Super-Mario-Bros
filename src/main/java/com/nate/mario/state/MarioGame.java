@@ -3,8 +3,8 @@ package com.nate.mario.state;
 import java.util.HashMap;
 
 import com.nate.mario.entity.player.Player;
-import com.nate.mario.gfx.EntitySprite;
 import com.nate.mario.gfx.Screen;
+import com.nate.mario.gfx.sprite.PlayerSprite;
 import com.nate.mario.level.Level;
 import com.nate.mario.level.LevelLoader;
 import com.nate.mario.util.Timer;
@@ -23,7 +23,7 @@ public class MarioGame extends GameState {
 
     public MarioGame(Screen screen) {
         this.screen = screen;
-        player = new Player(0, 0, 0, EntitySprite.MARIO_SMALL_STILL);
+        player = new Player(0, 0, 0);
 
         levels = LevelLoader.loadLevels();
         setLevel(0);
@@ -56,7 +56,7 @@ public class MarioGame extends GameState {
     private void setLevel(int levelNumber) {
         currentLevel = levels.get(levelNumber);
         currentLevelNumber = levelNumber;
-        player = new Player(currentLevel.getPlayerSpawnX(), currentLevel.getPlayerSpawnY(), player.getScore(), player.getSprite());
+        player = new Player(currentLevel.getPlayerSpawnX(), currentLevel.getPlayerSpawnY(), player.getScore());
         currentLevel.addPlayer(player);
         screen.resetScroll();
     }
