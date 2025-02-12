@@ -23,25 +23,32 @@ import com.nate.mario.level.tile.Tile;
 public class Level {
 
     private static final int TIME_TICK_INTERVAL = 400;
+    private final int deathHeight;
 
     public Tile[][] tiles;
     public List<Item> items;
     
+    private BufferedImage levelImage;
     private String levelName;
     private Color levelType;
     
     private Player player;
     private int playerSpawnX, playerSpawnY;
+    private int playerLives;
     private List<Entity> entities;
     private List<Entity> onScreenEntities;
     
     private long timeInMillis;
     private int timeRemaining;
-    private boolean levelFinished = false;
-    private boolean gameOver = false;
+    private boolean resetLevel;
+    private boolean levelFinished;
+    private boolean gameOver;
+    private boolean playerDying;
 
     public Level(BufferedImage levelImage, String levelName) {
+        this.levelImage = levelImage;
         this.levelName = levelName;
+        playerLives = 2;
 
         int width = levelImage.getWidth();
         int height = levelImage.getHeight();
@@ -106,13 +113,41 @@ public class Level {
                 if (tiles[x][y] == null) throw new IllegalArgumentException("Valid tile does not exist at " + x + ", " + y + " on level " + levelName);
             }
         }
+
+        deathHeight = tiles[0].length * 16 - 32;
+    }
+
+    public Level newLevel() {
+        Level newLevel = new Level(getLevelImage(), getLevelName());
+        newLevel.setPlayerLives(playerLives);
+        return newLevel;
     }
 
     public void tick(boolean[] keys) {
-        decrementTime();
-        if (timeRemaining == 0) gameOver = true;
+        System.out.println(playerLives);
+        if (player.isInDyingAnimation()) {
+            resetLevel = true;
+            return;
+        }
 
-        if (player.isAnimating()) {
+        decrementTime();
+        if (timeRemaining == 0 || player.isDead() || player.getY() > deathHeight) {
+            if (playerLives > 0) {
+                playerLives--;
+                player.setInDyingAnimation();
+            } else gameOver = true;
+            return;
+        }
+
+        if (playerDying) {
+            if (player.getY() <= deathHeight) {
+                player.move();
+            } else {
+                resetLevel = true;
+            }
+        }
+
+        if (player.isDoingPowerUpAnimation()) {
             player.updateAnimation();
             return;
         }
@@ -121,13 +156,6 @@ public class Level {
         for (Entity entity : entities) {
             if (entity.isToBeDeleted()) {
                 entitiesToRemove.add(entity);
-            }
-
-            if (entity instanceof Player) {
-                if (player.getY() > tiles[0].length * 16 - 16 - player.getHeight()) {
-                    gameOver = true;
-                    return;
-                }
             }
             
             if (onScreenEntities.contains(entity) || entity instanceof Player) {
@@ -262,7 +290,7 @@ public class Level {
     }
 
     private void decrementTime() {
-        if (player.isAnimating()) {
+        if (player.isDoingPowerUpAnimation()) {
             timeInMillis = System.currentTimeMillis();
             return;
         }
@@ -320,12 +348,14 @@ public class Level {
         entities.add(0, player);
     }
     
-    public void addMob(Entity entity) { entities.add(entity); }
+    public void setPlayerLives(int playerLives) { this.playerLives = playerLives; }
 
     public Tile[][] getTiles() { return tiles; }
     public boolean isLevelFinished() { return levelFinished; }
     public boolean isGameOver() { return gameOver; }
+    public boolean resetLevel() { return resetLevel; }
     public String getLevelName() { return levelName; }
     public int getPlayerSpawnX() { return playerSpawnX; }
     public int getPlayerSpawnY() { return playerSpawnY; }
+    public BufferedImage getLevelImage() { return levelImage; }
 }

@@ -136,7 +136,7 @@ public abstract class Entity {
 
             if (localCollisionRectangle.intersects(otherCollisionRectangle)) {
                 if (entity instanceof Player) continue;
-                else System.out.println("Goomba collision!"); //Handle enemy on enemy collision here. Check game for what happens
+                //else  //Handle enemy on enemy collision here. Check irl game for what happens
             }
         }
     }

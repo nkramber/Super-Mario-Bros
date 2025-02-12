@@ -28,6 +28,7 @@ public class Player extends Entity {
     private static final float VER_ACCEL_RATE = 0.35f;
     private static final float VER_MAX_SPEED = 7.0f;
     private static final float SKID_RATE = 1.3f;
+    private static final float MONSTER_JUMPED_ON_SPEED = -3.2f;
     private static final float[] JUMP_SPEED_RATE = {
         -3.9f,
         -3.9f,
@@ -71,14 +72,15 @@ public class Player extends Entity {
     private float currentHorMaxSpeed = WALK_MAX_SPEED;
 
     private PowerUpState powerUpState = PowerUpState.SMALL;
-    private boolean hasJumped = false;
-    private boolean sprinting = false;
-    private boolean skidding = false;
-    private boolean growing = false;
-    private boolean shrinking = false;
-    private boolean gainedFireFlower = false;
+    private boolean isDead;
+    private boolean inDyingAnimation;
+    private boolean hasJumped;
+    private boolean sprinting;
+    private boolean skidding;
+    private boolean growing;
+    private boolean shrinking;
+    private boolean gainedFireFlower;
     
-    private int lives = 3;
     private int score = 0;
     private int coinCount = 0;
     private int maxX;
@@ -95,6 +97,12 @@ public class Player extends Entity {
         skidding = false;
         if (yDir != 0 && onGround) onGround = false;
 
+        //Falling
+        if (!onGround) {
+            if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
+            else yDir += VER_ACCEL_RATE;
+        }
+
         if ((keys[actionKey] || keys[actionKey2]) && !sprinting) {
             sprinting = true;
             currentHorAccelRate = SPRINT_ACCEL_RATE;
@@ -105,12 +113,6 @@ public class Player extends Entity {
             currentHorAccelRate = WALK_ACCEL_RATE;
             currentHorDecelRate = WALK_DECEL_RATE;
             currentHorMaxSpeed = WALK_MAX_SPEED;
-        }
-
-        //Falling
-        if (!onGround) {
-            if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
-            else yDir += VER_ACCEL_RATE;
         }
         
         //Either both sideways keys are being held or neither of them are, so slow down
@@ -281,15 +283,23 @@ public class Player extends Entity {
 
     @Override
     public void doEntityCollisions(List<Entity> entities) {
+        int yOffset = 4;
+        int xOffset = 2;
+
         for (Entity entity : entities) {
             if (entity.equals(this)) continue;
-            Rectangle localCollisionRectangle = new Rectangle((int) getX(), (int) getY(), getWidth(), getHeight());
+            Rectangle localCollisionRectangle = new Rectangle((int) x + xOffset, (int) y + yOffset, width - xOffset * 2, height - yOffset * 2);
             Rectangle otherCollisionRectangle = new Rectangle((int) entity.getX(), (int) entity.getY(), entity.getWidth(), entity.getHeight());
 
             if (localCollisionRectangle.intersects(otherCollisionRectangle)) {
                 if (entity instanceof Goomba) {
-                    entity.setToBeDeleted();
-                    addToScore(250); //Change score to whatever goombas give
+                    if (y + 2 < entity.getY() && yDir > 0) {
+                        yDir = MONSTER_JUMPED_ON_SPEED;
+                        entity.setToBeDeleted();
+                        addToScore(100); //Add multiplicitave scoring for player still in the air combos
+                    } else {
+                        isDead = true;
+                    }
                 }
             }
         }
@@ -444,10 +454,12 @@ public class Player extends Entity {
 
     public int getCoinCount() { return coinCount; }
     public int getScore() { return score; }
-    public int getLives() { return lives; }
-    public boolean isAnimating() { return growing || shrinking || gainedFireFlower; }
+    public boolean isDoingPowerUpAnimation() { return growing || shrinking || gainedFireFlower; }
+    public boolean isDead() { return isDead; }
+    public boolean isInDyingAnimation() { return inDyingAnimation; }
 
-    public void reduceLives() { lives--; }
+    public void setyDir(float yDir) { this.yDir = yDir; }
+    public void setInDyingAnimation() { inDyingAnimation = true; }
 
     @Override
     public Entity newEntity(int xTile, int yTile) {

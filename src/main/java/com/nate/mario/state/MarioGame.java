@@ -34,6 +34,9 @@ public class MarioGame extends GameState {
             gameOverTimer.tick();
         } else if (currentLevel.isGameOver()) {
             setGameOver();
+        } else if (currentLevel.resetLevel()) {
+            // System.out.println(currentLevel.getPlayerLives()); // Determine why lives reset to 2
+            setLevel(currentLevelNumber);
         } else {
             currentLevel.tick(keys);
 
@@ -53,8 +56,8 @@ public class MarioGame extends GameState {
     }
 
     private void setLevel(int levelNumber) {
-        currentLevel = levels.get(levelNumber);
-        currentLevelNumber = levelNumber;
+        Level levelToGet = levels.get(levelNumber);
+        currentLevel = levelToGet.newLevel();
         player = new Player(currentLevel.getPlayerSpawnX(), currentLevel.getPlayerSpawnY(), player.getScore());
         currentLevel.addPlayer(player);
         screen.resetScroll();
