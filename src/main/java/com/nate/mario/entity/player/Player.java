@@ -16,6 +16,7 @@ import com.nate.mario.item.PowerUpItem;
 import com.nate.mario.level.Level;
 import com.nate.mario.level.tile.ItemBlockTile;
 import com.nate.mario.level.tile.Tile;
+import com.nate.mario.util.Timer;
 
 public class Player extends Entity {
 
@@ -71,7 +72,9 @@ public class Player extends Entity {
     private float currentHorDecelRate = WALK_DECEL_RATE;
     private float currentHorMaxSpeed = WALK_MAX_SPEED;
 
+    private Timer deathTimer = null;
     private PowerUpState powerUpState = PowerUpState.SMALL;
+
     private boolean isDead;
     private boolean inDyingAnimation;
     private boolean hasJumped;
@@ -97,10 +100,20 @@ public class Player extends Entity {
         skidding = false;
         if (yDir != 0 && onGround) onGround = false;
 
+        if (deathTimer != null) {
+            deathTimer.tick();
+            if (deathTimer.getElapsedTime() < 500) return;
+            else {
+                deathTimer = null;
+                yDir = -5.0f;
+            }
+        }
+
         //Falling
         if (!onGround) {
             if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
             else yDir += VER_ACCEL_RATE;
+            if (inDyingAnimation) return;
         }
 
         if ((keys[actionKey] || keys[actionKey2]) && !sprinting) {
@@ -358,6 +371,11 @@ public class Player extends Entity {
     public void updateAnimation() {
         if (time == 0) time = System.currentTimeMillis();
 
+        if (inDyingAnimation) {
+            currentSprite = PlayerSprite.MARIO_SMALL_DIE;
+            return;
+        }
+
         if (growing) {
             animationFrame++;
             currentSprite = PlayerSprite.MARIO_GROW_ANIMATION.get(animationFrame / 5);
@@ -457,9 +475,15 @@ public class Player extends Entity {
     public boolean isDoingPowerUpAnimation() { return growing || shrinking || gainedFireFlower; }
     public boolean isDead() { return isDead; }
     public boolean isInDyingAnimation() { return inDyingAnimation; }
+    public Timer getDeathTimer() { return deathTimer; }
 
+    public void setxDir(float xDir) { this.xDir = xDir; }
     public void setyDir(float yDir) { this.yDir = yDir; }
-    public void setInDyingAnimation() { inDyingAnimation = true; }
+    public void setInDyingAnimation() {
+        inDyingAnimation = true;
+        deathTimer = new Timer();
+    }
+    public void setNotOnGround() { onGround = false; }
 
     @Override
     public Entity newEntity(int xTile, int yTile) {

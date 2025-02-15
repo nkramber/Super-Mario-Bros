@@ -14,6 +14,7 @@ public class MarioGame extends GameState {
     private HashMap<Integer, Level> levels;
     private Level currentLevel;
     private int currentLevelNumber;
+    private int playerLives;
 
     private boolean gameOver = false;
     private Timer gameOverTimer;
@@ -23,6 +24,7 @@ public class MarioGame extends GameState {
     public MarioGame(Screen screen) {
         this.screen = screen;
         player = new Player(0, 0, 0);
+        playerLives = 2;
 
         levels = LevelLoader.loadLevels();
         setLevel(0);
@@ -32,11 +34,17 @@ public class MarioGame extends GameState {
     public void tick(boolean[] keys) {
         if (gameOver) {
             gameOverTimer.tick();
-        } else if (currentLevel.isGameOver()) {
-            setGameOver();
+
+            if (gameOverTimer.getElapsedTime() >= 7000) {
+                gameOver = false;
+                gameOverTimer = null;
+                newGame();
+            }
         } else if (currentLevel.resetLevel()) {
-            // System.out.println(currentLevel.getPlayerLives()); // Determine why lives reset to 2
-            setLevel(currentLevelNumber);
+            if (playerLives > 0) {
+                playerLives--;
+                setLevel(currentLevelNumber);
+            } else setGameOver();
         } else {
             currentLevel.tick(keys);
 
@@ -57,7 +65,7 @@ public class MarioGame extends GameState {
 
     private void setLevel(int levelNumber) {
         Level levelToGet = levels.get(levelNumber);
-        currentLevel = levelToGet.newLevel();
+        currentLevel = levelToGet.newLevel(playerLives);
         player = new Player(currentLevel.getPlayerSpawnX(), currentLevel.getPlayerSpawnY(), player.getScore());
         currentLevel.addPlayer(player);
         screen.resetScroll();
@@ -65,20 +73,13 @@ public class MarioGame extends GameState {
 
     private void newGame() {
         levels = LevelLoader.loadLevels();
+        playerLives = 2;
         setLevel(0);
     }
 
     @Override
     public void render() {
-        if (gameOver) {
-            if (gameOverTimer.getElapsedTime() < 7000) {
-                screen.drawGameOver(player.getCoinCount(), player.getScore(), currentLevel.getLevelName());
-            } else {
-                gameOver = false;
-                gameOverTimer = null;
-                newGame();
-            }
-        }
+        if (gameOver) screen.drawGameOver(player.getCoinCount(), player.getScore(), currentLevel.getLevelName());
         else currentLevel.render(screen);
     }
 }

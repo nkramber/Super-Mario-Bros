@@ -24,6 +24,7 @@ public class Level {
 
     private static final int TIME_TICK_INTERVAL = 400;
     private final int deathHeight;
+    private final int dyingAnimationHeight;
 
     public Tile[][] tiles;
     public List<Item> items;
@@ -34,7 +35,6 @@ public class Level {
     
     private Player player;
     private int playerSpawnX, playerSpawnY;
-    private int playerLives;
     private List<Entity> entities;
     private List<Entity> onScreenEntities;
     
@@ -43,12 +43,10 @@ public class Level {
     private boolean resetLevel;
     private boolean levelFinished;
     private boolean gameOver;
-    private boolean playerDying;
 
     public Level(BufferedImage levelImage, String levelName) {
         this.levelImage = levelImage;
         this.levelName = levelName;
-        playerLives = 2;
 
         int width = levelImage.getWidth();
         int height = levelImage.getHeight();
@@ -115,36 +113,37 @@ public class Level {
         }
 
         deathHeight = tiles[0].length * 16 - 32;
+        dyingAnimationHeight = tiles[0].length * 16 + 128;
     }
 
-    public Level newLevel() {
+    public Level newLevel(int playerLives) {
         Level newLevel = new Level(getLevelImage(), getLevelName());
-        newLevel.setPlayerLives(playerLives);
         return newLevel;
     }
 
     public void tick(boolean[] keys) {
-        System.out.println(playerLives);
         if (player.isInDyingAnimation()) {
-            resetLevel = true;
-            return;
-        }
-
-        decrementTime();
-        if (timeRemaining == 0 || player.isDead() || player.getY() > deathHeight) {
-            if (playerLives > 0) {
-                playerLives--;
-                player.setInDyingAnimation();
-            } else gameOver = true;
-            return;
-        }
-
-        if (playerDying) {
-            if (player.getY() <= deathHeight) {
+            if (player.getY() <= dyingAnimationHeight) {
+                player.updateAnimation();
+                player.getMovement(keys, this);
                 player.move();
             } else {
                 resetLevel = true;
             }
+            return;
+        }
+
+        decrementTime();
+        // if (player.getY() > deathHeight) {
+            // resetLevel = true;
+        // }
+
+        if (timeRemaining == 0 || player.isDead() || player.getY() > deathHeight) {
+            player.setxDir(0);
+            player.setyDir(0);
+            player.setNotOnGround();
+            player.setInDyingAnimation();
+            return;
         }
 
         if (player.isDoingPowerUpAnimation()) {
@@ -347,8 +346,6 @@ public class Level {
         this.player = player;
         entities.add(0, player);
     }
-    
-    public void setPlayerLives(int playerLives) { this.playerLives = playerLives; }
 
     public Tile[][] getTiles() { return tiles; }
     public boolean isLevelFinished() { return levelFinished; }
