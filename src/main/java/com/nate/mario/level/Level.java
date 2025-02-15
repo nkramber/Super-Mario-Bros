@@ -335,11 +335,14 @@ public class Level {
 
         onScreenEntities.clear();
         for (Entity entity : entities) {
+            if (entity instanceof Player) continue;
             if (!screen.isOffScreen((int) entity.getX(), (int) entity.getY())) {
                 onScreenEntities.add(entity);
                 entity.render(screen);
             }
         }
+
+        player.render(screen);
     }
 
     public void addPlayer(Player player) { 
