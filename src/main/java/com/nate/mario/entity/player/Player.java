@@ -102,7 +102,7 @@ public class Player extends Entity {
 
         if (deathTimer != null) {
             deathTimer.tick();
-            if (deathTimer.getElapsedTime() < 500) return;
+            if (deathTimer.getElapsedTime() < 750) return;
             else {
                 deathTimer = null;
                 yDir = -5.0f;

@@ -112,8 +112,8 @@ public class Level {
             }
         }
 
-        deathHeight = tiles[0].length * 16 - 32;
-        dyingAnimationHeight = tiles[0].length * 16 + 128;
+        deathHeight = tiles[0].length * 16 - 48;
+        dyingAnimationHeight = tiles[0].length * 16 + 450;
     }
 
     public Level newLevel(int playerLives) {
@@ -134,9 +134,6 @@ public class Level {
         }
 
         decrementTime();
-        // if (player.getY() > deathHeight) {
-            // resetLevel = true;
-        // }
 
         if (timeRemaining == 0 || player.isDead() || player.getY() > deathHeight) {
             player.setxDir(0);
@@ -153,7 +150,7 @@ public class Level {
 
         List<Entity> entitiesToRemove = new ArrayList<>();
         for (Entity entity : entities) {
-            if (entity.isToBeDeleted()) {
+            if (entity.isToBeDeleted() || entity.getY() > deathHeight) {
                 entitiesToRemove.add(entity);
             }
             
@@ -336,7 +333,7 @@ public class Level {
         onScreenEntities.clear();
         for (Entity entity : entities) {
             if (entity instanceof Player) continue;
-            if (!screen.isOffScreen((int) entity.getX(), (int) entity.getY())) {
+            if (!screen.isOffScreen((int) entity.getX(), 0)) {
                 onScreenEntities.add(entity);
                 entity.render(screen);
             }

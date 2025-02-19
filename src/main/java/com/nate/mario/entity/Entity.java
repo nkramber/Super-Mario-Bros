@@ -129,14 +129,17 @@ public abstract class Entity {
     }
 
     public void doEntityCollisions(List<Entity> entities) {
+        int xOffset = 3;
+
         for (Entity entity : entities) {
             if (entity.equals(this)) continue;
-            Rectangle localCollisionRectangle = new Rectangle((int) getX(), (int) getY(), getWidth(), getHeight());
-            Rectangle otherCollisionRectangle = new Rectangle((int) entity.getX(), (int) entity.getY(), entity.getWidth(), entity.getHeight());
+            Rectangle localCollisionRectangle = new Rectangle((int) getX() + xOffset, (int) getY(), getWidth() - xOffset * 2, getHeight());
+            Rectangle otherCollisionRectangle = new Rectangle((int) entity.getX() + xOffset, (int) entity.getY(), entity.getWidth() - xOffset * 2, entity.getHeight());
 
             if (localCollisionRectangle.intersects(otherCollisionRectangle)) {
                 if (entity instanceof Player) continue;
-                //else  //Handle enemy on enemy collision here. Check irl game for what happens
+                xDir = -xDir;
+                entity.setxDir(-entity.getxDir());
             }
         }
     }
@@ -145,6 +148,7 @@ public abstract class Entity {
 
     public void updateAnimation() {}
     public void setToBeDeleted() { isToBeDeleted = true; }
+    public void setxDir(float xDir) { this.xDir = xDir; }
 
     public float getX() { return x; }
     public float getY() { return y; }
