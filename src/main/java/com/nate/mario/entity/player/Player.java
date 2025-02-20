@@ -20,6 +20,7 @@ import com.nate.mario.util.Timer;
 
 public class Player extends Entity {
 
+    private static final int DEATH_TIMER_TIME = 750; //time in ms before we begin our death animation
     private static final float WALK_DECEL_RATE = 0.1f;
     private static final float WALK_ACCEL_RATE = 0.03f;
     private static final float WALK_MAX_SPEED = 1.5f;
@@ -100,89 +101,28 @@ public class Player extends Entity {
         skidding = false;
         if (yDir != 0 && onGround) onGround = false;
 
-        if (deathTimer != null) {
-            deathTimer.tick();
-            if (deathTimer.getElapsedTime() < 750) return;
-            else {
-                deathTimer = null;
-                yDir = -5.0f;
-            }
-        }
+        //If the death timer exists, we are dead and waiting to start our death animation
+        if (deathTimer != null) if (tickDeathTimer()) return; //update our death timer, returns true if we've been dead enough time to begin the death animation
 
-        //Falling
-        if (!onGround) {
-            if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
-            else yDir += VER_ACCEL_RATE;
-            if (inDyingAnimation) return;
-        }
+        //This mean we're either falling or dead
+        if (!onGround) doGravity();
+        //Skip movement calculation if we're dead
+        if (inDyingAnimation) return;
 
-        if ((keys[actionKey] || keys[actionKey2]) && !sprinting) {
-            sprinting = true;
-            currentHorAccelRate = SPRINT_ACCEL_RATE;
-            currentHorDecelRate = SPRINT_DECEL_RATE;
-            currentHorMaxSpeed = SPRINT_MAX_SPEED;
-        } else if ((!keys[actionKey] && !keys[actionKey2]) && sprinting) {
-            sprinting = false;
-            currentHorAccelRate = WALK_ACCEL_RATE;
-            currentHorDecelRate = WALK_DECEL_RATE;
-            currentHorMaxSpeed = WALK_MAX_SPEED;
-        }
+        //Check if our sprint state has changed since the last tick. If we were sprinting but are not pressing the action key, "un-sprint" the player and vice-versa
+        if ((keys[actionKey] || keys[actionKey2]) && !sprinting) isSprinting();
+        else if ((!keys[actionKey] && !keys[actionKey2]) && sprinting) isWalking();
         
         //Either both sideways keys are being held or neither of them are, so slow down
-        if ((!keys[leftKey] && !keys[rightKey]) || (keys[leftKey] && keys[rightKey])) {
-            if (xDir > 0) {
-                if (xDir - currentHorDecelRate < 0) xDir = 0;
-                else xDir -= currentHorDecelRate;
-            } else if (xDir < 0) {
-                if (xDir + currentHorDecelRate > 0) xDir = 0;
-                else xDir += currentHorDecelRate;
-            }
-        } else if (keys[leftKey]) {
-            if (onGround) facingLeft = true;
-            if (xDir > 0) { //If we're moving to the right when we press left, we 'skid'
-                if (xDir - currentHorDecelRate * SKID_RATE < 0) { //Done skidding
-                    xDir = 0;
-                } else {
-                    if ((hasJumped && !onGround) || (falling && !onGround)) xDir -= currentHorDecelRate / 3; //If we're in the air, don't skid, instead only reduce our momentum by only a small amount
-                    else {
-                        skidding = true;
-                        xDir -= currentHorDecelRate * SKID_RATE;
-                    }
-                }
-            } else if (xDir - currentHorAccelRate < -currentHorMaxSpeed) { //Reached max speed in the left direction
-                if (!sprinting) xDir += currentHorDecelRate;
-                else xDir = -currentHorMaxSpeed;
-            } else {
-                if ((hasJumped && !onGround) || (falling && !onGround)) xDir -= currentHorAccelRate / 3; //If we're in the air, only increase our momentum by a small amount
-                else xDir -= currentHorAccelRate;
-            }
-        } else if (keys[rightKey]) {
-            if (onGround) facingLeft = false;
-            if (xDir < 0) { //If we're moving to the left when we press right, we 'skid'
-                if (xDir + currentHorDecelRate * SKID_RATE > 0) { //Done skidding
-                    xDir = 0;
-                } else {
-                    if ((hasJumped && !onGround) || (falling && !onGround)) xDir += currentHorDecelRate / 3; //If we're in the air, don't skid
-                    else {
-                        skidding = true;
-                        xDir += currentHorDecelRate * SKID_RATE;
-                    }
-                }
-            } else if (xDir + currentHorAccelRate > currentHorMaxSpeed) { //Reached max speed in the right direction
-                if (!sprinting) xDir -= currentHorDecelRate;
-                else xDir = currentHorMaxSpeed;
-            } else {
-                if ((hasJumped && !onGround) || (falling && !onGround)) xDir += currentHorAccelRate / 3; //If we're in the air, only increase our momentum by a small amount
-                else xDir += currentHorAccelRate;
-            }
-        }
+        if ((!keys[leftKey] && !keys[rightKey]) || (keys[leftKey] && keys[rightKey])) horizontalDeceleration();
+
+        else if (keys[leftKey]) moveLeft();
+        else if (keys[rightKey]) moveRight();
 
         //Only update the maxX variable if the player has advanced further to the right, and the player hasn't
         //reached the right edge of the screen. Without this the ability of the player to retreat to the left
         //would be prevented once the camera stops scrolling to the right at the edge of the level
-        if (x > maxX && x < level.getTiles().length * 16 - 190) {
-            maxX = (int) x;
-        }
+        if (x > maxX && x < level.getTiles().length * 16 - 190) maxX = (int) x;
 
         //Prevent player from retreating backwards
         if (x + xDir < maxX - 96) {
@@ -190,29 +130,13 @@ public class Player extends Entity {
             xDir = 0;
         }
 
-        //Prevent player from clipping past right side of level
-        if (x + xDir >= level.getTiles().length * 16 - 48) {
-            x = level.getTiles().length * 16 - 48;
-            xDir = 0;
-        }
+        //Prevent the player from clipping into the invisible tiles on the far left and far right of the level
+        preventClippingOutsideLevel(level.getTiles().length);
 
-        //Prevent player from clipping past left side of level
-        if (x + xDir < 32) {
-            x = 32;
-            xDir = 0;
-        }
+        //Jump
+        if (keys[jumpKey] || keys[jumpKey2]) doJump();
 
-        if (keys[jumpKey] || keys[jumpKey2]) {
-            if (jumpTick == 0 && onGround && !hasJumped) {
-                hasJumped = true;
-                yDir = JUMP_SPEED_RATE[jumpTick++];
-            } else if (jumpTick > 0 && jumpTick < JUMP_SPEED_RATE.length) {
-                yDir = JUMP_SPEED_RATE[jumpTick++];
-            } else if (jumpTick == JUMP_SPEED_RATE.length) {
-                jumpTick = 0;
-            }
-        }
-
+        //Stop jumping
         if (!keys[jumpKey] && !keys[jumpKey2]) {
             jumpTick = 0;
             if (onGround && hasJumped) hasJumped = false;
@@ -458,17 +382,112 @@ public class Player extends Entity {
         }
     }
 
-    private void increaseCoinCount() {
-        coinCount++;
+    private boolean tickDeathTimer() {
+        deathTimer.tick();
+        if (deathTimer.getElapsedTime() < DEATH_TIMER_TIME) return true;
+        deathTimer = null;
+        yDir = -5.0f;
+        return false;
     }
 
-    private void addToScore(int amountToAdd) {
-        score = score + amountToAdd;
+    private void doGravity() {
+        if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
+        else yDir += VER_ACCEL_RATE;
     }
 
-    public void setHeight(int tiles) {
-        height = tiles * PlayerSprite.TILE_HEIGHT;
+    private void horizontalDeceleration() {
+        if (xDir > 0) {
+            if (xDir - currentHorDecelRate < 0) xDir = 0;
+            else xDir -= currentHorDecelRate;
+        } else if (xDir < 0) {
+            if (xDir + currentHorDecelRate > 0) xDir = 0;
+            else xDir += currentHorDecelRate;
+        }
     }
+
+    private void moveLeft() {
+        if (onGround) facingLeft = true;
+        if (xDir > 0) { //If we're moving to the right when we press left, we 'skid'
+            if (xDir - currentHorDecelRate * SKID_RATE < 0) { //Done skidding
+                xDir = 0;
+            } else {
+                if ((hasJumped && !onGround) || (falling && !onGround)) xDir -= currentHorDecelRate / 3; //If we're in the air, don't skid, instead only reduce our momentum by only a small amount
+                else {
+                    skidding = true;
+                    xDir -= currentHorDecelRate * SKID_RATE;
+                }
+            }
+        } else if (xDir - currentHorAccelRate < -currentHorMaxSpeed) { //Reached max speed in the left direction
+            if (!sprinting) xDir += currentHorDecelRate;
+            else xDir = -currentHorMaxSpeed;
+        } else {
+            if ((hasJumped && !onGround) || (falling && !onGround)) xDir -= currentHorAccelRate / 3; //If we're in the air, only increase our momentum by a small amount
+            else xDir -= currentHorAccelRate;
+        }
+    }
+
+    private void moveRight() {
+        if (onGround) facingLeft = false;
+        if (xDir < 0) { //If we're moving to the left when we press right, we 'skid'
+            if (xDir + currentHorDecelRate * SKID_RATE > 0) { //Done skidding
+                xDir = 0;
+            } else {
+                if ((hasJumped && !onGround) || (falling && !onGround)) xDir += currentHorDecelRate / 3; //If we're in the air, don't skid
+                else {
+                    skidding = true;
+                    xDir += currentHorDecelRate * SKID_RATE;
+                }
+            }
+        } else if (xDir + currentHorAccelRate > currentHorMaxSpeed) { //Reached max speed in the right direction
+            if (!sprinting) xDir -= currentHorDecelRate;
+            else xDir = currentHorMaxSpeed;
+        } else {
+            if ((hasJumped && !onGround) || (falling && !onGround)) xDir += currentHorAccelRate / 3; //If we're in the air, only increase our momentum by a small amount
+            else xDir += currentHorAccelRate;
+        }
+    }
+
+    private void isSprinting() {
+        sprinting = true;
+        currentHorAccelRate = SPRINT_ACCEL_RATE;
+        currentHorDecelRate = SPRINT_DECEL_RATE;
+        currentHorMaxSpeed = SPRINT_MAX_SPEED;
+    }
+
+    private void isWalking() {
+        sprinting = false;
+        currentHorAccelRate = WALK_ACCEL_RATE;
+        currentHorDecelRate = WALK_DECEL_RATE;
+        currentHorMaxSpeed = WALK_MAX_SPEED;
+    }
+
+    private void preventClippingOutsideLevel(int mapWidthInTiles) {
+        //Prevent player from clipping past right side of level
+        if (x + xDir >= mapWidthInTiles * 16 - 48) {
+            x = mapWidthInTiles * 16 - 48;
+            xDir = 0;
+        }
+
+        //Prevent player from clipping past left side of level
+        if (x + xDir < 32) {
+            x = 32;
+            xDir = 0;
+        }
+    }
+
+    private void doJump() {
+        if (jumpTick == 0 && onGround && !hasJumped) {
+            hasJumped = true;
+            yDir = JUMP_SPEED_RATE[jumpTick++];
+        } else if (jumpTick > 0 && jumpTick < JUMP_SPEED_RATE.length) {
+            yDir = JUMP_SPEED_RATE[jumpTick++];
+        } else if (jumpTick == JUMP_SPEED_RATE.length) {
+            jumpTick = 0;
+        }
+    }
+
+    private void increaseCoinCount() { coinCount++; }
+    private void addToScore(int amountToAdd) { score = score + amountToAdd; }
 
     public int getCoinCount() { return coinCount; }
     public int getScore() { return score; }
@@ -476,14 +495,15 @@ public class Player extends Entity {
     public boolean isDead() { return isDead; }
     public boolean isInDyingAnimation() { return inDyingAnimation; }
     public Timer getDeathTimer() { return deathTimer; }
-
+    
+    public void setNotOnGround() { onGround = false; }
+    public void setHeight(int tiles) { height = tiles * PlayerSprite.TILE_HEIGHT; }
     public void setxDir(float xDir) { this.xDir = xDir; }
     public void setyDir(float yDir) { this.yDir = yDir; }
     public void setInDyingAnimation() {
         inDyingAnimation = true;
         deathTimer = new Timer();
     }
-    public void setNotOnGround() { onGround = false; }
 
     @Override
     public Entity newEntity(int xTile, int yTile) {
