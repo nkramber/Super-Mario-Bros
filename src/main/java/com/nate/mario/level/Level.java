@@ -122,55 +122,76 @@ public class Level {
     }
 
     public void tick(boolean[] keys) {
+        decrementLevelTime();
+
+        boolean skipRestOfTick = tickPlayer(keys);
+        if (skipRestOfTick) return;
+
+        tickEntities();
+        tickItems();
+        tickTiles();
+    }
+
+    private boolean tickPlayer(boolean[] keys) {
         if (player.isInDyingAnimation()) {
             if (player.getY() <= dyingAnimationHeight) {
                 player.updateAnimation();
-                player.getMovement(keys, this);
+                if (player.getDeathTimer() != null) player.tickDeathTimer();
+                else player.doGravity();
                 player.move();
             } else {
                 resetLevel = true;
             }
-            return;
+            return true;
         }
-
-        decrementTime();
 
         if (timeRemaining == 0 || player.isDead() || player.getY() > deathHeight) {
             player.setxDir(0);
             player.setyDir(0);
             player.setNotOnGround();
             player.setInDyingAnimation();
-            return;
+            return true;
         }
 
         if (player.isDoingPowerUpAnimation()) {
             player.updateAnimation();
-            return;
+            return true;
         }
 
+        player.getMovement(keys, this);
+        player.doTileCollisions(getLocalCollisionTiles(player));
+        if (!player.isInvincible()) player.doEntityCollisions(entities);
+        else player.tickInvincibleTimer();
+
+        player.move();
+
+        List<Item> collisionItems = getLocalCollisionItems(player);
+        player.doItemCollisions(collisionItems);
+
+        return false;
+    }
+
+    private void tickEntities() {
         List<Entity> entitiesToRemove = new ArrayList<>();
         for (Entity entity : entities) {
             if (entity.isToBeDeleted() || entity.getY() > deathHeight) {
                 entitiesToRemove.add(entity);
             }
             
-            if (onScreenEntities.contains(entity) || entity instanceof Player) {
-                entity.getMovement(keys, this);
+            if (onScreenEntities.contains(entity)) {
+                entity.getMovement();
                 entity.doTileCollisions(getLocalCollisionTiles(entity));
                 entity.doEntityCollisions(entities);
                 entity.move();
-            }
-
-            if (entity instanceof Player) {
-                List<Item> collisionItems = getLocalCollisionItems((Player) entity);
-                player.doItemCollisions(collisionItems);
             }
 
             entity.updateAnimation();
         }
 
         for (Entity entity : entitiesToRemove) entities.remove(entity); //add death animation to goombas
+    }
 
+    private void tickItems() {
         List<Item> itemsToRemove = new ArrayList<>();
         for (Item item : items) {
             if (item.isToBeDeleted()) {
@@ -191,7 +212,9 @@ public class Level {
         }
 
         for (Item item : itemsToRemove) items.remove(item);
+    }
 
+    private void tickTiles() {
         for (int x = 0; x < tiles.length; x++) {
             for (int y = 0; y < tiles[0].length; y++) {
                 Tile tile = tiles[x][y];
@@ -285,7 +308,7 @@ public class Level {
         return collisionItems;
     }
 
-    private void decrementTime() {
+    private void decrementLevelTime() {
         if (player.isDoingPowerUpAnimation()) {
             timeInMillis = System.currentTimeMillis();
             return;

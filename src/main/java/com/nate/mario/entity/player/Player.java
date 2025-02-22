@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.nate.mario.entity.Entity;
 import com.nate.mario.entity.Goomba;
+import com.nate.mario.gfx.Screen;
 import com.nate.mario.gfx.sprite.PlayerSprite;
 import com.nate.mario.item.CoinItem;
 import com.nate.mario.item.FireFlowerItem;
@@ -21,6 +22,7 @@ import com.nate.mario.util.Timer;
 public class Player extends Entity {
 
     private static final int DEATH_TIMER_TIME = 750; //time in ms before we begin our death animation
+    private static final int INVINCIBLE_TIMER_TIME = 2000;
     private static final float WALK_DECEL_RATE = 0.1f;
     private static final float WALK_ACCEL_RATE = 0.03f;
     private static final float WALK_MAX_SPEED = 1.5f;
@@ -73,10 +75,18 @@ public class Player extends Entity {
     private float currentHorDecelRate = WALK_DECEL_RATE;
     private float currentHorMaxSpeed = WALK_MAX_SPEED;
 
+    private int invincibleFrame = 0;
+    private int animationFrame = 0;
+    private int runSpriteFrame = 0;
+    private long time = 0;
+
     private Timer deathTimer = null;
+    private Timer invincibleTimer = null;
     private PowerUpState powerUpState = PowerUpState.SMALL;
 
     private boolean isDead;
+    private boolean invincible;
+    private boolean skipRender;
     private boolean inDyingAnimation;
     private boolean hasJumped;
     private boolean sprinting;
@@ -101,10 +111,7 @@ public class Player extends Entity {
         skidding = false;
         if (yDir != 0 && onGround) onGround = false;
 
-        //If the death timer exists, we are dead and waiting to start our death animation
-        if (deathTimer != null) if (tickDeathTimer()) return; //update our death timer, returns true if we've been dead enough time to begin the death animation
-
-        //This mean we're either falling or dead
+        //This mean we're falling
         if (!onGround) doGravity();
         //Skip movement calculation if we're dead
         if (inDyingAnimation) return;
@@ -235,7 +242,12 @@ public class Player extends Entity {
                         entity.setToBeDeleted();
                         addToScore(100); //Add multiplicitave scoring for player still in the air combos
                     } else {
-                        isDead = true;
+                        if (powerUpState == PowerUpState.SMALL) {
+                            isDead = true;
+                        } else {
+                            changePowerUpState(PowerUpState.SMALL);
+                            setInvincible();
+                        }
                     }
                 }
             }
@@ -287,13 +299,15 @@ public class Player extends Entity {
         powerUpState = state;
     }
 
-    int animationFrame = 0;
-    int runSpriteFrame = 0;
-    long time = 0;
-
     @Override
     public void updateAnimation() {
         if (time == 0) time = System.currentTimeMillis();
+
+        if (invincible) {
+            invincibleFrame++;
+            if (invincibleFrame % 2 == 0) skipRender = true;
+            else skipRender = false;
+        }
 
         if (inDyingAnimation) {
             currentSprite = PlayerSprite.MARIO_SMALL_DIE;
@@ -382,15 +396,28 @@ public class Player extends Entity {
         }
     }
 
-    private boolean tickDeathTimer() {
-        deathTimer.tick();
-        if (deathTimer.getElapsedTime() < DEATH_TIMER_TIME) return true;
-        deathTimer = null;
-        yDir = -5.0f;
-        return false;
+    @Override
+    public void render(Screen screen) {
+        if (!skipRender) screen.drawSprite(currentSprite, facingLeft, (int) x, (int) y);
     }
 
-    private void doGravity() {
+    public void tickInvincibleTimer() {
+        invincibleTimer.tick();
+        if (invincibleTimer.getElapsedTime() < INVINCIBLE_TIMER_TIME) return;
+        invincibleTimer = null;
+        invincible = false;
+        invincibleFrame = 0;
+        skipRender = false;
+    }
+
+    public void tickDeathTimer() {
+        deathTimer.tick();
+        if (deathTimer.getElapsedTime() < DEATH_TIMER_TIME) return;
+        deathTimer = null;
+        yDir = -5.0f;
+    }
+
+    public void doGravity() {
         if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
         else yDir += VER_ACCEL_RATE;
     }
@@ -494,7 +521,9 @@ public class Player extends Entity {
     public boolean isDoingPowerUpAnimation() { return growing || shrinking || gainedFireFlower; }
     public boolean isDead() { return isDead; }
     public boolean isInDyingAnimation() { return inDyingAnimation; }
+    public boolean isInvincible() { return invincible; }
     public Timer getDeathTimer() { return deathTimer; }
+    public Timer getInvincibleTimer() { return invincibleTimer; }
     
     public void setNotOnGround() { onGround = false; }
     public void setHeight(int tiles) { height = tiles * PlayerSprite.TILE_HEIGHT; }
@@ -503,6 +532,11 @@ public class Player extends Entity {
     public void setInDyingAnimation() {
         inDyingAnimation = true;
         deathTimer = new Timer();
+    }
+    public void setNotInvincible() { invincible = false; }
+    public void setInvincible() {
+        invincible = true;
+        invincibleTimer = new Timer();
     }
 
     @Override
