@@ -22,22 +22,25 @@ import com.nate.mario.level.tile.Tile;
 
 public class Level {
 
-    private static final int TIME_TICK_INTERVAL = 400;
-    private final int deathHeight;
-    private final int dyingAnimationHeight;
+    private static final int TIME_TICK_INTERVAL = 400; //Time in MS between in-game time decrementing
+    private final int deathHeight; //Y coordinate where anything below this on screen (greater than this by value) triggers the death of the entity
+    private final int dyingAnimationHeight; //Used when we are in the death animation - below this (greater than by value) triggers the level reset
 
-    public Tile[][] tiles;
-    public List<Item> items;
-    
+    //Data for and from loading the level
     private BufferedImage levelImage;
     private String levelName;
     private Color levelType;
-    
-    private Player player;
-    private int playerSpawnX, playerSpawnY;
+
+    //Data storage
+    public Tile[][] tiles;
+    public List<Item> items;
     private List<Entity> entities;
     private List<Entity> onScreenEntities;
+
+    private Player player;
+    private int playerSpawnX, playerSpawnY;
     
+    //Track our current level time
     private long timeInMillis;
     private int timeRemaining;
     private boolean resetLevel;
@@ -167,6 +170,8 @@ public class Level {
 
         List<Item> collisionItems = getLocalCollisionItems(player);
         player.doItemCollisions(collisionItems);
+        
+        player.updateAnimation();
 
         return false;
     }
@@ -246,6 +251,7 @@ public class Level {
         }
     }
 
+    //Calculate which tiles to check for collisions based on the location of the entity
     private Tile[][] getLocalCollisionTiles(Entity entity) {
         int xBoundLeft = (int) (entity.getX() - 16) / 16;
         int xBoundRight = (int) (entity.getX() + 31) / 16;
@@ -267,6 +273,7 @@ public class Level {
         return collisionTiles;
     }
 
+    //Calculate which tiles to check for collisions based on the location of the item
     private Tile[][] getLocalCollisionTiles(Item item) {
         int xBoundLeft = (int) (item.getX() - 16) / 16;
         int xBoundRight = (int) (item.getX() + 31) / 16;
@@ -288,6 +295,7 @@ public class Level {
         return collisionTiles;
     }
 
+    //Calculate which items to check for collisions based on the location of the entity
     private List<Item> getLocalCollisionItems(Entity entity) {
         int xBoundLeft = (int) (entity.getX() - 16);
         int xBoundRight = (int) (entity.getX() + 31);
@@ -309,26 +317,30 @@ public class Level {
     }
 
     private void decrementLevelTime() {
+        //Don't decrement the level time if we are in a transition animation
         if (player.isDoingPowerUpAnimation()) {
             timeInMillis = System.currentTimeMillis();
             return;
         }
 
-        if (timeInMillis == 0) {
-            timeInMillis = System.currentTimeMillis();
-        } else {
-            long currentTimeInMillis = System.currentTimeMillis();
-            if (currentTimeInMillis - timeInMillis >= TIME_TICK_INTERVAL) {
-                timeRemaining--;
-                timeInMillis += TIME_TICK_INTERVAL;
-            }
+        //If the time hasn't been set yet, set it now
+        if (timeInMillis == 0) timeInMillis = System.currentTimeMillis();
+
+        //Calculate how much time has passed. If more than TIME_TICK_INTERVAL, reduce the game time by 1
+        long currentTimeInMillis = System.currentTimeMillis();
+        if (currentTimeInMillis - timeInMillis >= TIME_TICK_INTERVAL) {
+            timeRemaining--;
+            timeInMillis += TIME_TICK_INTERVAL;
         }
     }
 
     public void render(Screen screen) {
+        //Update the scroll position of the screen based on the players x coordinate and the length of the level
         screen.setScroll((int) player.getX(), tiles.length);
+        //Render the entire screen with the sky color of the level type. This prevents the animating '?' blocks from having black pixels underneath
         screen.setBackgroundColor(levelType);
 
+        //Render items
         for (Item item : items) {
             screen.drawItem(item.getSprite(), (int) item.getX(), (int) item.getY());
             if (item instanceof PowerUpItem) {
@@ -337,25 +349,30 @@ public class Level {
                     powerUpItem.setToBeDeleted();
                     continue;
                 }
+
+                //Draw a blank sky tile below the block containing our item. This prevents the item from appearing below the animating block
                 if (powerUpItem.inSpawnAnimation()) screen.drawTile("sky", (int) powerUpItem.getX(), powerUpItem.getInitialY());
             }
         }
 
+        //Render tiles
         for (int x = 0; x < tiles.length; x++) {
             for (int y = 0; y < tiles[x].length; y++) {
                 Tile tile = tiles[x][y];
                 if (tile instanceof EmptyItemBlockTile && ((EmptyItemBlockTile)tile).isAnimating()) {
+                    //Subtract the animation frame from the Y coordinate
                     screen.drawTile(tile.getName(), x * 16, y * 16 - ((EmptyItemBlockTile)tile).getAnimationFrame());
                 }
+                //Don't draw sky tiles or they'll cover up our items
                 else if (!(tile instanceof SkyTile)) screen.drawTile(tile.getName(), x * 16, y * 16);
             }
         }
 
         screen.drawHud(player.getCoinCount(), player.getScore(), timeRemaining, levelName);
 
+        //Render entities
         onScreenEntities.clear();
         for (Entity entity : entities) {
-            if (entity instanceof Player) continue;
             if (!screen.isOffScreen((int) entity.getX(), 0)) {
                 onScreenEntities.add(entity);
                 entity.render(screen);
@@ -365,11 +382,7 @@ public class Level {
         player.render(screen);
     }
 
-    public void addPlayer(Player player) { 
-        this.player = player;
-        entities.add(0, player);
-    }
-
+    public void setPlayer(Player player) { this.player = player; }
     public Tile[][] getTiles() { return tiles; }
     public boolean isLevelFinished() { return levelFinished; }
     public boolean isGameOver() { return gameOver; }
