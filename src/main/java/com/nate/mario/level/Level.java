@@ -329,7 +329,7 @@ public class Level {
 
     private void decrementLevelTime() {
         //Don't decrement the level time if we are in a transition animation
-        if (player.isDoingPowerUpAnimation()) {
+        if (player.isDoingPowerUpAnimation() || player.isInDyingAnimation()) {
             timeInMillis = System.currentTimeMillis();
             return;
         }
