@@ -9,6 +9,7 @@ import com.nate.mario.entity.Entity;
 import com.nate.mario.entity.player.Player;
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.gfx.sprite.PlayerSprite;
+import com.nate.mario.item.CoinFromBlock;
 import com.nate.mario.item.AnimatedPowerUpItem;
 import com.nate.mario.item.CoinItem;
 import com.nate.mario.item.FireFlowerItem;
@@ -62,6 +63,8 @@ public class Level {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Color color = new Color(levelImage.getRGB(x, y));
+
+
 
                 //Top left corner corresponds to our level type, should be the sky tile color
                 if (x == 0 && y == 0) {
@@ -214,6 +217,11 @@ public class Level {
 
             if (item instanceof AnimatedPowerUpItem) ((AnimatedPowerUpItem) item).updateAnimationFrame();
             if (item instanceof PowerUpItem) ((PowerUpItem) item).move();
+
+            if (item instanceof CoinFromBlock) {
+                ((CoinFromBlock) item).updateAnimationFrame();
+                ((CoinFromBlock) item).move();
+            }
         }
 
         for (Item item : itemsToRemove) items.remove(item);
@@ -232,15 +240,17 @@ public class Level {
                     ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
                     if (itemBlockTile.readyToCreateItem()) {
                         Item itemToCreate = itemBlockTile.getItemToCreate();
-                        if (itemToCreate instanceof MushroomItem) {
-                            if (PlayerSprite.MARIO_SMALL.contains(player.getSprite())) {
-                                items.add(itemToCreate.newItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16));
-                            } else {
-                                FireFlowerItem fireFlowerItem = (FireFlowerItem) Item.items.get("fire_flower");
-                                items.add(fireFlowerItem.newItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16));
-                            }
+                        if (itemToCreate instanceof PowerUpItem) {
+                            if (PlayerSprite.MARIO_SMALL.contains(player.getSprite())) items.add(new MushroomItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16));
+                            else items.add(new FireFlowerItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16));
                         }
-                        else items.add(itemToCreate.newItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16));
+
+                        //If we aren't spawning a power up item, spawn an animated coin above the block and give a coin to the player
+                        else {
+                            items.add(new CoinFromBlock(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16 - 16));
+                            player.increaseCoinCount();
+                            player.addToScore(CoinItem.SCORE);
+                        }
                     }
 
                     if (itemBlockTile.isToBeDeleted()) {
@@ -305,6 +315,7 @@ public class Level {
         List<Item> collisionItems = new ArrayList<>();
 
         for (Item item : items) {
+            if (item instanceof CoinFromBlock) continue; //Don't collide with animated coin items as they aren't collidable
             int itemX = (int) item.getX();
             int itemY = (int) item.getY();
 

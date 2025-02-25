@@ -4,6 +4,8 @@ import com.nate.mario.gfx.sprite.ItemSprite;
 
 public class PowerUpItem extends Item {
 
+    public static final int SCORE = 1000;
+
     protected boolean inSpawnAnimation = true;
     protected int initialY;
 

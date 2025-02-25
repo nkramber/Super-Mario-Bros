@@ -4,3 +4,7 @@ fire_flower_1, 3, 1
 fire_flower_2, 4, 1
 fire_flower_3, 5, 1
 fire_flower_4, 6, 1
+animated_coin_1, 1, 2
+animated_coin_2, 2, 2
+animated_coin_3, 3, 2
+animated_coin_4, 4, 2

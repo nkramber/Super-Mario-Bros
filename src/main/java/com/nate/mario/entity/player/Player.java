@@ -29,7 +29,7 @@ public class Player extends Entity {
     private static final float SPRINT_DECEL_RATE = 0.1f;
     private static final float SPRINT_ACCEL_RATE = 0.05f;
     private static final float SPRINT_MAX_SPEED = 2.5f;
-    private static final float VER_ACCEL_RATE = 0.35f;
+    public static final float VER_ACCEL_RATE = 0.35f;
     private static final float VER_MAX_SPEED = 7.0f;
     private static final float SKID_RATE = 1.3f;
     private static final float MONSTER_JUMPED_ON_SPEED = -3.2f;
@@ -280,8 +280,7 @@ public class Player extends Entity {
                             if (tile instanceof ItemBlockTile) {
                                 ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
                                 itemBlockTile.toBeDeleted();
-                    
-                                if (itemBlockTile.containsItem()) itemBlockTile.createItem();
+                                itemBlockTile.createItem();
                             }
                             newY = tile.getyTile() * 16 + 16 - yOffset;
                             jumpTick = 0;
@@ -365,14 +364,14 @@ public class Player extends Entity {
                 item.setToBeDeleted();
                 if (item instanceof CoinItem) {
                     increaseCoinCount();
-                    addToScore(200);
+                    addToScore(CoinItem.SCORE);
                 } else if (item instanceof MushroomItem) {
                     changePowerUpState(PowerUpState.BIG);
-                    addToScore(1000);
+                    addToScore(PowerUpItem.SCORE);
                 } else if (item instanceof FireFlowerItem) {
                     if (PlayerSprite.MARIO_BIG.contains(currentSprite)) changePowerUpState(PowerUpState.FIRE);
                     else changePowerUpState(PowerUpState.BIG);
-                    addToScore(1000);
+                    addToScore(PowerUpItem.SCORE);
                 }
             }
         }
@@ -513,8 +512,8 @@ public class Player extends Entity {
         yDir = -5.0f;
     }
 
-    private void increaseCoinCount() { coinCount++; }
-    private void addToScore(int amountToAdd) { score = score + amountToAdd; }
+    public void increaseCoinCount() { coinCount++; }
+    public void addToScore(int amountToAdd) { score = score + amountToAdd; }
 
     public int getCoinCount() { return coinCount; }
     public int getScore() { return score; }

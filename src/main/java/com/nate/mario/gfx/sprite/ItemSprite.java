@@ -13,6 +13,12 @@ public class ItemSprite {
         new ItemSprite("fire_flower_3"),
         new ItemSprite("fire_flower_4")
     };
+    public static final ItemSprite[] ANIMATED_COIN = {
+        new ItemSprite("animated_coin_1"),
+        new ItemSprite("animated_coin_2"),
+        new ItemSprite("animated_coin_3"),
+        new ItemSprite("animated_coin_4")
+    };
 
     private final String name;
 

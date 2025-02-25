@@ -4,6 +4,8 @@ import com.nate.mario.gfx.sprite.ItemSprite;
 
 public class CoinItem extends Item {
 
+    public static final int SCORE = 200;
+
     public CoinItem(int id) {
         super(id);
     }

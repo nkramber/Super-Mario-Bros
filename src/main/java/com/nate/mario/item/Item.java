@@ -6,10 +6,10 @@ import com.nate.mario.gfx.sprite.ItemSprite;
 
 public class Item {
 
+    //ID corresponds to the green color value of the pixel in the level file where the item is to be placed
     public static Map<String, Item> items = Map.of(
         "coin", new CoinItem(255),
-        "mushroom", new MushroomItem(100),
-        "fire_flower", new FireFlowerItem(-1)
+        "mushroom", new MushroomItem(100)
     );
 
     protected int id;

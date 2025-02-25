@@ -4,7 +4,7 @@ import com.nate.mario.item.Item;
 
 public class ItemBlockTile extends Tile {
 
-    private Item item;
+    private Item item = Item.items.get("animated_coin");
     private boolean createItem = false;
 
     public ItemBlockTile(int id, String name, boolean solid) {
