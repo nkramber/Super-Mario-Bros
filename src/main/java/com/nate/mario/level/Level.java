@@ -9,7 +9,7 @@ import com.nate.mario.entity.Entity;
 import com.nate.mario.entity.player.Player;
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.gfx.sprite.PlayerSprite;
-import com.nate.mario.item.CoinFromBlock;
+import com.nate.mario.item.BlockCoin;
 import com.nate.mario.item.AnimatedPowerUpItem;
 import com.nate.mario.item.CoinItem;
 import com.nate.mario.item.FireFlowerItem;
@@ -63,8 +63,6 @@ public class Level {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Color color = new Color(levelImage.getRGB(x, y));
-
-
 
                 //Top left corner corresponds to our level type, should be the sky tile color
                 if (x == 0 && y == 0) {
@@ -182,18 +180,8 @@ public class Level {
     private void tickEntities() {
         List<Entity> entitiesToRemove = new ArrayList<>();
         for (Entity entity : entities) {
-            if (entity.isToBeDeleted() || entity.getY() > deathHeight) {
-                entitiesToRemove.add(entity);
-            }
-            
-            if (onScreenEntities.contains(entity)) {
-                entity.getMovement();
-                entity.doTileCollisions(getLocalCollisionTiles(entity));
-                entity.doEntityCollisions(entities);
-                entity.move();
-            }
-
-            entity.updateAnimation();
+            if (onScreenEntities.contains(entity)) entity.tick(this);
+            if (entity.isToBeDeleted() || entity.getY() > deathHeight) entitiesToRemove.add(entity);
         }
 
         for (Entity entity : entitiesToRemove) entities.remove(entity); //add death animation to goombas
@@ -202,26 +190,9 @@ public class Level {
     private void tickItems() {
         List<Item> itemsToRemove = new ArrayList<>();
         for (Item item : items) {
-            if (item.isToBeDeleted()) {
-                itemsToRemove.add(item);
-                continue;
-            }
+            item.tick(this);
 
-            if (item instanceof MushroomItem) {
-                MushroomItem mushroomItem = (MushroomItem) item;
-                mushroomItem.getMovement();
-                if (!mushroomItem.inSpawnAnimation()) {
-                    mushroomItem.doTileCollisions(getLocalCollisionTiles(item));
-                }
-            }
-
-            if (item instanceof AnimatedPowerUpItem) ((AnimatedPowerUpItem) item).updateAnimationFrame();
-            if (item instanceof PowerUpItem) ((PowerUpItem) item).move();
-
-            if (item instanceof CoinFromBlock) {
-                ((CoinFromBlock) item).updateAnimationFrame();
-                ((CoinFromBlock) item).move();
-            }
+            if (item.isToBeDeleted()) itemsToRemove.add(item);
         }
 
         for (Item item : itemsToRemove) items.remove(item);
@@ -247,7 +218,7 @@ public class Level {
 
                         //If we aren't spawning a power up item, spawn an animated coin above the block and give a coin to the player
                         else {
-                            items.add(new CoinFromBlock(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16 - 16));
+                            items.add(new BlockCoin(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16 - 16));
                             player.increaseCoinCount();
                             player.addToScore(CoinItem.SCORE);
                         }
@@ -283,28 +254,6 @@ public class Level {
         return collisionTiles;
     }
 
-    //Calculate which tiles to check for collisions based on the location of the item
-    private Tile[][] getLocalCollisionTiles(Item item) {
-        int xBoundLeft = (int) (item.getX() - 16) / 16;
-        int xBoundRight = (int) (item.getX() + 31) / 16;
-        int yBoundTop = (int) (item.getY() - 16) / 16;
-        int yBoundBottom = (int) (item.getY() + 31) / 16;
-
-        Tile[][] collisionTiles = new Tile[xBoundRight - xBoundLeft + 1][yBoundBottom - yBoundTop + 1];
-
-        int x = 0;
-        for (int i = xBoundLeft; i <= xBoundRight; i++) {
-            int y = 0;
-            for (int j = yBoundTop; j <= yBoundBottom; j++) {
-                collisionTiles[x][y] = tiles[i][j];
-                y++;
-            }
-            x++;
-        }
-
-        return collisionTiles;
-    }
-
     //Calculate which items to check for collisions based on the location of the entity
     private List<Item> getLocalCollisionItems(Entity entity) {
         int xBoundLeft = (int) (entity.getX() - 16);
@@ -315,7 +264,7 @@ public class Level {
         List<Item> collisionItems = new ArrayList<>();
 
         for (Item item : items) {
-            if (item instanceof CoinFromBlock) continue; //Don't collide with animated coin items as they aren't collidable
+            if (item instanceof BlockCoin) continue; //Don't collide with animated coin items as they aren't collidable
             int itemX = (int) item.getX();
             int itemY = (int) item.getY();
 
@@ -395,6 +344,7 @@ public class Level {
 
     public void setPlayer(Player player) { this.player = player; }
     public Tile[][] getTiles() { return tiles; }
+    public List<Entity> getEntities() { return entities; }
     public boolean isLevelFinished() { return levelFinished; }
     public boolean isGameOver() { return gameOver; }
     public boolean resetLevel() { return resetLevel; }

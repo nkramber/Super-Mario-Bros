@@ -10,6 +10,7 @@ import com.nate.mario.gfx.Screen;
 import com.nate.mario.gfx.sprite.Sprite;
 import com.nate.mario.level.Level;
 import com.nate.mario.level.tile.Tile;
+import com.nate.mario.util.Collision;
 
 public abstract class Entity {
 
@@ -44,6 +45,13 @@ public abstract class Entity {
         this.yDir = yDir;
         this.height = currentSprite.getHeight() * 16;
         this.currentSprite = currentSprite;
+    }
+
+    public void tick(Level level) {
+        getMovement();
+        doTileCollisions(Collision.getEntityCollisionTiles(this, level.getTiles()));
+        doEntityCollisions(level.getEntities());
+        move();
     }
 
     public void getMovement(boolean[] keys, Level level) { getMovement(); }
@@ -146,7 +154,6 @@ public abstract class Entity {
 
     public abstract Entity newEntity(int xTile, int yTile);
 
-    public void updateAnimation() {}
     public void setToBeDeleted() { isToBeDeleted = true; }
     public void setxDir(float xDir) { this.xDir = xDir; }
 

@@ -393,7 +393,6 @@ public class Player extends Entity {
         powerUpState = state;
     }
 
-    @Override
     public void updateAnimation() {
         if (time == 0) time = System.currentTimeMillis();
 

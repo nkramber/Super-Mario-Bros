@@ -3,6 +3,7 @@ package com.nate.mario.item;
 import java.util.Map;
 
 import com.nate.mario.gfx.sprite.ItemSprite;
+import com.nate.mario.level.Level;
 
 public class Item {
 
@@ -34,6 +35,9 @@ public class Item {
         this.y = y;
         this.sprites = sprites;
     }
+
+    public void tick(Level level) { tick(); }
+    public void tick() {}
 
     public Item newItem(float x, float y) { return null; }
 

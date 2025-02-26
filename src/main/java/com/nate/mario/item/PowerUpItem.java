@@ -22,11 +22,6 @@ public class PowerUpItem extends Item {
         super(x, y, sprites);
         initialY = (int) y;
     }
-    
-    public void move() {
-        if (inSpawnAnimation && (initialY - y < 16)) y -= 0.5f;
-        else if (inSpawnAnimation) inSpawnAnimation = false;
-    }
 
     public boolean inSpawnAnimation() { return inSpawnAnimation; }
     public int getInitialY() { return initialY; }

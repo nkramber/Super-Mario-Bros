@@ -4,7 +4,9 @@ import java.awt.Rectangle;
 import java.util.HashSet;
 
 import com.nate.mario.gfx.sprite.ItemSprite;
+import com.nate.mario.level.Level;
 import com.nate.mario.level.tile.Tile;
+import com.nate.mario.util.Collision;
 
 public class MushroomItem extends PowerUpItem {
 
@@ -27,16 +29,21 @@ public class MushroomItem extends PowerUpItem {
         return new MushroomItem(x, y);
     }
 
-    public void getMovement() {
+    @Override
+    public void tick(Level level) {
+        //If we are falling, then add gravity to the mushroom/set at terminal velocity
         if (!onGround) {
             if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
             else yDir += VER_ACCEL_RATE;
         }
-    }
 
-    public void move() {
+        //Don't collide with tiles while we're still rising out of our spawn block
+        if (!inSpawnAnimation) doTileCollisions(Collision.getItemCollisionTiles(this, level.getTiles()));
+
+        //Move upwards if we're in our spawn animation
         if (inSpawnAnimation && (initialY - y < 16)) y -= 0.5f;
         else {
+            //Done moving upwards. Begin moving sideways, adding gravity when falling, and collision with tiles
             if (inSpawnAnimation) inSpawnAnimation = false;
 
             x += xDir;
