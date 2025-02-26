@@ -17,6 +17,7 @@ import com.nate.mario.item.PowerUpItem;
 import com.nate.mario.level.Level;
 import com.nate.mario.level.tile.ItemBlockTile;
 import com.nate.mario.level.tile.Tile;
+import com.nate.mario.util.Collision;
 import com.nate.mario.util.Timer;
 
 public class Player extends Entity {
@@ -106,8 +107,53 @@ public class Player extends Entity {
         facingLeft = false;
     }
 
-    @Override
-    public void getMovement(boolean[] keys, Level level) {
+    public boolean tick(Level level, boolean[] keys) {
+        //Update our death animation if necessary
+        if (inDyingAnimation) {
+            //Still above the height threshold where we reset the level
+            if (y <= level.getDyingAnimationHeight()) {
+                updateAnimation();
+
+                if (deathTimer != null) tickDeathTimer();
+                else doGravity();
+
+                move();
+            } else level.doResetLevel();
+            //Skip the rest of the tick if we're dead
+            return true;
+        }
+
+        //Check if we should die or are already flagged as dead
+        if (level.getTimeRemaining() <= 0 || isDead || y > level.getDeathHeight()) {
+            xDir = 0;
+            yDir = 0;
+            onGround = false;
+            setInDyingAnimation();
+            return true;
+        }
+
+        if (isDoingPowerUpAnimation()) {
+            updateAnimation();
+            return true;
+        }
+
+        getMovement(level, keys);
+        doTileCollisions(Collision.getEntityCollisionTiles(this, level.getTiles()));
+        doEntityCollisions(level.getEntities());
+
+        if (invincible) tickInvincibleTimer();
+
+        move();
+
+        List<Item> collisionItems = Collision.getEntityCollisionItems(this, level.getItems());
+        doItemCollisions(collisionItems);
+        
+        updateAnimation();
+
+        return false;
+    }
+
+    public void getMovement(Level level, boolean[] keys) {
         skidding = false;
         if (yDir != 0 && onGround) onGround = false;
 
@@ -335,7 +381,7 @@ public class Player extends Entity {
                         yDir = MONSTER_JUMPED_ON_SPEED;
                         entity.setToBeDeleted();
                         addToScore(100); //Add multiplicitave scoring for player still in the air combos
-                    } else {
+                    } else if (!invincible) {
                         if (powerUpState == PowerUpState.SMALL) {
                             isDead = true;
                         } else {

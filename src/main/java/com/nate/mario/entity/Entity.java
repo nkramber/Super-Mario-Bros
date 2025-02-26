@@ -54,8 +54,6 @@ public abstract class Entity {
         move();
     }
 
-    public void getMovement(boolean[] keys, Level level) { getMovement(); }
-
     public void getMovement() {
         if (!onGround) {
             if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;

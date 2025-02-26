@@ -10,7 +10,6 @@ import com.nate.mario.entity.player.Player;
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.gfx.sprite.PlayerSprite;
 import com.nate.mario.item.BlockCoin;
-import com.nate.mario.item.AnimatedPowerUpItem;
 import com.nate.mario.item.CoinItem;
 import com.nate.mario.item.FireFlowerItem;
 import com.nate.mario.item.Item;
@@ -44,6 +43,8 @@ public class Level {
     //Track our current level time
     private long timeInMillis;
     private int timeRemaining;
+
+    //Track our current level state
     private boolean resetLevel;
     private boolean levelFinished;
     private boolean gameOver;
@@ -120,61 +121,17 @@ public class Level {
         dyingAnimationHeight = tiles[0].length * 16 + 450;
     }
 
-    public Level newLevel(int playerLives) {
-        Level newLevel = new Level(getLevelImage(), getLevelName());
-        return newLevel;
-    }
-
     public void tick(boolean[] keys) {
         decrementLevelTime();
 
-        boolean skipRestOfTick = tickPlayer(keys);
-        if (skipRestOfTick) return;
+        //If the player is dead or doing a power up animation, skip the rest of the tick
+        boolean skipRestOfTick = player.tick(this, keys);
 
-        tickEntities();
-        tickItems();
-        tickTiles();
-    }
-
-    private boolean tickPlayer(boolean[] keys) {
-        if (player.isInDyingAnimation()) {
-            if (player.getY() <= dyingAnimationHeight) {
-                player.updateAnimation();
-                if (player.getDeathTimer() != null) player.tickDeathTimer();
-                else player.doGravity();
-                player.move();
-            } else {
-                resetLevel = true;
-            }
-            return true;
+        if (!skipRestOfTick) {
+            tickEntities();
+            tickItems();
+            tickTiles();
         }
-
-        if (timeRemaining == 0 || player.isDead() || player.getY() > deathHeight) {
-            player.setxDir(0);
-            player.setyDir(0);
-            player.setNotOnGround();
-            player.setInDyingAnimation();
-            return true;
-        }
-
-        if (player.isDoingPowerUpAnimation()) {
-            player.updateAnimation();
-            return true;
-        }
-
-        player.getMovement(keys, this);
-        player.doTileCollisions(getLocalCollisionTiles(player));
-        if (!player.isInvincible()) player.doEntityCollisions(entities);
-        else player.tickInvincibleTimer();
-
-        player.move();
-
-        List<Item> collisionItems = getLocalCollisionItems(player);
-        player.doItemCollisions(collisionItems);
-        
-        player.updateAnimation();
-
-        return false;
     }
 
     private void tickEntities() {
@@ -230,50 +187,6 @@ public class Level {
                 }
             }
         }
-    }
-
-    //Calculate which tiles to check for collisions based on the location of the entity
-    private Tile[][] getLocalCollisionTiles(Entity entity) {
-        int xBoundLeft = (int) (entity.getX() - 16) / 16;
-        int xBoundRight = (int) (entity.getX() + 31) / 16;
-        int yBoundTop = (int) (entity.getY() - 16) / 16;
-        int yBoundBottom = (int) (entity.getY() + 31 + entity.getHeight() - 16) / 16;
-
-        Tile[][] collisionTiles = new Tile[xBoundRight - xBoundLeft + 1][yBoundBottom - yBoundTop + 1];
-
-        int x = 0;
-        for (int i = xBoundLeft; i <= xBoundRight; i++) {
-            int y = 0;
-            for (int j = yBoundTop; j <= yBoundBottom; j++) {
-                collisionTiles[x][y] = tiles[i][j];
-                y++;
-            }
-            x++;
-        }
-
-        return collisionTiles;
-    }
-
-    //Calculate which items to check for collisions based on the location of the entity
-    private List<Item> getLocalCollisionItems(Entity entity) {
-        int xBoundLeft = (int) (entity.getX() - 16);
-        int xBoundRight = (int) (entity.getX() + 31);
-        int yBoundTop = (int) (entity.getY() - 16);
-        int yBoundBottom = (int) (entity.getY() + 31 + entity.getHeight() - 16);
-
-        List<Item> collisionItems = new ArrayList<>();
-
-        for (Item item : items) {
-            if (item instanceof BlockCoin) continue; //Don't collide with animated coin items as they aren't collidable
-            int itemX = (int) item.getX();
-            int itemY = (int) item.getY();
-
-            if (itemX > xBoundLeft && itemX < xBoundRight && itemY > yBoundTop && itemY < yBoundBottom) {
-                collisionItems.add(item);
-            }
-        }
-
-        return collisionItems;
     }
 
     private void decrementLevelTime() {
@@ -342,14 +255,19 @@ public class Level {
         player.render(screen);
     }
 
+    public void doResetLevel() { resetLevel = true; }
     public void setPlayer(Player player) { this.player = player; }
     public Tile[][] getTiles() { return tiles; }
     public List<Entity> getEntities() { return entities; }
+    public List<Item> getItems() { return items; }
     public boolean isLevelFinished() { return levelFinished; }
     public boolean isGameOver() { return gameOver; }
     public boolean resetLevel() { return resetLevel; }
     public String getLevelName() { return levelName; }
     public int getPlayerSpawnX() { return playerSpawnX; }
     public int getPlayerSpawnY() { return playerSpawnY; }
+    public int getDyingAnimationHeight() { return dyingAnimationHeight; }
+    public int getDeathHeight() { return deathHeight; }
+    public int getTimeRemaining() { return timeRemaining; }
     public BufferedImage getLevelImage() { return levelImage; }
 }

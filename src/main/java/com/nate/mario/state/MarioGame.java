@@ -65,7 +65,7 @@ public class MarioGame extends GameState {
 
     private void setLevel(int levelNumber) {
         Level levelToGet = levels.get(levelNumber);
-        currentLevel = levelToGet.newLevel(playerLives);
+        currentLevel = new Level(levelToGet.getLevelImage(), levelToGet.getLevelName());
         player = new Player(currentLevel.getPlayerSpawnX(), currentLevel.getPlayerSpawnY(), player.getScore());
         currentLevel.setPlayer(player);
         screen.resetScroll();

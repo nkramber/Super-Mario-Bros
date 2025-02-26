@@ -14,9 +14,11 @@ import com.nate.mario.gfx.sprite.Sprite;
 
 public class Screen {
 
+    //How many dummy pixels (tiles * 16) are below each level
     private static final int VERTICAL_OFFSET = -96;
 
-    private static final int SCREEN_LEFT_PADDING = -32;
+    //How many dummy pixels (tiles * 16) are on the left side of each level
+    public static final int SCREEN_LEFT_PADDING = -32;
 
     private Graphics2D g;
     private HashMap<String, BufferedImage> entitySprites;

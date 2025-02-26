@@ -62,7 +62,7 @@ public class LevelLoader {
         return levels;
     }
 
-    public static int getLevelNumber(String levelName) {
+    private static int getLevelNumber(String levelName) {
         int worldNumber = Integer.parseInt(Character.toString(levelName.charAt(0)));
         int levelNumber = Integer.parseInt(Character.toString(levelName.charAt(2)));
 
