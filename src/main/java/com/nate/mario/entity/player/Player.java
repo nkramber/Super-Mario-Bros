@@ -111,7 +111,7 @@ public class Player extends Entity {
         //Update our death animation if necessary
         if (inDyingAnimation) {
             //Still above the height threshold where we reset the level
-            if (y <= level.getDyingAnimationHeight()) {
+            if (y <= level.getDeathHeightWhenAnimating()) {
                 updateAnimation();
 
                 if (deathTimer != null) tickDeathTimer();

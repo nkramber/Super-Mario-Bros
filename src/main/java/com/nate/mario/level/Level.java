@@ -24,7 +24,7 @@ public class Level {
 
     private static final int TIME_TICK_INTERVAL = 400; //Time in MS between in-game time decrementing
     private final int deathHeight; //Y coordinate where anything below this on screen (greater than this by value) triggers the death of the entity
-    private final int dyingAnimationHeight; //Used when we are in the death animation - below this (greater than by value) triggers the level reset
+    private final int deathHeightWhenAnimating; //Used when we are in the death animation - below this (greater than by value) triggers the level reset
 
     //Data for and from loading the level
     private BufferedImage levelImage;
@@ -32,8 +32,9 @@ public class Level {
     private Color levelType;
 
     //Data storage
-    public Tile[][] tiles;
-    public List<Item> items;
+    private Tile[][] tiles;
+    private List<Tile> tilesToTick;
+    private List<Item> items;
     private List<Entity> entities;
     private List<Entity> onScreenEntities;
 
@@ -57,6 +58,7 @@ public class Level {
         int height = levelImage.getHeight();
         
         tiles = new Tile[width][height];
+        tilesToTick = new ArrayList<>();
         items = new ArrayList<>();
         entities = new ArrayList<>();
         onScreenEntities = new ArrayList<>();
@@ -92,10 +94,13 @@ public class Level {
                 //Red is the tile type
                 for (Tile tile : Tile.tiles) {
                     if (color.getRed() == tile.getID()) {
-                        tiles[x][y] = tile.newTile(x, y, tile.getID(), tile.getName(), tile.isSolid());
+                        tiles[x][y] = tile.newTile(x, y);
                         break;
                     }
                 }
+
+                //Add the tile to our list of tiles to tick if necessary
+                if (tiles[x][y].isTickable()) tilesToTick.add(tiles[x][y]);
 
                 //Green is the item type
                 for (Item item : Item.items.values()) {
@@ -117,8 +122,9 @@ public class Level {
             }
         }
 
+        //Set our deathHeight variables based on the 
         deathHeight = tiles[0].length * 16 - 48;
-        dyingAnimationHeight = tiles[0].length * 16 + 450;
+        deathHeightWhenAnimating = deathHeight + 402;
     }
 
     public void tick(boolean[] keys) {
@@ -135,6 +141,7 @@ public class Level {
     }
 
     private void tickEntities() {
+        //Keep track of which entities need to be removed - can't remove inside our loop, so we remove after
         List<Entity> entitiesToRemove = new ArrayList<>();
         for (Entity entity : entities) {
             if (onScreenEntities.contains(entity)) entity.tick(this);
@@ -145,10 +152,10 @@ public class Level {
     }
 
     private void tickItems() {
+        //Keep track of which items need to be removed - can't remove inside our loop, so we remove after
         List<Item> itemsToRemove = new ArrayList<>();
         for (Item item : items) {
             item.tick(this);
-
             if (item.isToBeDeleted()) itemsToRemove.add(item);
         }
 
@@ -156,36 +163,35 @@ public class Level {
     }
 
     private void tickTiles() {
-        for (int x = 0; x < tiles.length; x++) {
-            for (int y = 0; y < tiles[0].length; y++) {
-                Tile tile = tiles[x][y];
-
-                if (tile instanceof EmptyItemBlockTile && tile.isAnimating()) {
-                    ((EmptyItemBlockTile) tile).animate();
-                }
-
-                if (tile instanceof ItemBlockTile) {
-                    ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
-                    if (itemBlockTile.readyToCreateItem()) {
-                        Item itemToCreate = itemBlockTile.getItemToCreate();
-                        if (itemToCreate instanceof PowerUpItem) {
-                            if (PlayerSprite.MARIO_SMALL.contains(player.getSprite())) items.add(new MushroomItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16));
-                            else items.add(new FireFlowerItem(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16));
-                        }
-
-                        //If we aren't spawning a power up item, spawn an animated coin above the block and give a coin to the player
-                        else {
-                            items.add(new BlockCoin(itemBlockTile.getxTile() * 16, itemBlockTile.getyTile() * 16 - 16));
-                            player.increaseCoinCount();
-                            player.addToScore(CoinItem.SCORE);
-                        }
-                    }
-
-                    if (itemBlockTile.isToBeDeleted()) {
-                        tiles[itemBlockTile.getxTile()][itemBlockTile.getyTile()] = new EmptyItemBlockTile(itemBlockTile.getxTile(), itemBlockTile.getyTile(), -1, "emptyitemblock", true);
-                    }
+        List<Tile> tilesToRemoveFromTickList = new ArrayList<>();
+        List<Tile> tilesToAddToTickList = new ArrayList<>();
+        for (Tile tile : tilesToTick) {
+            tile.tick(this);
+            if (tile.isToBeDeleted()) {
+                tilesToRemoveFromTickList.add(tile);
+                if (!(tile instanceof EmptyItemBlockTile)) {
+                    EmptyItemBlockTile newTile = new EmptyItemBlockTile(tile.getxTile(), tile.getyTile());
+                    tiles[tile.getxTile()][tile.getyTile()] = newTile;
+                    tilesToAddToTickList.add(newTile);
                 }
             }
+        }
+
+        for (Tile tile : tilesToRemoveFromTickList) tilesToTick.remove(tile);
+        for (Tile tile : tilesToAddToTickList) tilesToTick.add(tile);
+    }
+
+    public void createItem(Item item, int xTile, int yTile) {
+        if (item instanceof PowerUpItem) {
+            if (PlayerSprite.MARIO_SMALL.contains(player.getSprite())) items.add(new MushroomItem(xTile * 16, yTile * 16));
+            else items.add(new FireFlowerItem(xTile * 16, yTile * 16));
+        }
+
+        //If we aren't spawning a power up item, spawn an animated coin above the block and give a coin to the player
+        else {
+            items.add(new BlockCoin(xTile * 16, yTile * 16 - 16));
+            player.increaseCoinCount();
+            player.addToScore(CoinItem.SCORE);
         }
     }
 
@@ -224,7 +230,7 @@ public class Level {
                 }
 
                 //Draw a blank sky tile below the block containing our item. This prevents the item from appearing below the animating block
-                if (powerUpItem.inSpawnAnimation()) screen.drawTile("sky", (int) powerUpItem.getX(), powerUpItem.getInitialY());
+                if (powerUpItem.inSpawnAnimation()) screen.drawTile("sky_tile", (int) powerUpItem.getX(), powerUpItem.getInitialY());
             }
         }
 
@@ -260,13 +266,14 @@ public class Level {
     public Tile[][] getTiles() { return tiles; }
     public List<Entity> getEntities() { return entities; }
     public List<Item> getItems() { return items; }
+    public Player getPlayer() { return player; }
     public boolean isLevelFinished() { return levelFinished; }
     public boolean isGameOver() { return gameOver; }
     public boolean resetLevel() { return resetLevel; }
     public String getLevelName() { return levelName; }
     public int getPlayerSpawnX() { return playerSpawnX; }
     public int getPlayerSpawnY() { return playerSpawnY; }
-    public int getDyingAnimationHeight() { return dyingAnimationHeight; }
+    public int getDeathHeightWhenAnimating() { return deathHeightWhenAnimating; }
     public int getDeathHeight() { return deathHeight; }
     public int getTimeRemaining() { return timeRemaining; }
     public BufferedImage getLevelImage() { return levelImage; }
