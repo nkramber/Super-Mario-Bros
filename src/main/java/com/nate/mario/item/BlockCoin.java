@@ -11,6 +11,10 @@ public class BlockCoin extends Item {
     private int animationFrame = 0;
     private float yDir = -5.5f;
 
+    public BlockCoin(int id) {
+        super(id);
+    }
+
     public BlockCoin(float x, float y) {
         super(x, y, ItemSprite.ANIMATED_COIN);
     }

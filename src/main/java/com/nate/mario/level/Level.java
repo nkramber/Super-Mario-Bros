@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.nate.mario.entity.Entity;
 import com.nate.mario.entity.player.Player;
+import com.nate.mario.entity.player.PowerUpState;
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.gfx.sprite.PlayerSprite;
 import com.nate.mario.item.BlockCoin;
@@ -34,6 +35,7 @@ public class Level {
     //Data storage
     private Tile[][] tiles;
     private List<Tile> tilesToTick;
+    private List<Tile> onScreenTiles;
     private List<Item> items;
     private List<Entity> entities;
     private List<Entity> onScreenEntities;
@@ -59,6 +61,7 @@ public class Level {
         
         tiles = new Tile[width][height];
         tilesToTick = new ArrayList<>();
+        onScreenTiles = new ArrayList<>();
         items = new ArrayList<>();
         entities = new ArrayList<>();
         onScreenEntities = new ArrayList<>();
@@ -106,7 +109,10 @@ public class Level {
                 for (Item item : Item.items.values()) {
                     if (color.getGreen() == item.getID()) {
                         if (item instanceof CoinItem) items.add(item.newItem(x * 16, y * 16));
-                        else if (tiles[x][y] instanceof ItemBlockTile) ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(item);
+                        else if (tiles[x][y] instanceof ItemBlockTile) {
+                            if (item instanceof MushroomItem) ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(item);
+                            else ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(Item.items.get("block_coin"));
+                        }
                         break;
                     }
                 }
@@ -163,13 +169,15 @@ public class Level {
     }
 
     private void tickTiles() {
+        //Keep track of which tiles we are going to add and remove from our tick list
         List<Tile> tilesToRemoveFromTickList = new ArrayList<>();
         List<Tile> tilesToAddToTickList = new ArrayList<>();
         for (Tile tile : tilesToTick) {
-            tile.tick(this);
+            if (onScreenTiles.contains(tile)) tile.tick(this);
             if (tile.isToBeDeleted()) {
                 tilesToRemoveFromTickList.add(tile);
-                if (!(tile instanceof EmptyItemBlockTile)) {
+                //If the tile is an ItemBlockTile, we want to replace it with a new empty item block. Otherwise we simply remove it from the tick list
+                if (tile instanceof ItemBlockTile) {
                     EmptyItemBlockTile newTile = new EmptyItemBlockTile(tile.getxTile(), tile.getyTile());
                     tiles[tile.getxTile()][tile.getyTile()] = newTile;
                     tilesToAddToTickList.add(newTile);
@@ -177,13 +185,15 @@ public class Level {
             }
         }
 
+        //Add and remove tiles from our tick list
         for (Tile tile : tilesToRemoveFromTickList) tilesToTick.remove(tile);
         for (Tile tile : tilesToAddToTickList) tilesToTick.add(tile);
     }
 
     public void createItem(Item item, int xTile, int yTile) {
+        //If it is a PowerUpItem, evaluate Mario's current PowerUpState and spawn a mushroom if we're small
         if (item instanceof PowerUpItem) {
-            if (PlayerSprite.MARIO_SMALL.contains(player.getSprite())) items.add(new MushroomItem(xTile * 16, yTile * 16));
+            if (player.getPowerUpState(PowerUpState.SMALL)) items.add(new MushroomItem(xTile * 16, yTile * 16));
             else items.add(new FireFlowerItem(xTile * 16, yTile * 16));
         }
 
@@ -235,15 +245,19 @@ public class Level {
         }
 
         //Render tiles
+        onScreenTiles.clear();
         for (int x = 0; x < tiles.length; x++) {
             for (int y = 0; y < tiles[x].length; y++) {
                 Tile tile = tiles[x][y];
-                if (tile instanceof EmptyItemBlockTile && ((EmptyItemBlockTile)tile).isAnimating()) {
-                    //Subtract the animation frame from the Y coordinate
-                    screen.drawTile(tile.getName(), x * 16, y * 16 - ((EmptyItemBlockTile)tile).getAnimationFrame());
+                if (!screen.isOffScreen(x * 16, 0)) {
+                    onScreenTiles.add(tile);
+                    if (tile instanceof EmptyItemBlockTile && ((EmptyItemBlockTile)tile).isAnimating()) {
+                        //Subtract the animation frame from the Y coordinate
+                        screen.drawTile(tile.getName(), x * 16, y * 16 - ((EmptyItemBlockTile)tile).getAnimationFrame());
+                    }
+                    //Don't draw sky tiles or they'll cover up our items
+                    else if (!(tile instanceof SkyTile)) screen.drawTile(tile.getName(), x * 16, y * 16);
                 }
-                //Don't draw sky tiles or they'll cover up our items
-                else if (!(tile instanceof SkyTile)) screen.drawTile(tile.getName(), x * 16, y * 16);
             }
         }
 

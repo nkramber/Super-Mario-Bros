@@ -568,6 +568,7 @@ public class Player extends Entity {
     public boolean isInvincible() { return invincible; }
     public Timer getDeathTimer() { return deathTimer; }
     public Timer getInvincibleTimer() { return invincibleTimer; }
+    public boolean getPowerUpState(PowerUpState powerUpState) { return this.powerUpState == powerUpState; }
     
     public void setNotOnGround() { onGround = false; }
     public void setHeight(int tiles) { height = tiles * PlayerSprite.TILE_HEIGHT; }

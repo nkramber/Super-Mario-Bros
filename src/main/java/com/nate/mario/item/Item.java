@@ -10,7 +10,8 @@ public class Item {
     //ID corresponds to the green color value of the pixel in the level file where the item is to be placed
     public static Map<String, Item> items = Map.of(
         "coin", new CoinItem(255),
-        "mushroom", new MushroomItem(100)
+        "mushroom", new MushroomItem(100),
+        "block_coin", new BlockCoin(-1)
     );
 
     protected int id;
