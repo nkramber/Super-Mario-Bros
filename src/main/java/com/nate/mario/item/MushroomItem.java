@@ -10,6 +10,9 @@ import com.nate.mario.util.Collision;
 
 public class MushroomItem extends PowerUpItem {
 
+    private static final int ID = 100;
+    private static final ItemSprite SPRITE = ItemSprite.MUSHROOM;
+
     private static final float VER_ACCEL_RATE = 0.35f;
     private static final float VER_MAX_SPEED = 4.0f;
 
@@ -17,16 +20,8 @@ public class MushroomItem extends PowerUpItem {
     private float yDir = 0;
     private boolean onGround = true;
 
-    public MushroomItem(int id) {
-        super(id);
-    }
-
     public MushroomItem(float x, float y) {
-        super(x, y, ItemSprite.MUSHROOM);
-    }
-    
-    public Item newItem(float x, float y) {
-        return new MushroomItem(x, y);
+        super(x, y);
     }
 
     @Override
@@ -99,4 +94,8 @@ public class MushroomItem extends PowerUpItem {
         x = newX;
         y = newY;
     }
+
+    @Override public Item newItem(float x, float y) { return new MushroomItem(x, y); }
+    @Override public int getID() { return ID; }
+    @Override public ItemSprite getSprite() { return SPRITE; }
 }

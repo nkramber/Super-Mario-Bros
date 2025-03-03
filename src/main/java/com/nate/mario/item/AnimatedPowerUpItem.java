@@ -2,16 +2,12 @@ package com.nate.mario.item;
 
 import com.nate.mario.gfx.sprite.ItemSprite;
 
-public class AnimatedPowerUpItem extends PowerUpItem {
+public abstract class AnimatedPowerUpItem extends PowerUpItem {
 
     protected int animationFrame = 0;
 
-    public AnimatedPowerUpItem(int id) {
-        super(id);
-    }
-
-    public AnimatedPowerUpItem(float x, float y, ItemSprite[] sprites) {
-        super(x, y, sprites);
+    public AnimatedPowerUpItem(float x, float y) {
+        super(x, y);
     }
 
     @Override
@@ -25,6 +21,8 @@ public class AnimatedPowerUpItem extends PowerUpItem {
         else if (inSpawnAnimation) inSpawnAnimation = false;
     }
 
-    public ItemSprite getSprite() { return sprites[animationFrame / 2]; }
-    public ItemSprite[] getSprites() { return sprites; }
+    @Override public abstract ItemSprite getSprite();
+    
+    @Override public Item newItem(float x, float y) { return null; }
+    @Override public int getID() { return -1; }
 }

@@ -5,18 +5,17 @@ import com.nate.mario.gfx.sprite.ItemSprite;
 
 public class BlockCoin extends Item {
 
+    private static final int ID = -1;
+    private static final ItemSprite[] SPRITES = ItemSprite.ANIMATED_COIN;
+
     private static float VER_ACCEL_RATE = Player.VER_ACCEL_RATE;
     private static float VELOCITY_TO_DELETE = 4.5f;
 
     private int animationFrame = 0;
     private float yDir = -5.5f;
 
-    public BlockCoin(int id) {
-        super(id);
-    }
-
     public BlockCoin(float x, float y) {
-        super(x, y, ItemSprite.ANIMATED_COIN);
+        super(x, y);
     }
 
     @Override
@@ -34,6 +33,7 @@ public class BlockCoin extends Item {
         y += yDir;
     }
 
-    @Override
-    public ItemSprite getSprite() { return sprites[animationFrame / 2]; }
+    @Override public ItemSprite getSprite() { return SPRITES[animationFrame / 2]; }
+    @Override public Item newItem(float x, float y) { return null; }
+    @Override public int getID() { return ID; }
 }

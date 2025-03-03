@@ -9,3 +9,4 @@ rewrite item code to match tile code - static IDs, etc
 change data loading to be consistent between entities, items, and tiles
 
 change player entity collisions to only use local entities and to utilize a static method in Collision class
+

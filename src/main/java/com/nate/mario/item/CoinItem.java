@@ -4,18 +4,16 @@ import com.nate.mario.gfx.sprite.ItemSprite;
 
 public class CoinItem extends Item {
 
+    private static final int ID = 255;
+    private static final ItemSprite SPRITE = ItemSprite.COIN;
+
     public static final int SCORE = 200;
 
-    public CoinItem(int id) {
-        super(id);
-    }
-
     public CoinItem(float x, float y) {
-        super(x, y, ItemSprite.COIN);
+        super(x, y);
     }
 
-    @Override
-    public Item newItem(float x, float y) {
-        return new CoinItem(x, y);
-    }
+    @Override public Item newItem(float x, float y) { return new CoinItem(x, y); }
+    @Override public int getID() { return ID; }
+    @Override public ItemSprite getSprite() { return SPRITE; }
 }
