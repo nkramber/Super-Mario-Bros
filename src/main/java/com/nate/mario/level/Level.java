@@ -9,7 +9,6 @@ import com.nate.mario.entity.Entity;
 import com.nate.mario.entity.player.Player;
 import com.nate.mario.entity.player.PowerUpState;
 import com.nate.mario.gfx.Screen;
-import com.nate.mario.gfx.sprite.PlayerSprite;
 import com.nate.mario.item.BlockCoin;
 import com.nate.mario.item.CoinItem;
 import com.nate.mario.item.FireFlowerItem;
@@ -128,8 +127,9 @@ public class Level {
             }
         }
 
-        //Set our deathHeight variables based on the 
+        //Set our deathHeight variables based on the level height. This determines at what Y coordinate to kill entities or remove items
         deathHeight = tiles[0].length * 16 - 48;
+        //Death height is lower when the player is animating. This keep correct death animation timing
         deathHeightWhenAnimating = deathHeight + 402;
     }
 
