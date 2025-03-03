@@ -16,6 +16,7 @@ import com.nate.mario.item.Item;
 import com.nate.mario.item.MushroomItem;
 import com.nate.mario.item.PowerUpItem;
 import com.nate.mario.level.tile.EmptyItemBlockTile;
+import com.nate.mario.level.tile.GroundTile;
 import com.nate.mario.level.tile.ItemBlockTile;
 import com.nate.mario.level.tile.SkyTile;
 import com.nate.mario.level.tile.Tile;
@@ -67,63 +68,65 @@ public class Level {
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                Color color = new Color(levelImage.getRGB(x, y));
+                Color tileData = new Color(levelImage.getRGB(x, y));
+
+                //Check for sky tiles
+                if (tileData.getRed() == SkyTile.ID) {
+                    tiles[x][y] = new SkyTile(x, y);
+                    if (tileData.getGreen() == 0 && tileData.getBlue() == 0) continue;
+                }
 
                 //Top left corner corresponds to our level type, should be the sky tile color
                 if (x == 0 && y == 0) {
-                    if (color.getRGB() == LevelType.OVERWORLD.getRGB()) levelType = LevelType.OVERWORLD;
-
-                    tiles[x][y] = Tile.tiles.get(0);
+                    if (tileData.getRGB() == LevelType.OVERWORLD.getRGB()) levelType = LevelType.OVERWORLD;
+                    tiles[x][y] = new GroundTile(x, y);
                     continue;
-                }
-
                 //Below level type is the starting level time, red + green = time units
-                if (x == 0 && y == 1) {
-                    timeRemaining = (color.getRed() + color.getGreen());
-
-                    tiles[x][y] = Tile.tiles.get(0);
+                } else if (x == 0 && y == 1) {
+                    timeRemaining = (tileData.getRed() + tileData.getGreen());
+                    tiles[x][y] = new GroundTile(x, y);
+                    continue;
+                //Below starting level time is player spawn position
+                } else if (x == 0 && y == 2) {
+                    playerSpawnX = tileData.getRed();
+                    playerSpawnY = tileData.getGreen();
+                    tiles[x][y] = new GroundTile(x, y);
                     continue;
                 }
 
-                //Below starting level time is player spawn position
-                if (x == 0 && y == 2) {
-                    playerSpawnX = color.getRed();
-                    playerSpawnY = color.getGreen();
-
-                    tiles[x][y] = Tile.tiles.get(0);
-                }
-
-                //Red is the tile type
                 for (Tile tile : Tile.tiles) {
-                    if (color.getRed() == tile.getID()) {
+                    if (tileData.getRed() == tile.getID()) {
                         tiles[x][y] = tile.newTile(x, y);
                         break;
                     }
-                }
-
-                //Add the tile to our list of tiles to tick if necessary
-                if (tiles[x][y].isTickable()) tilesToTick.add(tiles[x][y]);
-
-                //Green is the item type
-                for (Item item : Item.items.values()) {
-                    if (color.getGreen() == item.getID()) {
-                        if (item instanceof CoinItem) items.add(item.newItem(x * 16, y * 16));
-                        else if (tiles[x][y] instanceof ItemBlockTile) {
-                            if (item instanceof MushroomItem) ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(item);
-                            else ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(Item.items.get("block_coin"));
-                        }
-                        break;
-                    }
-                }
-
-                //Blue is the entity type
-                for (Entity entity : Entity.entities.values()) {
-                    if (color.getBlue() == entity.getID()) {
-                        entities.add(entity.newEntity(x, y));
-                    }
+                    if (tileData.getGreen() == 0 && tileData.getBlue() == 0) continue;
                 }
 
                 if (tiles[x][y] == null) throw new IllegalArgumentException("Valid tile does not exist at " + x + ", " + y + " on level " + levelName);
+                if (tiles[x][y].isTickable()) tilesToTick.add(tiles[x][y]);
+
+                if (tileData.getBlue() != 0) {
+                    for (Entity entity : Entity.entities.values()) {
+                        if (tileData.getBlue() == entity.getID()) {
+                            entities.add(entity.newEntity(x, y));
+                            break;
+                        }
+                    }
+                    if (tileData.getGreen() == 0) continue;
+                }
+
+                if (tileData.getGreen() != 0) {
+                    for (Item item : Item.items.values()) {
+                        if (tileData.getGreen() == item.getID()) {
+                            if (item instanceof CoinItem) items.add(item.newItem(x * 16, y * 16));
+                            else if (tiles[x][y] instanceof ItemBlockTile) {
+                                if (item instanceof MushroomItem) ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(item);
+                                else ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(Item.items.get("block_coin"));
+                            }
+                            break;
+                        }
+                    }
+                }
             }
         }
 

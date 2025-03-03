@@ -129,23 +129,25 @@ public class Player extends Entity {
             yDir = 0;
             onGround = false;
             setInDyingAnimation();
+            //Skip the rest of the tick if we're dead
             return true;
         }
 
         if (isDoingPowerUpAnimation()) {
             updateAnimation();
+            //Skip the rest of the tick if we're mid-animation
             return true;
         }
 
         getMovement(level, keys);
-        doTileCollisions(Collision.getEntityCollisionTiles(this, level.getTiles()));
+        doTileCollisions(Collision.getLocalEntityCollisionTiles(this, level.getTiles()));
         doEntityCollisions(level.getEntities());
 
         if (invincible) tickInvincibleTimer();
 
         move();
 
-        List<Item> collisionItems = Collision.getEntityCollisionItems(this, level.getItems());
+        List<Item> collisionItems = Collision.getLocalEntityCollisionItems(this, level.getItems());
         doItemCollisions(collisionItems);
         
         updateAnimation();
@@ -588,4 +590,6 @@ public class Player extends Entity {
     public Entity newEntity(int xTile, int yTile) {
         return new Player(xTile, yTile, score);
     }
+
+    @Override public int getID() { return -1; }
 }

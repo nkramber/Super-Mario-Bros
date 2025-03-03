@@ -151,7 +151,7 @@ public class Screen {
     }
 
     public boolean isOffScreen(int x, int y) {
-        return (x + xScroll < -17 || x + xScroll >= Main.SCREEN_WIDTH + 1 || y < -33 || y > Main.SCREEN_HEIGHT - VERTICAL_OFFSET + 1);
+        return (x + xScroll < -49 || x + xScroll >= Main.SCREEN_WIDTH + 33 || y < -33 || y > Main.SCREEN_HEIGHT - VERTICAL_OFFSET + 1);
     }
 
     public void resetScroll() { xScroll = SCREEN_LEFT_PADDING; }

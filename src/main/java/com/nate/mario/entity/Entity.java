@@ -15,13 +15,12 @@ import com.nate.mario.util.Collision;
 public abstract class Entity {
 
     public static Map<String, Entity> entities = Map.of(
-        "goomba", new Goomba(255)
+        "goomba", new Goomba(-1, -1)
     );
 
     private static final float VER_ACCEL_RATE = 0.35f;
     private static final float VER_MAX_SPEED = 4.0f;
 
-    private int id;
     private boolean isToBeDeleted;
 
     protected float x, y;
@@ -34,10 +33,6 @@ public abstract class Entity {
     protected boolean falling;
     protected boolean facingLeft;
 
-    public Entity(int id) {
-        this.id = id;
-    }
-
     public Entity(float xTile, float yTile, float xDir, float yDir, Sprite currentSprite) {
         this.x = xTile * 16;
         this.y = yTile * 16;
@@ -49,7 +44,7 @@ public abstract class Entity {
 
     public void tick(Level level) {
         getMovement();
-        doTileCollisions(Collision.getEntityCollisionTiles(this, level.getTiles()));
+        doTileCollisions(Collision.getLocalEntityCollisionTiles(this, level.getTiles()));
         doEntityCollisions(level.getEntities());
         move();
     }
@@ -151,6 +146,7 @@ public abstract class Entity {
     }
 
     public abstract Entity newEntity(int xTile, int yTile);
+    public abstract int getID();
 
     public void setToBeDeleted() { isToBeDeleted = true; }
     public void setxDir(float xDir) { this.xDir = xDir; }
@@ -161,7 +157,6 @@ public abstract class Entity {
     public float getyDir() { return yDir; }
     public int getWidth() { return width; }
     public int getHeight() { return height; }
-    public int getID() { return id; }
     public boolean isToBeDeleted() { return isToBeDeleted; }
     public Sprite getSprite() { return currentSprite; }
 }

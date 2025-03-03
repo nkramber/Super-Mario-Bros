@@ -33,7 +33,7 @@ public class MushroomItem extends PowerUpItem {
         }
 
         //Don't collide with tiles while we're still rising out of our spawn block
-        if (!inSpawnAnimation) doTileCollisions(Collision.getItemCollisionTiles(this, level.getTiles()));
+        if (!inSpawnAnimation) doTileCollisions(Collision.getLocalItemCollisionTiles(this, level.getTiles()));
 
         //Move upwards if we're in our spawn animation
         if (inSpawnAnimation && (initialY - y < 16)) y -= 0.5f;

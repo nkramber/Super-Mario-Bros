@@ -4,18 +4,14 @@ import com.nate.mario.gfx.sprite.EnemySprite;
 
 public class Goomba extends Entity {
 
+    private static final int ID = 255;
+    
     private static final float HORIZONTAL_SPEED = -1.0f;
-
-    public Goomba(int id) {
-        super(id);
-    }
 
     public Goomba(float xTile, float yTile) {
         super(xTile, yTile, HORIZONTAL_SPEED, 0, EnemySprite.GOOMBA1);
     }
 
-    @Override
-    public Entity newEntity(int xTile, int yTile) {
-        return new Goomba(xTile, yTile);
-    }
+    @Override public Entity newEntity(int xTile, int yTile) { return new Goomba(xTile, yTile); }
+    @Override public int getID() { return ID; }
 }

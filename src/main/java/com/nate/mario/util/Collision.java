@@ -11,7 +11,7 @@ import com.nate.mario.level.tile.Tile;
 public class Collision {
 
     //Calculate which items to check for collisions based on the location of the entity
-    public static List<Item> getEntityCollisionItems(Entity entity, List<Item> items) {
+    public static List<Item> getLocalEntityCollisionItems(Entity entity, List<Item> items) {
         int xBoundLeft = (int) (entity.getX() - 16);
         int xBoundRight = (int) (entity.getX() + 31);
         int yBoundTop = (int) (entity.getY() - 16);
@@ -33,7 +33,7 @@ public class Collision {
     }
 
     //Calculate which tiles to check for collisions based on the location of the entity
-    public static Tile[][] getEntityCollisionTiles(Entity entity, Tile[][] tiles) {
+    public static Tile[][] getLocalEntityCollisionTiles(Entity entity, Tile[][] tiles) {
         int xBoundLeft = (int) (entity.getX() - 16) / 16;
         int xBoundRight = (int) (entity.getX() + 31) / 16;
         int yBoundTop = (int) (entity.getY() - 16) / 16;
@@ -55,7 +55,7 @@ public class Collision {
     }
 
     //Calculate which tiles to check for collisions based on the location of the item
-    public static Tile[][] getItemCollisionTiles(Item item, Tile[][] tiles) {
+    public static Tile[][] getLocalItemCollisionTiles(Item item, Tile[][] tiles) {
         int xBoundLeft = (int) (item.getX() - 16) / 16;
         int xBoundRight = (int) (item.getX() + 31) / 16;
         int yBoundTop = (int) (item.getY() - 16) / 16;
