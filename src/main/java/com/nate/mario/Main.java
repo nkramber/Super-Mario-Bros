@@ -42,6 +42,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
         keys = new boolean[256];
 
         screen = new Screen((Graphics2D) display.getGraphics());
+        //draw "load screen" here
         currentState = new MarioGame(screen);
 
         addKeyListener(this);

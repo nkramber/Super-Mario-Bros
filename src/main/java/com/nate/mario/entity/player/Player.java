@@ -586,10 +586,6 @@ public class Player extends Entity {
         invincibleTimer = new Timer();
     }
 
-    @Override
-    public Entity newEntity(int xTile, int yTile) {
-        return new Player(xTile, yTile, score);
-    }
-
+    @Override public Entity newEntity(int xTile, int yTile) { return new Player(xTile, yTile, score); }
     @Override public int getID() { return -1; }
 }

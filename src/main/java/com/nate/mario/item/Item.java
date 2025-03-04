@@ -8,10 +8,9 @@ import com.nate.mario.level.Level;
 public abstract class Item {
 
     //ID corresponds to the green color value of the pixel in the level file where the item is to be placed
-    public static Map<String, Item> items = Map.of(
-        "coin", new CoinItem(-1, -1),
-        "mushroom", new MushroomItem(-1, -1),
-        "block_coin", new BlockCoin(-1, -1)
+    public static Map<Integer, Item> items = Map.of(
+        255, new CoinItem(-1, -1),
+        100, new MushroomItem(-1, -1)
     );
 
     protected float x, y;

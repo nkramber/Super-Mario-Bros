@@ -1,18 +1,16 @@
 package com.nate.mario.level.tile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 import com.nate.mario.level.Level;
 
 public abstract class Tile {
 
-    public static List<Tile> tiles = new ArrayList<>() {{
-        add(new SkyTile(-1, -1));
-        add(new GroundTile(-1, -1));
-        add(new ItemBlockTile(-1, -1));
-        add(new EmptyItemBlockTile(-1, -1));
-    }};
+    public static Map<Integer, Tile> tiles = Map.of(
+        0, new SkyTile(-1, -1),
+        255, new GroundTile(-1, -1),
+        60, new ItemBlockTile(-1, -1)
+    );
 
     protected int xTile, yTile;
     protected boolean tickable = false;

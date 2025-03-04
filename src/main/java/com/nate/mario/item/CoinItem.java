@@ -4,7 +4,7 @@ import com.nate.mario.gfx.sprite.ItemSprite;
 
 public class CoinItem extends Item {
 
-    private static final int ID = 255;
+    public static final int ID = 255;
     private static final ItemSprite SPRITE = ItemSprite.COIN;
 
     public static final int SCORE = 200;

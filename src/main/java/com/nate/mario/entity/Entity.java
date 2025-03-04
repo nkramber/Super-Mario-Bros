@@ -14,8 +14,8 @@ import com.nate.mario.util.Collision;
 
 public abstract class Entity {
 
-    public static Map<String, Entity> entities = Map.of(
-        "goomba", new Goomba(-1, -1)
+    public static Map<Integer, Entity> entities = Map.of(
+        255, new Goomba(-1, -1)
     );
 
     private static final float VER_ACCEL_RATE = 0.35f;

@@ -70,12 +70,6 @@ public class Level {
             for (int y = 0; y < height; y++) {
                 Color tileData = new Color(levelImage.getRGB(x, y));
 
-                //Check for sky tiles
-                if (tileData.getRed() == SkyTile.ID) {
-                    tiles[x][y] = new SkyTile(x, y);
-                    if (tileData.getGreen() == 0 && tileData.getBlue() == 0) continue;
-                }
-
                 //Top left corner corresponds to our level type, should be the sky tile color
                 if (x == 0 && y == 0) {
                     if (tileData.getRGB() == LevelType.OVERWORLD.getRGB()) levelType = LevelType.OVERWORLD;
@@ -94,37 +88,24 @@ public class Level {
                     continue;
                 }
 
-                for (Tile tile : Tile.tiles) {
-                    if (tileData.getRed() == tile.getID()) {
-                        tiles[x][y] = tile.newTile(x, y);
-                        break;
-                    }
-                    if (tileData.getGreen() == 0 && tileData.getBlue() == 0) continue;
-                }
-
-                if (tiles[x][y] == null) throw new IllegalArgumentException("Valid tile does not exist at " + x + ", " + y + " on level " + levelName);
+                //Red pixel data = tile
+                int id = tileData.getRed();
+                tiles[x][y] = Tile.tiles.get(id).newTile(x, y);
                 if (tiles[x][y].isTickable()) tilesToTick.add(tiles[x][y]);
 
+                //Blue pixel data = entity
                 if (tileData.getBlue() != 0) {
-                    for (Entity entity : Entity.entities.values()) {
-                        if (tileData.getBlue() == entity.getID()) {
-                            entities.add(entity.newEntity(x, y));
-                            break;
-                        }
-                    }
-                    if (tileData.getGreen() == 0) continue;
+                    id = tileData.getBlue();
+                    entities.add(Entity.entities.get(id).newEntity(x, y));
                 }
 
+                //Green pixel data = item
                 if (tileData.getGreen() != 0) {
-                    for (Item item : Item.items.values()) {
-                        if (tileData.getGreen() == item.getID()) {
-                            if (item instanceof CoinItem) items.add(item.newItem(x * 16, y * 16));
-                            else if (tiles[x][y] instanceof ItemBlockTile) {
-                                if (item instanceof MushroomItem) ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(item);
-                                else ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(Item.items.get("block_coin"));
-                            }
-                            break;
-                        }
+                    id = tileData.getGreen();
+                    //Add BlockTile (1UP, big coin) item adding here
+                    if (tiles[x][y] instanceof ItemBlockTile) {
+                        if (Item.items.containsKey(id)) ((ItemBlockTile) tiles[x][y]).addItemToItemBlock(Item.items.get(id));
+                        else items.add(new BlockCoin(x * 16, y * 16));
                     }
                 }
             }
