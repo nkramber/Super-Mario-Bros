@@ -2,7 +2,7 @@ package com.nate.mario.level.tile;
 
 public class SkyTile extends Tile {
 
-    private static final String NAME = "sky_tile";
+    public static final String NAME = "sky_tile";
     public static final int ID = 0;
 
     public SkyTile(int xTile, int yTile) {

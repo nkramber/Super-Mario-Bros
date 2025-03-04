@@ -2,6 +2,7 @@ package com.nate.mario.gfx;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -125,15 +126,15 @@ public class Screen {
         drawHudText(score, xHalfTile, yHalfTile);
     }
 
-    // public void drawRect(Color color, int x, int y, int width, int height) {
-    //     g.setColor(color);
-    //     g.drawRect(x + xScroll, y + VERTICAL_OFFSET, width, height);
-    // }
+    public void drawRect(Color color, int x, int y, int width, int height) {
+        g.setColor(color);
+        g.drawRect(x + xScroll, y + VERTICAL_OFFSET, width, height);
+    }
 
-    // public void drawRect(Color color, Rectangle rect) {
-    //     g.setColor(color);
-    //     g.drawRect(rect.x + xScroll, rect.y + VERTICAL_OFFSET, rect.width, rect.height);
-    // }
+    public void drawRect(Color color, Rectangle rect) {
+        g.setColor(color);
+        g.drawRect(rect.x + xScroll, rect.y + VERTICAL_OFFSET, rect.width, rect.height);
+    }
 
     public void setScroll(int playerX, int levelWidth) {
         if (playerX + 32 > Main.SCREEN_WIDTH / 2) {

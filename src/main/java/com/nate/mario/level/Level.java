@@ -224,7 +224,7 @@ public class Level {
                 }
 
                 //Draw a blank sky tile below the block containing our item. This prevents the item from appearing below the animating block
-                if (powerUpItem.inSpawnAnimation()) screen.drawTile("sky_tile", (int) powerUpItem.getX(), powerUpItem.getInitialY());
+                if (powerUpItem.inSpawnAnimation()) screen.drawTile(SkyTile.NAME, (int) powerUpItem.getX(), powerUpItem.getInitialY());
             }
         }
 

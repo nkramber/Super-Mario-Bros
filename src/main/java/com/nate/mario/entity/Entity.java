@@ -28,10 +28,13 @@ public abstract class Entity {
     protected int width = 16;
     protected int height;
     protected int jumpTick = 0;
+    protected int animationFrame = 0;
     protected Sprite currentSprite;
+    protected boolean inDyingAnimation;
     protected boolean onGround;
     protected boolean falling;
     protected boolean facingLeft;
+    protected boolean collidable = true;
 
     public Entity(float xTile, float yTile, float xDir, float yDir, Sprite currentSprite) {
         this.x = xTile * 16;
@@ -45,18 +48,22 @@ public abstract class Entity {
     public void tick(Level level) {
         getMovement();
         doTileCollisions(Collision.getLocalEntityCollisionTiles(this, level.getTiles()));
-        doEntityCollisions(level.getEntities());
+        if (!inDyingAnimation) doEntityCollisions(level.getEntities());
+        updateSprite();
         move();
     }
 
-    public void getMovement() {
+    protected void updateSprite() {}
+
+    protected void getMovement(Level level, boolean[] keys) { getMovement(); }
+    protected void getMovement() {
         if (!onGround) {
             if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
             else yDir += VER_ACCEL_RATE;
         }
     }
-
-    public void move() {
+    
+    protected void move() {
         x += xDir;
         y += yDir;
     }
@@ -65,7 +72,7 @@ public abstract class Entity {
         screen.drawSprite(currentSprite, facingLeft, (int) x, (int) y);
     }
 
-    public void doTileCollisions(Tile[][] tiles) {
+    protected void doTileCollisions(Tile[][] tiles) {
         int yOffset = 4;
         int xOffset = 2;
 
@@ -129,7 +136,7 @@ public abstract class Entity {
         y = newY;
     }
 
-    public void doEntityCollisions(List<Entity> entities) {
+    protected void doEntityCollisions(List<Entity> entities) {
         int xOffset = 3;
 
         for (Entity entity : entities) {
@@ -148,6 +155,8 @@ public abstract class Entity {
     public abstract Entity newEntity(int xTile, int yTile);
     public abstract int getID();
 
+    public void setNotCollidable() { collidable = false; }
+    public void setInDyingAnimation() { inDyingAnimation = true; }
     public void setToBeDeleted() { isToBeDeleted = true; }
     public void setxDir(float xDir) { this.xDir = xDir; }
 
@@ -158,5 +167,6 @@ public abstract class Entity {
     public int getWidth() { return width; }
     public int getHeight() { return height; }
     public boolean isToBeDeleted() { return isToBeDeleted; }
+    public boolean isCollidable() { return collidable; }
     public Sprite getSprite() { return currentSprite; }
 }

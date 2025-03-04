@@ -1,3 +1,2 @@
-goomba1, 1, 1
-goomba2, 2, 1
-goomba_dead, 3, 1
+goomba_walk, 1, 1
+goomba_dead, 2, 1

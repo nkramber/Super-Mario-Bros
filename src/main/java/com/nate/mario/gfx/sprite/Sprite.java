@@ -8,6 +8,11 @@ public class Sprite {
     protected final String name;
     protected final int height;
 
+    public Sprite(String name) {
+        this.name = name;
+        this.height = 1;
+    }
+
     public Sprite(String name, int height) {
         this.name = name;
         this.height = height;

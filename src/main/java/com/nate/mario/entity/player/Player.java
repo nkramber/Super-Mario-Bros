@@ -112,7 +112,7 @@ public class Player extends Entity {
         if (inDyingAnimation) {
             //Still above the height threshold where we reset the level
             if (y <= level.getDeathHeightWhenAnimating()) {
-                updateAnimation();
+                updateSprite();
 
                 if (deathTimer != null) tickDeathTimer();
                 else doGravity();
@@ -134,7 +134,7 @@ public class Player extends Entity {
         }
 
         if (isDoingPowerUpAnimation()) {
-            updateAnimation();
+            updateSprite();
             //Skip the rest of the tick if we're mid-animation
             return true;
         }
@@ -150,12 +150,13 @@ public class Player extends Entity {
         List<Item> collisionItems = Collision.getLocalEntityCollisionItems(this, level.getItems());
         doItemCollisions(collisionItems);
         
-        updateAnimation();
+        updateSprite();
 
         return false;
     }
 
-    public void getMovement(Level level, boolean[] keys) {
+    @Override
+    protected void getMovement(Level level, boolean[] keys) {
         skidding = false;
         if (yDir != 0 && onGround) onGround = false;
 
@@ -199,12 +200,12 @@ public class Player extends Entity {
     }
 
     @Override
-    public void move() {
+    protected void move() {
         x += xDir;
         y += yDir;
     }
 
-    public void doGravity() {
+    private void doGravity() {
         if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
         else yDir += VER_ACCEL_RATE;
     }
@@ -300,7 +301,7 @@ public class Player extends Entity {
     }
 
     @Override
-    public void doTileCollisions(Tile[][] tiles) {
+    protected void doTileCollisions(Tile[][] tiles) {
         int yOffset = 4;
         int xOffset = 2;
 
@@ -332,6 +333,7 @@ public class Player extends Entity {
                             }
                             newY = tile.getyTile() * 16 + 16 - yOffset;
                             jumpTick = 0;
+                            onGround = false;
                         } else { //Collide with tile below
                             newY = tile.getyTile() * 16 - height;
                             onGround = true;
@@ -353,13 +355,16 @@ public class Player extends Entity {
             }
         }
 
+        
         if (!floorTiles.isEmpty()) {
             onGround = false;
             falling = true;
             for (Tile floorTile : floorTiles) {
-                if (!floorTile.isSolid()) continue;
-                onGround = true;
-                falling = false;
+                if (floorTile.isSolid()) {
+                    onGround = true;
+                    falling = false;
+                    break;
+                }
             }
         }
 
@@ -368,27 +373,31 @@ public class Player extends Entity {
     }
 
     @Override
-    public void doEntityCollisions(List<Entity> entities) {
+    protected void doEntityCollisions(List<Entity> entities) {
         int yOffset = 4;
         int xOffset = 2;
 
         Rectangle localCollisionRectangle = new Rectangle((int) x + xOffset, (int) y + yOffset, width - xOffset * 2, height - yOffset);
 
         for (Entity entity : entities) {
-            Rectangle otherCollisionRectangle = new Rectangle((int) entity.getX(), (int) entity.getY(), entity.getWidth(), entity.getHeight());
+            if (entity.isCollidable()) {
+                Rectangle otherCollisionRectangle = new Rectangle((int) entity.getX(), (int) entity.getY(), entity.getWidth(), entity.getHeight());
 
-            if (localCollisionRectangle.intersects(otherCollisionRectangle)) {
-                if (entity instanceof Goomba) {
-                    if (y + 2 < entity.getY() && yDir > 0) {
-                        yDir = MONSTER_JUMPED_ON_SPEED;
-                        entity.setToBeDeleted();
-                        addToScore(100); //Add multiplicitave scoring for player still in the air combos
-                    } else if (!invincible) {
-                        if (powerUpState == PowerUpState.SMALL) {
-                            isDead = true;
-                        } else {
-                            changePowerUpState(PowerUpState.SMALL);
-                            setInvincible();
+                if (localCollisionRectangle.intersects(otherCollisionRectangle)) {
+                    if (entity instanceof Goomba) {
+                        //This means we jumped on the monsters head
+                        if (y + 2 < entity.getY() && yDir > 0) {
+                            yDir = MONSTER_JUMPED_ON_SPEED;
+                            entity.setInDyingAnimation();
+                            entity.setNotCollidable();
+                            addToScore(100); //Add multiplicitave scoring for player still in the air combos
+                        } else if (!invincible) {
+                            if (powerUpState == PowerUpState.SMALL) {
+                                isDead = true;
+                            } else {
+                                changePowerUpState(PowerUpState.SMALL);
+                                setInvincible();
+                            }
                         }
                     }
                 }
@@ -396,7 +405,7 @@ public class Player extends Entity {
         }
     }
 
-    public void doItemCollisions(List<Item> items) {
+    private void doItemCollisions(List<Item> items) {
         for (Item item : items) {
             int itemX = (int) item.getX();
             int itemY = (int) item.getY();
@@ -441,7 +450,8 @@ public class Player extends Entity {
         powerUpState = state;
     }
 
-    public void updateAnimation() {
+    @Override
+    protected void updateSprite() {
         if (time == 0) time = System.currentTimeMillis();
 
         if (invincible) {
@@ -543,7 +553,7 @@ public class Player extends Entity {
         if (!skipRender) screen.drawSprite(currentSprite, facingLeft, (int) x, (int) y);
     }
 
-    public void tickInvincibleTimer() {
+    private void tickInvincibleTimer() {
         invincibleTimer.tick();
         if (invincibleTimer.getElapsedTime() < INVINCIBLE_TIMER_TIME) return;
         invincibleTimer = null;
@@ -552,7 +562,7 @@ public class Player extends Entity {
         skipRender = false;
     }
 
-    public void tickDeathTimer() {
+    private void tickDeathTimer() {
         deathTimer.tick();
         if (deathTimer.getElapsedTime() < DEATH_TIMER_TIME) return;
         deathTimer = null;
