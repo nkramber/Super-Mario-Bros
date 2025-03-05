@@ -96,7 +96,10 @@ public class Level {
                 //Blue pixel data = entity
                 if (tileData.getBlue() != 0) {
                     id = tileData.getBlue();
-                    entities.add(Entity.entities.get(id).newEntity(x, y));
+                    Entity entity = Entity.entities.get(id).newEntity(x, y);
+                    entities.add(entity);
+                    //If the spawn tile is on screen at the start of the level, add it to our onScreenEntities list
+                    if (x < 16) onScreenEntities.add(entity);
                 }
 
                 //Green pixel data = item
@@ -112,7 +115,7 @@ public class Level {
         }
 
         //Set our deathHeight variables based on the level height. This determines at what Y coordinate to kill entities or remove items
-        deathHeight = tiles[0].length * 16 - 48;
+        deathHeight = tiles[0].length * 16 - 64;
         //Death height is lower when the player is animating. This keep correct death animation timing
         deathHeightWhenAnimating = deathHeight + 402;
     }
@@ -121,12 +124,30 @@ public class Level {
         decrementLevelTime();
 
         //If the player is dead or doing a power up animation, skip the rest of the tick
-        boolean skipRestOfTick = player.tick(this, keys);
+        player.tick(this, keys);
 
-        if (!skipRestOfTick) {
-            tickEntities();
+        if (!player.isInDyingAnimation()) {
             tickItems();
             tickTiles();
+            if (!player.isDoingPowerUpAnimation()) {
+                tickEntities();
+            }
+        }
+
+        doEntityCollisions();
+    }
+
+    private void doEntityCollisions() {
+        for (int i = 0; i < entities.size(); i++) {
+            Entity e1 = entities.get(i);
+            if (onScreenEntities.contains(e1)) {
+                for (int j = i + 1; j < entities.size(); j++) {
+                    Entity e2 = entities.get(j);
+                    if (onScreenEntities.contains(e2)) {
+                        //Entity collision here
+                    }
+                }
+            }
         }
     }
 
@@ -134,8 +155,11 @@ public class Level {
         //Keep track of which entities need to be removed - can't remove inside our loop, so we remove after
         List<Entity> entitiesToRemove = new ArrayList<>();
         for (Entity entity : entities) {
-            if (onScreenEntities.contains(entity)) entity.tick(this);
-            if (entity.isToBeDeleted() || entity.getY() > deathHeight) entitiesToRemove.add(entity);
+            if (!onScreenEntities.contains(entity) || entity.isToBeDeleted() || entity.getY() > deathHeight) {
+                entitiesToRemove.add(entity);
+                continue;
+            }
+            entity.tick(this);
         }
 
         for (Entity entity : entitiesToRemove) entities.remove(entity); //add death animation to goombas

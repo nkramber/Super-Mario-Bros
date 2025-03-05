@@ -14,6 +14,7 @@ import com.nate.mario.util.Collision;
 
 public abstract class Entity {
 
+    //Blue color code, entity type
     public static Map<Integer, Entity> entities = Map.of(
         255, new Goomba(-1, -1)
     );
@@ -45,27 +46,25 @@ public abstract class Entity {
         this.currentSprite = currentSprite;
     }
 
+    public void tick(Level level, boolean[] keys) { tick(level); }
     public void tick(Level level) {
-        getMovement();
-        doTileCollisions(Collision.getLocalEntityCollisionTiles(this, level.getTiles()));
-        if (!inDyingAnimation) doEntityCollisions(level.getEntities());
         updateSprite();
-        move();
+        doMovement();
+        doTileCollisions(Collision.getLocalEntityCollisionTiles(this, level.getTiles()));
+        // if (!inDyingAnimation) doEntityCollisions(level.getEntities());
     }
 
     protected void updateSprite() {}
 
-    protected void getMovement(Level level, boolean[] keys) { getMovement(); }
-    protected void getMovement() {
+    protected void doMovement(Level level, boolean[] keys) { doMovement(); }
+    protected void doMovement() {
+        x += xDir;
+        y += yDir;
+
         if (!onGround) {
             if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
             else yDir += VER_ACCEL_RATE;
         }
-    }
-    
-    protected void move() {
-        x += xDir;
-        y += yDir;
     }
 
     public void render(Screen screen) {

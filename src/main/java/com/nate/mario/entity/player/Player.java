@@ -22,8 +22,9 @@ import com.nate.mario.util.Timer;
 
 public class Player extends Entity {
 
-    private static final int DEATH_TIMER_TIME = 750; //time in ms before we begin our death animation
-    private static final int INVINCIBLE_TIMER_TIME = 2000;
+    private static final int DEATH_WAIT_TIME = 750; //time in ms before we begin our death animation
+
+    private static final int POST_DAMAGE_INVINCIBLE_TIME = 2000;
     private static final float WALK_DECEL_RATE = 0.06f;
     private static final float WALK_ACCEL_RATE = 0.035f;
     private static final float WALK_MAX_SPEED = 1.5f;
@@ -107,7 +108,8 @@ public class Player extends Entity {
         facingLeft = false;
     }
 
-    public boolean tick(Level level, boolean[] keys) {
+    @Override
+    public void tick(Level level, boolean[] keys) {
         //Update our death animation if necessary
         if (inDyingAnimation) {
             //Still above the height threshold where we reset the level
@@ -117,10 +119,10 @@ public class Player extends Entity {
                 if (deathTimer != null) tickDeathTimer();
                 else doGravity();
 
-                move();
+                y += yDir;
             } else level.doResetLevel();
             //Skip the rest of the tick if we're dead
-            return true;
+            return;
         }
 
         //Check if we should die or are already flagged as dead
@@ -130,33 +132,29 @@ public class Player extends Entity {
             onGround = false;
             setInDyingAnimation();
             //Skip the rest of the tick if we're dead
-            return true;
+            return;
         }
 
         if (isDoingPowerUpAnimation()) {
             updateSprite();
             //Skip the rest of the tick if we're mid-animation
-            return true;
+            return;
         }
-
-        getMovement(level, keys);
-        doTileCollisions(Collision.getLocalEntityCollisionTiles(this, level.getTiles()));
-        doEntityCollisions(level.getEntities());
 
         if (invincible) tickInvincibleTimer();
 
-        move();
-
-        List<Item> collisionItems = Collision.getLocalEntityCollisionItems(this, level.getItems());
-        doItemCollisions(collisionItems);
-        
         updateSprite();
-
-        return false;
+        doMovement(level, keys);
+        doTileCollisions(Collision.getLocalEntityCollisionTiles(this, level.getTiles()));
+        doItemCollisions(Collision.getLocalEntityCollisionItems(this, level.getItems()));
+        //doEntityCollisions(level.getEntities());
     }
 
     @Override
-    protected void getMovement(Level level, boolean[] keys) {
+    protected void doMovement(Level level, boolean[] keys) {
+        x += xDir;
+        y += yDir;
+
         skidding = false;
         if (yDir != 0 && onGround) onGround = false;
 
@@ -181,8 +179,8 @@ public class Player extends Entity {
         if (x > maxX && x < level.getTiles().length * 16 - 190) maxX = (int) x;
 
         //Prevent player from retreating backwards
-        if (x + xDir < maxX - 96) {
-            x = maxX - 96;
+        if (x + xDir < maxX - 97) {
+            x = maxX - 97;
             xDir = 0;
         }
 
@@ -197,12 +195,6 @@ public class Player extends Entity {
             jumpTick = 0;
             if (onGround && hasJumped) hasJumped = false;
         }
-    }
-
-    @Override
-    protected void move() {
-        x += xDir;
-        y += yDir;
     }
 
     private void doGravity() {
@@ -555,7 +547,7 @@ public class Player extends Entity {
 
     private void tickInvincibleTimer() {
         invincibleTimer.tick();
-        if (invincibleTimer.getElapsedTime() < INVINCIBLE_TIMER_TIME) return;
+        if (invincibleTimer.getElapsedTime() < POST_DAMAGE_INVINCIBLE_TIME) return;
         invincibleTimer = null;
         invincible = false;
         invincibleFrame = 0;
@@ -564,7 +556,7 @@ public class Player extends Entity {
 
     private void tickDeathTimer() {
         deathTimer.tick();
-        if (deathTimer.getElapsedTime() < DEATH_TIMER_TIME) return;
+        if (deathTimer.getElapsedTime() < DEATH_WAIT_TIME) return;
         deathTimer = null;
         yDir = -5.0f;
     }
