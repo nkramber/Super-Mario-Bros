@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.nate.mario.entity.Entity;
-import com.nate.mario.entity.Goomba;
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.gfx.sprite.PlayerSprite;
 import com.nate.mario.item.CoinItem;
@@ -23,6 +22,7 @@ import com.nate.mario.util.Timer;
 public class Player extends Entity {
 
     private static final int DEATH_WAIT_TIME = 750; //time in ms before we begin our death animation
+    private static final int COLLISION_OFFSET_X = 3;
 
     private static final int POST_DAMAGE_INVINCIBLE_TIME = 2000;
     private static final float WALK_DECEL_RATE = 0.06f;
@@ -106,6 +106,7 @@ public class Player extends Entity {
         this.score = score;
         maxX = (int) xTile * 16;
         facingLeft = false;
+        collisionRect = new Rectangle((int) x, (int) y, width, height);
     }
 
     @Override
@@ -119,7 +120,7 @@ public class Player extends Entity {
                 if (deathTimer != null) tickDeathTimer();
                 else doGravity();
 
-                y += yDir;
+                y += dirY;
             } else level.doResetLevel();
             //Skip the rest of the tick if we're dead
             return;
@@ -127,8 +128,8 @@ public class Player extends Entity {
 
         //Check if we should die or are already flagged as dead
         if (level.getTimeRemaining() <= 0 || isDead || y > level.getDeathHeight()) {
-            xDir = 0;
-            yDir = 0;
+            dirX = 0;
+            dirY = 0;
             onGround = false;
             setInDyingAnimation();
             //Skip the rest of the tick if we're dead
@@ -145,18 +146,35 @@ public class Player extends Entity {
 
         updateSprite();
         doMovement(level, keys);
+
+        collisionRect = new Rectangle((int) x + COLLISION_OFFSET_X, (int) y, width - COLLISION_OFFSET_X * 2, height);
         doTileCollisions(Collision.getLocalEntityCollisionTiles(this, level.getTiles()));
         doItemCollisions(Collision.getLocalEntityCollisionItems(this, level.getItems()));
-        //doEntityCollisions(level.getEntities());
+    }
+
+    @Override
+    public void entityCollide(Entity entity) {
+        if (inDyingAnimation) return;
+        //If we collided with the entity from above (our y is less than theirs and we are falling)
+        if (y + 2 < entity.getY() && dirY > 0) {
+            dirY = MONSTER_JUMPED_ON_SPEED;
+            addToScore(entity.getScore());
+        } else if (!invincible) {
+            if (powerUpState == PowerUpState.SMALL) isDead = true;
+            else {
+                changePowerUpState(PowerUpState.SMALL);
+                setInvincible();
+            }
+        }
     }
 
     @Override
     protected void doMovement(Level level, boolean[] keys) {
-        x += xDir;
-        y += yDir;
+        x += dirX;
+        y += dirY;
 
         skidding = false;
-        if (yDir != 0 && onGround) onGround = false;
+        if (dirY != 0 && onGround) onGround = false;
 
         //This mean we're falling
         if (!onGround) doGravity();
@@ -179,9 +197,9 @@ public class Player extends Entity {
         if (x > maxX && x < level.getTiles().length * 16 - 190) maxX = (int) x;
 
         //Prevent player from retreating backwards
-        if (x + xDir < maxX - 97) {
+        if (x + dirX < maxX - 97) {
             x = maxX - 97;
-            xDir = 0;
+            dirX = 0;
         }
 
         //Prevent the player from clipping into the invisible tiles on the far left and far right of the level
@@ -198,54 +216,54 @@ public class Player extends Entity {
     }
 
     private void doGravity() {
-        if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
-        else yDir += VER_ACCEL_RATE;
+        if (dirY + VER_ACCEL_RATE > VER_MAX_SPEED) dirY = VER_MAX_SPEED;
+        else dirY += VER_ACCEL_RATE;
     }
 
     private void horizontalDeceleration() {
-        if (xDir > 0) {
-            if (xDir - currentHorDecelRate < 0) xDir = 0;
-            else xDir -= currentHorDecelRate;
-        } else if (xDir < 0) {
-            if (xDir + currentHorDecelRate > 0) xDir = 0;
-            else xDir += currentHorDecelRate;
+        if (dirX > 0) {
+            if (dirX - currentHorDecelRate < 0) dirX = 0;
+            else dirX -= currentHorDecelRate;
+        } else if (dirX < 0) {
+            if (dirX + currentHorDecelRate > 0) dirX = 0;
+            else dirX += currentHorDecelRate;
         }
     }
 
     private void moveLeft() {
         if (onGround) facingLeft = true;
-        if (xDir > 0) { //If we're moving to the right when we press left, we 'skid'
-            if (xDir - currentHorDecelRate * SKID_RATE < 0) { //Done skidding
-                xDir = 0;
+        if (dirX > 0) { //If we're moving to the right when we press left, we 'skid'
+            if (dirX - currentHorDecelRate * SKID_RATE < 0) { //Done skidding
+                dirX = 0;
             } else {
-                if ((hasJumped && !onGround) || (falling && !onGround)) xDir -= currentHorDecelRate; //If we're in the air, don't skid
+                if ((hasJumped && !onGround) || (falling && !onGround)) dirX -= currentHorDecelRate; //If we're in the air, don't skid
                 else {
                     skidding = true;
-                    xDir -= currentHorDecelRate * SKID_RATE;
+                    dirX -= currentHorDecelRate * SKID_RATE;
                 }
             }
-        } else if (xDir - currentHorAccelRate < -currentHorMaxSpeed) { //Reached max speed in the left direction
-            if (!sprinting) xDir += currentHorDecelRate;
-            else xDir = -currentHorMaxSpeed;
-        } else xDir -= currentHorAccelRate;
+        } else if (dirX - currentHorAccelRate < -currentHorMaxSpeed) { //Reached max speed in the left direction
+            if (!sprinting) dirX += currentHorDecelRate;
+            else dirX = -currentHorMaxSpeed;
+        } else dirX -= currentHorAccelRate;
     }
 
     private void moveRight() {
         if (onGround) facingLeft = false;
-        if (xDir < 0) { //If we're moving to the left when we press right, we 'skid'
-            if (xDir + currentHorDecelRate * SKID_RATE > 0) { //Done skidding
-                xDir = 0;
+        if (dirX < 0) { //If we're moving to the left when we press right, we 'skid'
+            if (dirX + currentHorDecelRate * SKID_RATE > 0) { //Done skidding
+                dirX = 0;
             } else {
-                if ((hasJumped && !onGround) || (falling && !onGround)) xDir += currentHorDecelRate; //If we're in the air, don't skid
+                if ((hasJumped && !onGround) || (falling && !onGround)) dirX += currentHorDecelRate; //If we're in the air, don't skid
                 else {
                     skidding = true;
-                    xDir += currentHorDecelRate * SKID_RATE;
+                    dirX += currentHorDecelRate * SKID_RATE;
                 }
             }
-        } else if (xDir + currentHorAccelRate > currentHorMaxSpeed) { //Reached max speed in the right direction
-            if (!sprinting) xDir -= currentHorDecelRate;
-            else xDir = currentHorMaxSpeed;
-        } else xDir += currentHorAccelRate;
+        } else if (dirX + currentHorAccelRate > currentHorMaxSpeed) { //Reached max speed in the right direction
+            if (!sprinting) dirX -= currentHorDecelRate;
+            else dirX = currentHorMaxSpeed;
+        } else dirX += currentHorAccelRate;
     }
 
     private void isSprinting() {
@@ -264,15 +282,15 @@ public class Player extends Entity {
 
     private void preventClippingOutsideLevel(int mapWidthInTiles) {
         //Prevent player from clipping past right side of level
-        if (x + xDir >= mapWidthInTiles * 16 - 48) {
+        if (x + dirX >= mapWidthInTiles * 16 - 48) {
             x = mapWidthInTiles * 16 - 48;
-            xDir = 0;
+            dirX = 0;
         }
 
         //Prevent player from clipping past left side of level
-        if (x + xDir < 32) {
+        if (x + dirX < 32) {
             x = 32;
-            xDir = 0;
+            dirX = 0;
         }
     }
 
@@ -284,9 +302,9 @@ public class Player extends Entity {
         
         if (jumpTick == 0 && onGround && !hasJumped) {
             hasJumped = true;
-            yDir = JUMP_SPEED_RATE[jumpTick++];
+            dirY = JUMP_SPEED_RATE[jumpTick++];
         } else if (jumpTick > 0 && jumpTick < JUMP_SPEED_RATE.length) {
-            yDir = JUMP_SPEED_RATE[jumpTick++];
+            dirY = JUMP_SPEED_RATE[jumpTick++];
         } else if (jumpTick == JUMP_SPEED_RATE.length) {
             jumpTick = 0;
         }
@@ -300,8 +318,8 @@ public class Player extends Entity {
         float newX = x;
         float newY = y;
 
-        Rectangle verticalEntityRect = new Rectangle((int) (x) + xOffset, (int) (y + yDir + yOffset), width - xOffset * 2, height - yOffset);
-        Rectangle horizontalEntityRect = new Rectangle((int) (x + xDir + xOffset), (int) (y + yOffset), width - xOffset * 2, height - yOffset);
+        Rectangle verticalEntityRect = new Rectangle((int) (x) + xOffset, (int) (y + dirY + yOffset), width - xOffset * 2, height - yOffset);
+        Rectangle horizontalEntityRect = new Rectangle((int) (x + dirX + xOffset), (int) (y + yOffset), width - xOffset * 2, height - yOffset);
         HashSet<Tile> floorTiles = new HashSet<>();
 
         for (int i = 0; i < tiles.length; i++) {
@@ -316,7 +334,7 @@ public class Player extends Entity {
 
                 if (tile.isSolid()) {
                     if (verticalEntityRect.intersects(tileRect)) {
-                        yDir = 0;
+                        dirY = 0;
                         if (tile.getyTile() * 16 < newY) { //Collide with tile above
                             if (tile instanceof ItemBlockTile) {
                                 ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
@@ -335,7 +353,7 @@ public class Player extends Entity {
                     }
     
                     if (horizontalEntityRect.intersects(tileRect)) {
-                        xDir = 0;
+                        dirX = 0;
                         if (tile.getxTile() * 16 < newX) { //Collide with tile to the left
                             newX = tile.getxTile() * 16 + 16 - xOffset;
                         } else { //Collide with tile to the right
@@ -362,39 +380,6 @@ public class Player extends Entity {
 
         x = newX;
         y = newY;
-    }
-
-    @Override
-    protected void doEntityCollisions(List<Entity> entities) {
-        int yOffset = 4;
-        int xOffset = 2;
-
-        Rectangle localCollisionRectangle = new Rectangle((int) x + xOffset, (int) y + yOffset, width - xOffset * 2, height - yOffset);
-
-        for (Entity entity : entities) {
-            if (entity.isCollidable()) {
-                Rectangle otherCollisionRectangle = new Rectangle((int) entity.getX(), (int) entity.getY(), entity.getWidth(), entity.getHeight());
-
-                if (localCollisionRectangle.intersects(otherCollisionRectangle)) {
-                    if (entity instanceof Goomba) {
-                        //This means we jumped on the monsters head
-                        if (y + 2 < entity.getY() && yDir > 0) {
-                            yDir = MONSTER_JUMPED_ON_SPEED;
-                            entity.setInDyingAnimation();
-                            entity.setNotCollidable();
-                            addToScore(100); //Add multiplicitave scoring for player still in the air combos
-                        } else if (!invincible) {
-                            if (powerUpState == PowerUpState.SMALL) {
-                                isDead = true;
-                            } else {
-                                changePowerUpState(PowerUpState.SMALL);
-                                setInvincible();
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private void doItemCollisions(List<Item> items) {
@@ -490,7 +475,7 @@ public class Player extends Entity {
             }
         }
 
-        if (xDir < 0.22f && xDir > -0.22f && yDir == 0 && onGround) {
+        if (dirX < 0.22f && dirX > -0.22f && dirY == 0 && onGround) {
             time = 0;
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = PlayerSprite.MARIO_SMALL_STILL;
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = PlayerSprite.MARIO_BIG_STILL;
@@ -514,13 +499,13 @@ public class Player extends Entity {
             int spriteCycleTime;
 
             if (sprinting) {
-                if (currentHorMaxSpeed - Math.abs(xDir) > 0.15f) {
+                if (currentHorMaxSpeed - Math.abs(dirX) > 0.15f) {
                     spriteCycleTime = 80;
                 } else {
                     spriteCycleTime = 30;
                 }
             } else {
-                if (currentHorMaxSpeed - Math.abs(xDir) > 0.15f) {
+                if (currentHorMaxSpeed - Math.abs(dirX) > 0.15f) {
                     spriteCycleTime = 120;
                 } else {
                     spriteCycleTime = 50;
@@ -558,7 +543,7 @@ public class Player extends Entity {
         deathTimer.tick();
         if (deathTimer.getElapsedTime() < DEATH_WAIT_TIME) return;
         deathTimer = null;
-        yDir = -5.0f;
+        dirY = -5.0f;
     }
 
     public void increaseCoinCount() { coinCount++; }
@@ -576,8 +561,8 @@ public class Player extends Entity {
     
     public void setNotOnGround() { onGround = false; }
     public void setHeight(int tiles) { height = tiles * PlayerSprite.TILE_HEIGHT; }
-    public void setxDir(float xDir) { this.xDir = xDir; }
-    public void setyDir(float yDir) { this.yDir = yDir; }
+    public void setxDir(float xDir) { this.dirX = xDir; }
+    public void setyDir(float yDir) { this.dirY = yDir; }
     public void setInDyingAnimation() {
         inDyingAnimation = true;
         deathTimer = new Timer();

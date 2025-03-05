@@ -2,7 +2,6 @@ package com.nate.mario.entity;
 
 import java.awt.Rectangle;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 import com.nate.mario.entity.player.Player;
@@ -25,50 +24,63 @@ public abstract class Entity {
     private boolean isToBeDeleted;
 
     protected float x, y;
-    protected float xDir, yDir;
+    protected float dirX, dirY;
     protected int width = 16;
     protected int height;
     protected int jumpTick = 0;
     protected int animationFrame = 0;
     protected Sprite currentSprite;
+    protected Rectangle collisionRect;
     protected boolean inDyingAnimation;
     protected boolean onGround;
     protected boolean falling;
     protected boolean facingLeft;
     protected boolean collidable = true;
 
-    public Entity(float xTile, float yTile, float xDir, float yDir, Sprite currentSprite) {
+    public Entity(float xTile, float yTile, float dirX, float dirY, Sprite currentSprite) {
         this.x = xTile * 16;
         this.y = yTile * 16;
-        this.xDir = xDir;
-        this.yDir = yDir;
+        this.dirX = dirX;
+        this.dirY = dirY;
         this.height = currentSprite.getHeight() * 16;
         this.currentSprite = currentSprite;
+        collisionRect = new Rectangle((int) x, (int) y, width, height);
     }
 
     public void tick(Level level, boolean[] keys) { tick(level); }
     public void tick(Level level) {
         updateSprite();
         doMovement();
+        collisionRect = new Rectangle((int) (x + dirX), (int) (y + dirY), width, height);
         doTileCollisions(Collision.getLocalEntityCollisionTiles(this, level.getTiles()));
-        // if (!inDyingAnimation) doEntityCollisions(level.getEntities());
     }
 
     protected void updateSprite() {}
 
     protected void doMovement(Level level, boolean[] keys) { doMovement(); }
     protected void doMovement() {
-        x += xDir;
-        y += yDir;
+        x += dirX;
+        y += dirY;
 
         if (!onGround) {
-            if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
-            else yDir += VER_ACCEL_RATE;
+            if (dirY + VER_ACCEL_RATE > VER_MAX_SPEED) dirY = VER_MAX_SPEED;
+            else dirY += VER_ACCEL_RATE;
         }
     }
 
     public void render(Screen screen) {
         screen.drawSprite(currentSprite, facingLeft, (int) x, (int) y);
+    }
+
+    public void entityCollide(Entity entity) {
+        if (entity instanceof Player) {
+            //If the player collided with us from above (player y is above the entity y, player is falling)
+            if (entity.getY() + 2 < y && entity.getDirY() > 0) {
+                setInDyingAnimation();
+            }
+        } else {
+            dirX = -dirX;
+        }
     }
 
     protected void doTileCollisions(Tile[][] tiles) {
@@ -78,8 +90,8 @@ public abstract class Entity {
         float newX = x;
         float newY = y;
 
-        Rectangle verticalEntityRect = new Rectangle((int) (x) + xOffset, (int) (y + yDir + yOffset), width - xOffset * 2, height - yOffset);
-        Rectangle horizontalEntityRect = new Rectangle((int) (x + xDir + xOffset), (int) (y + yOffset), width - xOffset * 2, height - yOffset);
+        Rectangle verticalEntityRect = new Rectangle((int) (x) + xOffset, (int) (y + dirY + yOffset), width - xOffset * 2, height - yOffset);
+        Rectangle horizontalEntityRect = new Rectangle((int) (x + dirX + xOffset), (int) (y + yOffset), width - xOffset * 2, height - yOffset);
         HashSet<Tile> floorTiles = new HashSet<>();
 
         for (int i = 0; i < tiles.length; i++) {
@@ -94,9 +106,9 @@ public abstract class Entity {
 
                 if (tile.isSolid()) {
                     if (verticalEntityRect.intersects(tileRect)) {
-                        yDir = 0;
+                        dirY = 0;
                         if (tile.getyTile() * 16 < newY) { //Collide with tile above
-                            yDir = 0;
+                            dirY = 0;
                             newY = tile.getyTile() * 16 + 16 - yOffset;
                             jumpTick = 0;
                         } else { //Collide with tile below
@@ -108,7 +120,7 @@ public abstract class Entity {
                     }
     
                     if (horizontalEntityRect.intersects(tileRect)) {
-                        xDir = 0 - xDir;
+                        dirX = 0 - dirX;
                         if (tile.getxTile() * 16 < newX) { //Collide with tile to the left
                             newX = tile.getxTile() * 16 + 16 - xOffset;
                         } else { //Collide with tile to the right
@@ -135,37 +147,25 @@ public abstract class Entity {
         y = newY;
     }
 
-    protected void doEntityCollisions(List<Entity> entities) {
-        int xOffset = 3;
-
-        for (Entity entity : entities) {
-            if (entity.equals(this)) continue;
-            Rectangle localCollisionRectangle = new Rectangle((int) getX() + xOffset, (int) getY(), getWidth() - xOffset * 2, getHeight());
-            Rectangle otherCollisionRectangle = new Rectangle((int) entity.getX() + xOffset, (int) entity.getY(), entity.getWidth() - xOffset * 2, entity.getHeight());
-
-            if (localCollisionRectangle.intersects(otherCollisionRectangle)) {
-                if (entity instanceof Player) continue;
-                xDir = -xDir;
-                entity.setxDir(-entity.getxDir());
-            }
-        }
-    }
-
     public abstract Entity newEntity(int xTile, int yTile);
     public abstract int getID();
+    public abstract int getScore();
 
-    public void setNotCollidable() { collidable = false; }
-    public void setInDyingAnimation() { inDyingAnimation = true; }
+    public void setInDyingAnimation() {
+        inDyingAnimation = true;
+        collidable = false;
+    }
     public void setToBeDeleted() { isToBeDeleted = true; }
-    public void setxDir(float xDir) { this.xDir = xDir; }
+    public void setDirX(float xDir) { this.dirX = xDir; }
 
     public float getX() { return x; }
     public float getY() { return y; }
-    public float getxDir() { return xDir; }
-    public float getyDir() { return yDir; }
+    public float getDirX() { return dirX; }
+    public float getDirY() { return dirY; }
     public int getWidth() { return width; }
     public int getHeight() { return height; }
     public boolean isToBeDeleted() { return isToBeDeleted; }
     public boolean isCollidable() { return collidable; }
     public Sprite getSprite() { return currentSprite; }
+    public Rectangle getCollisionRect() { return collisionRect; }
 }

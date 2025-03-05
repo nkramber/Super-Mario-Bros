@@ -141,10 +141,17 @@ public class Level {
         for (int i = 0; i < entities.size(); i++) {
             Entity e1 = entities.get(i);
             if (onScreenEntities.contains(e1)) {
+                if (player.getCollisionRect().intersects(e1.getCollisionRect()) && e1.isCollidable()) {
+                    e1.entityCollide(player);
+                    player.entityCollide(e1);
+                }
                 for (int j = i + 1; j < entities.size(); j++) {
                     Entity e2 = entities.get(j);
                     if (onScreenEntities.contains(e2)) {
-                        //Entity collision here
+                        if (e1.getCollisionRect().intersects(e2.getCollisionRect())) {
+                            e1.entityCollide(e2);
+                            e2.entityCollide(e1);
+                        }
                     }
                 }
             }
