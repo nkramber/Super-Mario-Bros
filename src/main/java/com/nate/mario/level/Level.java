@@ -98,8 +98,8 @@ public class Level {
                     id = tileData.getBlue();
                     Entity entity = Entity.entities.get(id).newEntity(x, y);
                     entities.add(entity);
-                    //If the spawn tile is on screen at the start of the level, add it to our onScreenEntities list
-                    if (x < 16) onScreenEntities.add(entity);
+                    //If the spawn tile is in the onScreenEntity range at the start of the level, add it to our onScreenEntities list
+                    if (x < 20) onScreenEntities.add(entity);
                 }
 
                 //Green pixel data = item
