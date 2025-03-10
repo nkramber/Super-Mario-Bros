@@ -494,10 +494,10 @@ public class Player extends Entity {
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = PlayerSprite.MARIO_SMALL_TURN;
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = PlayerSprite.MARIO_BIG_TURN;
             else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = PlayerSprite.MARIO_FIRE_TURN;
-        //Keep our same sprite if we are falling
+        //Keep our old sprite if we are falling
         } else if (falling) {
-            // time = 0;
             return;
+        //Otherwise we are in our run animation
         } else {
             long currentTime = System.currentTimeMillis();
             int spriteCycleTime;
