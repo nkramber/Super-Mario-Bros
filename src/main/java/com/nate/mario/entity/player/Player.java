@@ -475,31 +475,37 @@ public class Player extends Entity {
             }
         }
 
-        if (dirX < 0.22f && dirX > -0.22f && dirY == 0 && onGround) {
+        //If we're still
+        if (dirX == 0 && dirY == 0 && onGround) {
             time = 0;
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = PlayerSprite.MARIO_SMALL_STILL;
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = PlayerSprite.MARIO_BIG_STILL;
             else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = PlayerSprite.MARIO_FIRE_STILL;
             runSpriteFrame = 0;
+        //If we're jumping
         } else if (hasJumped && !falling && !onGround) {
             time = 0;
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = PlayerSprite.MARIO_SMALL_JUMP;
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = PlayerSprite.MARIO_BIG_JUMP;
             else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = PlayerSprite.MARIO_FIRE_JUMP;
+        //If we're actively turning
         } else if (skidding) {
             time = 0;
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = PlayerSprite.MARIO_SMALL_TURN;
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = PlayerSprite.MARIO_BIG_TURN;
             else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = PlayerSprite.MARIO_FIRE_TURN;
+        //Keep our same sprite if we are falling
         } else if (falling) {
-            time = 0;
+            // time = 0;
             return;
         } else {
             long currentTime = System.currentTimeMillis();
             int spriteCycleTime;
 
+            //spriteCycleTime = how long to hold our current run sprite before we change to a new one
+            //Changes based on if we're sprinting and how long we've been moving
             if (sprinting) {
-                if (currentHorMaxSpeed - Math.abs(dirX) > 0.15f) {
+                if (currentHorMaxSpeed - Math.abs(dirX) > 0.35f) {
                     spriteCycleTime = 80;
                 } else {
                     spriteCycleTime = 30;
@@ -512,15 +518,15 @@ public class Player extends Entity {
                 }
             }
 
+            //If we've waited long enough to switch sprites in our run cycle
             if (currentTime - time > spriteCycleTime) {
                 time += spriteCycleTime;
                 if (runSpriteFrame < 2) runSpriteFrame++;
                 else runSpriteFrame = 0;
             }
 
-            if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = PlayerSprite.MARIO_SMALL_RUN[runSpriteFrame];
-            else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = PlayerSprite.MARIO_BIG_RUN[runSpriteFrame];
-            else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = PlayerSprite.MARIO_FIRE_RUN[runSpriteFrame];
+            //Get our run sprite based on our PowerUpState and runSpriteFrame
+            currentSprite = PlayerSprite.getRunSprite(powerUpState, runSpriteFrame);
         }
     }
 

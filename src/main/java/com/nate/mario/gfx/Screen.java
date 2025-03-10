@@ -51,7 +51,9 @@ public class Screen {
     }
 
     public void drawSprite(Sprite sprite, boolean facingLeft, int x, int y) {
+        //Make sure the entity is on screen before rendering
         if (!isOffScreen(x, y)) {
+            //Check the direction the entity is facing and render the appropriate sprite
             if (!facingLeft) {
                 if (!entitySprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - sprite name does not exist!");
                 else g.drawImage(entitySprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
@@ -63,6 +65,7 @@ public class Screen {
     }
 
     public void drawTile(String tileName, int x, int y) {
+        //Make sure the tile is on screen before rendering
         if (!isOffScreen(x, y)) {
             if (!tiles.containsKey(tileName)) throw new IllegalArgumentException(tileName + " - tile name does not exist!");
             else {
@@ -72,6 +75,7 @@ public class Screen {
     }
 
     public void drawItem(ItemSprite sprite, int x, int y) {
+        //Make sure the item is on screen before rendering
         if (!isOffScreen(x, y)) {
             if (!items.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - item name does not exist!");
             else g.drawImage(items.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);

@@ -2,7 +2,11 @@ package com.nate.mario.gfx.sprite;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import com.nate.mario.entity.player.PowerUpState;
 
 public class PlayerSprite extends Sprite {
 
@@ -151,11 +155,22 @@ public class PlayerSprite extends Sprite {
         MARIO_GROW1
     ));
 
+    private static final Map<PowerUpState, PlayerSprite[]> runSprites = new HashMap<>() {{
+        put(PowerUpState.SMALL, MARIO_SMALL_RUN);
+        put(PowerUpState.BIG, MARIO_BIG_RUN);
+        put(PowerUpState.FIRE, MARIO_FIRE_RUN);
+    }};
+
     public PlayerSprite(String name) {
         super(name, 1);
     }
 
     public PlayerSprite(String name, int height) {
         super(name, height);
+    }
+
+    //Get the correct sprite set based on the player's state, and retrieve the correct run frame from that array
+    public static PlayerSprite getRunSprite(PowerUpState state, int runSpriteFrame) {
+        return runSprites.get(state)[runSpriteFrame];
     }
 }
