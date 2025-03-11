@@ -8,8 +8,9 @@ public abstract class Tile {
 
     public static Map<Integer, Tile> tiles = Map.of(
         0, new SkyTile(-1, -1),
-        255, new GroundTile(-1, -1),
-        60, new ItemBlockTile(-1, -1)
+        60, new ItemBlockTile(-1, -1),
+        150, new BreakableTile(-1, -1),
+        255, new GroundTile(-1, -1)
     );
 
     protected int xTile, yTile;
@@ -28,13 +29,17 @@ public abstract class Tile {
     public void tick(Level level) { tick(); }
     public void tick() {}
 
-    public void toBeDeleted() { toBeDeleted = true; }
+    public void toBeDeleted() {
+        toBeDeleted = true;
+    }
 
     public boolean isToBeDeleted() { return toBeDeleted; }
 
     public abstract Tile newTile(int xTile, int yTile);
     public abstract String getName();
     public abstract int getID();
+
+    public void stopTicking() { tickable = false; }
 
     public boolean isSolid() { return solid; }
     public boolean isAnimating() { return animating; }

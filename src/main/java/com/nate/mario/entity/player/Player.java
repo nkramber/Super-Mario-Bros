@@ -14,6 +14,7 @@ import com.nate.mario.item.Item;
 import com.nate.mario.item.MushroomItem;
 import com.nate.mario.item.PowerUpItem;
 import com.nate.mario.level.Level;
+import com.nate.mario.level.tile.BreakableTile;
 import com.nate.mario.level.tile.ItemBlockTile;
 import com.nate.mario.level.tile.Tile;
 import com.nate.mario.util.Collision;
@@ -340,6 +341,8 @@ public class Player extends Entity {
                                 ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
                                 itemBlockTile.toBeDeleted();
                                 itemBlockTile.createItem();
+                            } else if (tile instanceof BreakableTile) {
+                                tile.toBeDeleted();
                             }
                             newY = tile.getyTile() * 16 + 16 - yOffset;
                             jumpTick = 0;

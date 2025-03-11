@@ -2,3 +2,4 @@ sky_tile, 1, 1
 ground_tile, 2, 1
 item_block_tile, 3, 1
 empty_item_block_tile, 4, 1
+breakable_tile, 5, 1

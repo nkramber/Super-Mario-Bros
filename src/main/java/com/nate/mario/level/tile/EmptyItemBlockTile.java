@@ -8,15 +8,15 @@ public class EmptyItemBlockTile extends Tile {
     private int animationFrame = 0;
     private boolean animatingDown = false;
     
-    public EmptyItemBlockTile(int xTile, int yTile) {
-        super(xTile, yTile);
+    public EmptyItemBlockTile(int tileX, int tileY) {
+        super(tileX, tileY);
         tickable = true;
         animating = true;
     }
     
     @Override
-    public Tile newTile(int x, int y) {
-        return new ItemBlockTile(x, y);
+    public Tile newTile(int tileX, int tileY) {
+        return new ItemBlockTile(tileX, tileY);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class EmptyItemBlockTile extends Tile {
                 if (animationFrame == 4) animatingDown = true;
                 else animationFrame++;
             }
-        } else toBeDeleted();
+        } else stopTicking();
     }
 
     @Override public String getName() { return NAME; }

@@ -196,6 +196,8 @@ public class Level {
                     EmptyItemBlockTile newTile = new EmptyItemBlockTile(tile.getxTile(), tile.getyTile());
                     tiles[tile.getxTile()][tile.getyTile()] = newTile;
                     tilesToAddToTickList.add(newTile);
+                } else {
+                    tiles[tile.getxTile()][tile.getyTile()] = new SkyTile(tile.getxTile(), tile.getyTile());
                 }
             }
         }
