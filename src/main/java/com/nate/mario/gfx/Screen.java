@@ -22,21 +22,24 @@ public class Screen {
     public static final int SCREEN_LEFT_PADDING = -32;
 
     private Graphics2D g;
+
+    //Maps of all of our different sprites
     private HashMap<String, BufferedImage> entitySprites;
     private HashMap<String, BufferedImage> leftFacingSprites;
-    private HashMap<String, BufferedImage> tiles;
-    private HashMap<String, BufferedImage> items;
-    private HashMap<String, BufferedImage> hud;
+    private HashMap<String, BufferedImage> tileSprites;
+    private HashMap<String, BufferedImage> itemSprites;
+    private HashMap<String, BufferedImage> hudSprites;
 
+    //How many pixels to offset the screen. This is based on the x coordinate of the player
     private int xScroll = SCREEN_LEFT_PADDING;
 
     public Screen(Graphics2D g) {
         this.g = g;
         entitySprites = new SpriteSheet("player_sprite_tile_ids.txt").getSprites("/sprites/player_sprites.png", 16);
         entitySprites.putAll(new SpriteSheet("enemy_sprite_tile_ids.txt").getSprites("/sprites/enemy_sprites.png", 16));
-        tiles = new SpriteSheet("map_tile_ids.txt").getSprites("/sprites/tile_sprites.png", 16);
-        items = new SpriteSheet("item_tile_ids.txt").getSprites("/sprites/item_sprites.png", 16);
-        hud = new SpriteSheet("hud_tile_ids.txt").getSprites("/sprites/hud_sprites.png", 8);
+        tileSprites = new SpriteSheet("map_tile_ids.txt").getSprites("/sprites/tile_sprites.png", 16);
+        itemSprites = new SpriteSheet("item_tile_ids.txt").getSprites("/sprites/item_sprites.png", 16);
+        hudSprites = new SpriteSheet("hud_tile_ids.txt").getSprites("/sprites/hud_sprites.png", 8);
 
         leftFacingSprites = new HashMap<>();
         for (Map.Entry<String, BufferedImage> sprite : entitySprites.entrySet()) {
@@ -67,9 +70,9 @@ public class Screen {
     public void drawTile(String tileName, int x, int y) {
         //Make sure the tile is on screen before rendering
         if (!isOffScreen(x, y)) {
-            if (!tiles.containsKey(tileName)) throw new IllegalArgumentException(tileName + " - tile name does not exist!");
+            if (!tileSprites.containsKey(tileName)) throw new IllegalArgumentException(tileName + " - tile name does not exist!");
             else {
-                g.drawImage(tiles.get(tileName), x + xScroll, y + VERTICAL_OFFSET, null);
+                g.drawImage(tileSprites.get(tileName), x + xScroll, y + VERTICAL_OFFSET, null);
             }
         }
     }
@@ -77,8 +80,8 @@ public class Screen {
     public void drawItem(ItemSprite sprite, int x, int y) {
         //Make sure the item is on screen before rendering
         if (!isOffScreen(x, y)) {
-            if (!items.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - item name does not exist!");
-            else g.drawImage(items.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
+            if (!itemSprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - item name does not exist!");
+            else g.drawImage(itemSprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
         }
     }
 
@@ -109,13 +112,13 @@ public class Screen {
 
     public void drawHudText(String hudText, int xHalfTile, int yHalfTile) {
         for (int i = 0; i < hudText.length(); i++) {
-            g.drawImage(hud.get(String.valueOf(hudText.charAt(i))), (xHalfTile + i) * 8, yHalfTile * 8, null);
+            g.drawImage(hudSprites.get(String.valueOf(hudText.charAt(i))), (xHalfTile + i) * 8, yHalfTile * 8, null);
         }
     }
 
     public void drawHudIcon(String[] hudText, int xHalfTile, int yHalfTile) {
         for (int i = 0; i < hudText.length; i++) {
-            g.drawImage(hud.get(hudText[i]), (xHalfTile + i) * 8, yHalfTile * 8, null);
+            g.drawImage(hudSprites.get(hudText[i]), (xHalfTile + i) * 8, yHalfTile * 8, null);
         }
     }
 

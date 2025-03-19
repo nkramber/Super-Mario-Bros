@@ -66,6 +66,7 @@ public class LevelLoader {
         int worldNumber = Integer.parseInt(Character.toString(levelName.charAt(0)));
         int levelNumber = Integer.parseInt(Character.toString(levelName.charAt(2)));
 
+        //Since there are always 4 levels in a world, we can find the sequential level number from the file name
         return (worldNumber - 1) * 4 + levelNumber - 1;
     }
 }
