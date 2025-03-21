@@ -25,15 +25,15 @@ public class Main extends Canvas implements Runnable, KeyListener {
     private static final String TITLE = "Super Mario Bros.";
     private static final double TARGET_FPS = 60.0;
     private static final double TIME_BETWEEN_FRAMES = 1000000000 / TARGET_FPS;
-    private static boolean RUNNING;
-
+    
     private static JFrame FRAME;
     private static Random RANDOM;
     
     private BufferedImage display;
     private GameState currentState;
     private Screen screen;
-
+    
+    private boolean running;
     private boolean keys[];
 
     private void init() {
@@ -53,7 +53,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
         init();
 
         double lastUpdateTime = System.nanoTime();
-        while(RUNNING) {
+        while(running) {
             double currentTime = System.nanoTime();
             while (currentTime - lastUpdateTime > TIME_BETWEEN_FRAMES) {
                 // measureFPS();
@@ -95,7 +95,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
 
     private void start() {
         super.requestFocus();
-        RUNNING = true;
+        running = true;
         new Thread(this).start();
     }
 
@@ -121,7 +121,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
     }
 
     public void setState(GameState state) { currentState = state; }
-    public static void setNotRunning() { RUNNING = false; }
+    public void setNotRunning() { running = false; }
 
     public static Random getRandom() { return RANDOM; }
     
