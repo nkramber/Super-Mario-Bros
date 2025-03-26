@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.nate.mario.Main;
-import com.nate.mario.gfx.sprite.ItemSprite;
 import com.nate.mario.gfx.sprite.Sprite;
 
 public class Screen {

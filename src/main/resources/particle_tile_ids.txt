@@ -1,1 +1,4 @@
-block_particle, 1, 1
+block_particle_1, 1, 1
+block_particle_2, 2, 1
+block_particle_3, 1, 2
+block_particle_4, 2, 2
