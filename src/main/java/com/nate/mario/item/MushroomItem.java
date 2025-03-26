@@ -16,8 +16,8 @@ public class MushroomItem extends PowerUpItem {
     private static final float VER_ACCEL_RATE = 0.35f;
     private static final float VER_MAX_SPEED = 4.0f;
 
-    private float xDir = 0.75f;
-    private float yDir = 0;
+    private float dirX = 0.75f;
+    private float dirY = 0;
     private boolean onGround = true;
 
     public MushroomItem(float x, float y) {
@@ -28,8 +28,8 @@ public class MushroomItem extends PowerUpItem {
     public void tick(Level level) {
         //If we are falling, then add gravity to the mushroom/set at terminal velocity
         if (!onGround) {
-            if (yDir + VER_ACCEL_RATE > VER_MAX_SPEED) yDir = VER_MAX_SPEED;
-            else yDir += VER_ACCEL_RATE;
+            if (dirY + VER_ACCEL_RATE > VER_MAX_SPEED) dirY = VER_MAX_SPEED;
+            else dirY += VER_ACCEL_RATE;
         }
 
         //Don't collide with tiles while we're still rising out of our spawn block
@@ -41,8 +41,8 @@ public class MushroomItem extends PowerUpItem {
             //Done moving upwards. Begin moving sideways, adding gravity when falling, and collision with tiles
             if (inSpawnAnimation) inSpawnAnimation = false;
 
-            x += xDir;
-            y += yDir;
+            x += dirX;
+            y += dirY;
         }
     }
 
@@ -50,8 +50,8 @@ public class MushroomItem extends PowerUpItem {
         float newX = x;
         float newY = y;
 
-        Rectangle verticalItemRect = new Rectangle((int) x, (int) (y + yDir), 16, 16);
-        Rectangle horizontalItemRect = new Rectangle((int) (x + xDir), (int) y, 16, 16);
+        Rectangle verticalItemRect = new Rectangle((int) x, (int) (y + dirY), 16, 16);
+        Rectangle horizontalItemRect = new Rectangle((int) (x + dirX), (int) y, 16, 16);
         HashSet<Tile> floorTiles = new HashSet<>();
 
         for (int i = 0; i < tiles.length; i++) {
@@ -66,7 +66,7 @@ public class MushroomItem extends PowerUpItem {
 
                 if (tile.isSolid()) {
                     if (verticalItemRect.intersects(tileRect)) {
-                        yDir = 0;
+                        dirY = 0;
                         newY = tile.getyTile() * 16 - 16;
                         onGround = true;
 
@@ -74,7 +74,7 @@ public class MushroomItem extends PowerUpItem {
                     }
 
                     if (horizontalItemRect.intersects(tileRect)) {
-                        xDir = 0 - xDir;
+                        dirX = 0 - dirX;
                         if (tile.getxTile() * 16 < newX) newX = tile.getxTile() * 16 + 16;
                         else newX = tile.getxTile() * 16 - 16;
                         horizontalItemRect = new Rectangle((int) (newX), (int) y, 16, 16);

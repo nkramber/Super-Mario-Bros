@@ -29,6 +29,7 @@ public class Screen {
     private HashMap<String, BufferedImage> tileSprites;
     private HashMap<String, BufferedImage> itemSprites;
     private HashMap<String, BufferedImage> hudSprites;
+    private HashMap<String, BufferedImage> particleSprites;
 
     //How many pixels to offset the screen. This is based on the x coordinate of the player
     private int xScroll = SCREEN_LEFT_PADDING;
@@ -40,6 +41,7 @@ public class Screen {
         tileSprites = new SpriteSheet("map_tile_ids.txt").getSprites("/sprites/tile_sprites.png", 16);
         itemSprites = new SpriteSheet("item_tile_ids.txt").getSprites("/sprites/item_sprites.png", 16);
         hudSprites = new SpriteSheet("hud_tile_ids.txt").getSprites("/sprites/hud_sprites.png", 8);
+        particleSprites = new SpriteSheet("particle_tile_ids.txt").getSprites("/sprites/particle_sprites.png", 8);
 
         leftFacingSprites = new HashMap<>();
         for (Map.Entry<String, BufferedImage> sprite : entitySprites.entrySet()) {
@@ -67,6 +69,10 @@ public class Screen {
         }
     }
 
+    public void drawParticle(Sprite sprite, int x, int y) {
+        g.drawImage(particleSprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
+    }
+
     public void drawTile(String tileName, int x, int y) {
         //Make sure the tile is on screen before rendering
         if (!isOffScreen(x, y)) {
@@ -77,7 +83,7 @@ public class Screen {
         }
     }
 
-    public void drawItem(ItemSprite sprite, int x, int y) {
+    public void drawItem(Sprite sprite, int x, int y) {
         //Make sure the item is on screen before rendering
         if (!isOffScreen(x, y)) {
             if (!itemSprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - item name does not exist!");

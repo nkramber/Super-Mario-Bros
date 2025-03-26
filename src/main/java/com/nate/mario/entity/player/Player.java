@@ -499,6 +499,7 @@ public class Player extends Entity {
             else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = PlayerSprite.MARIO_FIRE_TURN;
         //Keep our old sprite if we are falling
         } else if (falling) {
+            time = System.currentTimeMillis();
             return;
         //Otherwise we are in our run animation
         } else {

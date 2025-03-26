@@ -1,6 +1,6 @@
 package com.nate.mario.gfx.sprite;
 
-public class ItemSprite {
+public class ItemSprite extends Sprite {
 
     public static final int TILE_WIDTH = 16;
     public static final int TILE_HEIGHT = 16;
@@ -20,10 +20,8 @@ public class ItemSprite {
         new ItemSprite("animated_coin_4")
     };
 
-    private final String name;
-
     public ItemSprite(String name) {
-        this.name = name;
+        super(name);
     }
 
     public String getName() { return name; }

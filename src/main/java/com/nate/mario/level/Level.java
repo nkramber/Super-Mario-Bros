@@ -15,11 +15,14 @@ import com.nate.mario.item.FireFlowerItem;
 import com.nate.mario.item.Item;
 import com.nate.mario.item.MushroomItem;
 import com.nate.mario.item.PowerUpItem;
+import com.nate.mario.level.tile.BreakableTile;
 import com.nate.mario.level.tile.EmptyItemBlockTile;
 import com.nate.mario.level.tile.GroundTile;
 import com.nate.mario.level.tile.ItemBlockTile;
 import com.nate.mario.level.tile.SkyTile;
 import com.nate.mario.level.tile.Tile;
+import com.nate.mario.particle.BlockParticleSet;
+import com.nate.mario.particle.Particle;
 
 public class Level {
 
@@ -39,6 +42,7 @@ public class Level {
     private List<Item> items;
     private List<Entity> entities;
     private List<Entity> onScreenEntities;
+    private List<Particle> particles;
 
     private Player player;
     private int playerSpawnX, playerSpawnY;
@@ -56,15 +60,11 @@ public class Level {
         this.levelImage = levelImage;
         this.levelName = levelName;
 
+        initializeLists();
+
         int width = levelImage.getWidth();
         int height = levelImage.getHeight();
-        
         tiles = new Tile[width][height];
-        tilesToTick = new ArrayList<>();
-        onScreenTiles = new ArrayList<>();
-        items = new ArrayList<>();
-        entities = new ArrayList<>();
-        onScreenEntities = new ArrayList<>();
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -120,6 +120,15 @@ public class Level {
         deathHeightWhenAnimating = deathHeight + 402;
     }
 
+    private void initializeLists() {
+        tilesToTick = new ArrayList<>();
+        onScreenTiles = new ArrayList<>();
+        items = new ArrayList<>();
+        entities = new ArrayList<>();
+        onScreenEntities = new ArrayList<>();
+        particles = new ArrayList<>();
+    }
+
     public void tick(boolean[] keys) {
         decrementLevelTime();
 
@@ -127,6 +136,7 @@ public class Level {
         player.tick(this, keys);
 
         if (!player.isInDyingAnimation()) {
+            tickParticles();
             tickItems();
             tickTiles();
             if (!player.isDoingPowerUpAnimation()) {
@@ -156,6 +166,19 @@ public class Level {
                 }
             }
         }
+    }
+
+    private void tickParticles() {
+        List<Particle> particlesToRemove = new ArrayList<>();
+        for (Particle particle : particles) {
+            if (particle.isToBeDeleted()) {
+                particlesToRemove.add(particle);
+                continue;
+            }
+            particle.tick();
+        }
+
+        for (Particle particle : particlesToRemove) particles.remove(particle);
     }
 
     private void tickEntities() {
@@ -198,6 +221,13 @@ public class Level {
                     tilesToAddToTickList.add(newTile);
                 } else {
                     tiles[tile.getxTile()][tile.getyTile()] = new SkyTile(tile.getxTile(), tile.getyTile());
+                }
+
+                if (tile instanceof BreakableTile) {
+                    Particle[] blockParticles = new BlockParticleSet(tile.getxTile(), tile.getyTile()).getParticles();
+                    for (Particle particle : blockParticles) {
+                        particles.add(particle);
+                    }
                 }
             }
         }
@@ -279,6 +309,12 @@ public class Level {
         }
 
         screen.drawHud(player.getCoinCount(), player.getScore(), timeRemaining, levelName);
+
+        //Render particles
+        for (Particle particle : particles) {
+            screen.drawParticle(particle.getSprite(), (int) particle.getX(), (int) particle.getY());
+            if (screen.isOffScreen((int) particle.getX(), (int) particle.getY())) particle.setToBeDeleted();
+        }
 
         //Render entities
         onScreenEntities.clear();
