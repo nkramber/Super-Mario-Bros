@@ -9,14 +9,15 @@ import com.nate.mario.entity.Entity;
 import com.nate.mario.gfx.Screen;
 import com.nate.mario.gfx.sprite.PlayerSprite;
 import com.nate.mario.item.CoinItem;
-import com.nate.mario.item.FireFlowerItem;
 import com.nate.mario.item.Item;
-import com.nate.mario.item.MushroomItem;
-import com.nate.mario.item.PowerUpItem;
+import com.nate.mario.item.powerupitem.FireFlowerItem;
+import com.nate.mario.item.powerupitem.MushroomItem;
+import com.nate.mario.item.powerupitem.PowerUpItem;
 import com.nate.mario.level.Level;
-import com.nate.mario.level.tile.BreakableTile;
 import com.nate.mario.level.tile.ItemBlockTile;
 import com.nate.mario.level.tile.Tile;
+import com.nate.mario.level.tile.animatedtile.AnimatedTile;
+import com.nate.mario.level.tile.animatedtile.BreakableTile;
 import com.nate.mario.util.Collision;
 import com.nate.mario.util.Timer;
 
@@ -339,10 +340,15 @@ public class Player extends Entity {
                         if (tile.getyTile() * 16 < newY) { //Collide with tile above
                             if (tile instanceof ItemBlockTile) {
                                 ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
-                                itemBlockTile.toBeDeleted();
+                                itemBlockTile.setToBeDeleted();
                                 itemBlockTile.createItem();
                             } else if (tile instanceof BreakableTile) {
-                                tile.toBeDeleted();
+                                AnimatedTile breakableTile = (AnimatedTile)tile;
+                                if (powerUpState == PowerUpState.SMALL) {
+                                    if (!breakableTile.isAnimating()) breakableTile.setAnimating();
+                                } else {
+                                    tile.setToBeDeleted();
+                                }
                             }
                             newY = tile.getyTile() * 16 + 16 - yOffset;
                             jumpTick = 0;

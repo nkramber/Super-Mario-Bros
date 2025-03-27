@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.nate.mario.entity.Entity;
-import com.nate.mario.item.BlockCoin;
+import com.nate.mario.item.BlockCoinItem;
 import com.nate.mario.item.Item;
 import com.nate.mario.level.tile.Tile;
 
@@ -20,7 +20,7 @@ public class Collision {
         List<Item> collisionItems = new ArrayList<>();
 
         for (Item item : items) {
-            if (item instanceof BlockCoin) continue; //Don't collide with animated coin items as they aren't collidable
+            if (item instanceof BlockCoinItem) continue; //Don't collide with animated coin items as they aren't collidable
             int itemX = (int) item.getX();
             int itemY = (int) item.getY();
 

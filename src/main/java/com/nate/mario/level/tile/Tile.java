@@ -3,6 +3,7 @@ package com.nate.mario.level.tile;
 import java.util.Map;
 
 import com.nate.mario.level.Level;
+import com.nate.mario.level.tile.animatedtile.BreakableTile;
 
 public abstract class Tile {
 
@@ -16,7 +17,6 @@ public abstract class Tile {
     protected int xTile, yTile;
     protected boolean tickable = false;
     protected boolean toBeDeleted = false;
-    protected boolean animating = false;
     protected boolean solid = true;
 
     public Tile() {}
@@ -29,7 +29,7 @@ public abstract class Tile {
     public void tick(Level level) { tick(); }
     public void tick() {}
 
-    public void toBeDeleted() {
+    public void setToBeDeleted() {
         toBeDeleted = true;
     }
 
@@ -39,10 +39,7 @@ public abstract class Tile {
     public abstract String getName();
     public abstract int getID();
 
-    public void stopTicking() { tickable = false; }
-
     public boolean isSolid() { return solid; }
-    public boolean isAnimating() { return animating; }
     public boolean isTickable() { return tickable; }
     public int getxTile() { return xTile; }
     public int getyTile() { return yTile; }

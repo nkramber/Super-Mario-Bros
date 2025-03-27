@@ -1,6 +1,8 @@
-package com.nate.mario.level.tile;
+package com.nate.mario.level.tile.animatedtile;
 
-public class BreakableTile extends Tile {
+import com.nate.mario.level.tile.Tile;
+
+public class BreakableTile extends AnimatedTile {
 
     private static final String NAME = "breakable_tile";
     private static final int ID = 150;
@@ -17,5 +19,4 @@ public class BreakableTile extends Tile {
 
     @Override public String getName() { return NAME; }
     @Override public int getID() { return ID; }
-
 }

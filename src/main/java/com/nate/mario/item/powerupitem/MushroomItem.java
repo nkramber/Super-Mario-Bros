@@ -1,9 +1,10 @@
-package com.nate.mario.item;
+package com.nate.mario.item.powerupitem;
 
 import java.awt.Rectangle;
 import java.util.HashSet;
 
 import com.nate.mario.gfx.sprite.ItemSprite;
+import com.nate.mario.item.Item;
 import com.nate.mario.level.Level;
 import com.nate.mario.level.tile.Tile;
 import com.nate.mario.util.Collision;

@@ -6,14 +6,14 @@ public class BlockParticleSet {
 
     private BlockParticle[] particles = new BlockParticle[4];
 
-    private static final float START_HOR_VELOCITY = 0.5f;
+    private static final float START_HOR_VELOCITY = 0.75f;
     private static final float START_VER_VELOCITY = -4.0f;
 
     public BlockParticleSet(int xTile, int yTile) {
         //Top left particle
-        particles[0] = new BlockParticle(xTile * 16 - 4, yTile * 16 - 10, -START_HOR_VELOCITY, START_VER_VELOCITY);
+        particles[0] = new BlockParticle(xTile * 16 - 4, yTile * 16 - 10, -START_HOR_VELOCITY, START_VER_VELOCITY * 1.25f);
         //Top right particle
-        particles[1] = new BlockParticle(xTile * 16 + 12, yTile * 16 - 10, START_HOR_VELOCITY, START_VER_VELOCITY);
+        particles[1] = new BlockParticle(xTile * 16 + 12, yTile * 16 - 10, START_HOR_VELOCITY, START_VER_VELOCITY * 1.25f);
         //Bottom left particle
         particles[2] = new BlockParticle(xTile * 16 - 4, yTile * 16 + 6, -START_HOR_VELOCITY, START_VER_VELOCITY);
         //Bottom right particle

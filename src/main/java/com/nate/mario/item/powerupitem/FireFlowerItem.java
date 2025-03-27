@@ -1,4 +1,4 @@
-package com.nate.mario.item;
+package com.nate.mario.item.powerupitem;
 
 import com.nate.mario.gfx.sprite.ItemSprite;
 

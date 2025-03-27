@@ -1,6 +1,7 @@
-package com.nate.mario.item;
+package com.nate.mario.item.powerupitem;
 
 import com.nate.mario.gfx.sprite.ItemSprite;
+import com.nate.mario.item.Item;
 
 public abstract class AnimatedPowerUpItem extends PowerUpItem {
 

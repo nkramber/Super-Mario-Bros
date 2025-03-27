@@ -3,7 +3,7 @@ package com.nate.mario.item;
 import com.nate.mario.entity.player.Player;
 import com.nate.mario.gfx.sprite.ItemSprite;
 
-public class BlockCoin extends Item {
+public class BlockCoinItem extends Item {
 
     private static final int ID = -1;
     private static final ItemSprite[] SPRITES = ItemSprite.ANIMATED_COIN;
@@ -14,7 +14,7 @@ public class BlockCoin extends Item {
     private int animationFrame = 0;
     private float yDir = -5.5f;
 
-    public BlockCoin(float x, float y) {
+    public BlockCoinItem(float x, float y) {
         super(x, y);
     }
 

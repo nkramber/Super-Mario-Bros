@@ -3,6 +3,7 @@ package com.nate.mario.item;
 import java.util.Map;
 
 import com.nate.mario.gfx.sprite.ItemSprite;
+import com.nate.mario.item.powerupitem.MushroomItem;
 import com.nate.mario.level.Level;
 
 public abstract class Item {
