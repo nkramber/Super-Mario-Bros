@@ -7,6 +7,7 @@ public class GroundTile extends Tile {
     
     public GroundTile(int x, int y) {
         super(x, y);
+        tickable = false;
     }
 
     @Override

@@ -14,10 +14,7 @@ import com.nate.mario.item.powerupitem.FireFlowerItem;
 import com.nate.mario.item.powerupitem.MushroomItem;
 import com.nate.mario.item.powerupitem.PowerUpItem;
 import com.nate.mario.level.Level;
-import com.nate.mario.level.tile.ItemBlockTile;
 import com.nate.mario.level.tile.Tile;
-import com.nate.mario.level.tile.animatedtile.AnimatedTile;
-import com.nate.mario.level.tile.animatedtile.BreakableTile;
 import com.nate.mario.util.Collision;
 import com.nate.mario.util.Timer;
 
@@ -338,18 +335,7 @@ public class Player extends Entity {
                     if (verticalEntityRect.intersects(tileRect)) {
                         dirY = 0;
                         if (tile.getyTile() * 16 < newY) { //Collide with tile above
-                            if (tile instanceof ItemBlockTile) {
-                                ItemBlockTile itemBlockTile = (ItemBlockTile) tile;
-                                itemBlockTile.setToBeDeleted();
-                                itemBlockTile.createItem();
-                            } else if (tile instanceof BreakableTile) {
-                                AnimatedTile breakableTile = (AnimatedTile)tile;
-                                if (powerUpState == PowerUpState.SMALL) {
-                                    if (!breakableTile.isAnimating()) breakableTile.setAnimating();
-                                } else {
-                                    tile.setToBeDeleted();
-                                }
-                            }
+                            tile.doBottomCollision(powerUpState == PowerUpState.SMALL);
                             newY = tile.getyTile() * 16 + 16 - yOffset;
                             jumpTick = 0;
                             onGround = false;

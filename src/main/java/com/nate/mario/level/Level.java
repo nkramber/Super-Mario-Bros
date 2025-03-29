@@ -15,13 +15,11 @@ import com.nate.mario.item.Item;
 import com.nate.mario.item.powerupitem.FireFlowerItem;
 import com.nate.mario.item.powerupitem.MushroomItem;
 import com.nate.mario.item.powerupitem.PowerUpItem;
+import com.nate.mario.level.tile.BreakableTile;
 import com.nate.mario.level.tile.GroundTile;
 import com.nate.mario.level.tile.ItemBlockTile;
 import com.nate.mario.level.tile.SkyTile;
 import com.nate.mario.level.tile.Tile;
-import com.nate.mario.level.tile.animatedtile.AnimatedTile;
-import com.nate.mario.level.tile.animatedtile.BreakableTile;
-import com.nate.mario.level.tile.animatedtile.EmptyItemBlockTile;
 import com.nate.mario.particle.BlockParticleSet;
 import com.nate.mario.particle.Particle;
 
@@ -104,10 +102,10 @@ public class Level {
                 //Green pixel data = item
                 if (tileData.getGreen() != 0) {
                     id = tileData.getGreen();
-                    //Add BlockTile (1UP, big coin) item adding here
-                    if (tiles[x][y] instanceof ItemBlockTile) {
-                        if (Item.items.containsKey(id)) ((ItemBlockTile) tiles[x][y]).addItemToItemBlock(Item.items.get(id));
-                        else items.add(new BlockCoinItem(x * 16, y * 16));
+                    if (id == CoinItem.ID) items.add(new CoinItem(x * 16, y * 16));
+                    if (id == MushroomItem.ID) {
+                        Tile tile = tiles[x][y];
+                        if (tile instanceof ItemBlockTile) ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(Item.items.get(id));
                     }
                 }
             }
@@ -211,13 +209,7 @@ public class Level {
                 Tile tile = tiles[x][y];
                 if (onScreenTiles.contains(tile)) tile.tick(this);
                 if (tile.isToBeDeleted()) {
-                    //If the tile is an ItemBlockTile, we want to replace it with a new empty item block. Otherwise we simply remove it from the tick list
-                    if (tile instanceof ItemBlockTile) {
-                        EmptyItemBlockTile newTile = new EmptyItemBlockTile(tile.getxTile(), tile.getyTile());
-                        tiles[tile.getxTile()][tile.getyTile()] = newTile;
-                    } else {
-                        tiles[tile.getxTile()][tile.getyTile()] = new SkyTile(tile.getxTile(), tile.getyTile());
-                    }
+                    tiles[tile.getxTile()][tile.getyTile()] = new SkyTile(tile.getxTile(), tile.getyTile());
 
                     if (tile instanceof BreakableTile) {
                         Particle[] blockParticles = new BlockParticleSet(tile.getxTile(), tile.getyTile()).getParticles();
@@ -291,12 +283,14 @@ public class Level {
                 Tile tile = tiles[x][y];
                 if (!screen.isOffScreen(x * 16, 0)) {
                     onScreenTiles.add(tile);
-                    if (tile instanceof AnimatedTile && ((AnimatedTile)tile).isAnimating()) {
-                        //Subtract the animation frame from the Y coordinate
-                        screen.drawTile(tile.getName(), x * 16, y * 16 - ((AnimatedTile)tile).getAnimationFrame());
-                    }
+
+                    if (!(tile instanceof SkyTile)) screen.drawTile(tile.getName(), x * 16, y * 16 - tile.getAnimationFrame());
+                    // if (tile instanceof AnimatedTile && ((AnimatedTile)tile).isAnimating()) {
+                        // Subtract the animation frame from the Y coordinate
+                        // screen.drawTile(tile.getName(), x * 16, y * 16 - ((AnimatedTile)tile).getAnimationFrame());
+                    // }
                     //Don't draw sky tiles or they'll cover up our items
-                    else if (!(tile instanceof SkyTile)) screen.drawTile(tile.getName(), x * 16, y * 16);
+                    // else if (!(tile instanceof SkyTile)) screen.drawTile(tile.getName(), x * 16, y * 16);
                 }
             }
         }

@@ -8,6 +8,7 @@ public class SkyTile extends Tile {
     public SkyTile(int xTile, int yTile) {
         super(xTile, yTile);
         solid = false;
+        tickable = false;
     }
 
     @Override

@@ -11,8 +11,8 @@ import com.nate.mario.util.Collision;
 
 public class MushroomItem extends PowerUpItem {
 
-    private static final int ID = 100;
-    private static final ItemSprite SPRITE = ItemSprite.MUSHROOM;
+    public static final int ID = 100;
+    public static final ItemSprite SPRITE = ItemSprite.MUSHROOM;
 
     private static final float VER_ACCEL_RATE = 0.35f;
     private static final float VER_MAX_SPEED = 4.0f;
