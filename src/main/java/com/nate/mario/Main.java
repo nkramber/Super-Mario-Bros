@@ -28,6 +28,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
     
     private static JFrame FRAME;
     private static Random RANDOM;
+    private static int TICKS = 0;
     
     private BufferedImage display;
     private GameState currentState;
@@ -80,6 +81,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
     // }
 
     private void tick() {
+        TICKS++;
         currentState.tick(keys);
     }
 
@@ -124,6 +126,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
     public void setNotRunning() { running = false; }
 
     public static Random getRandom() { return RANDOM; }
+    public static int getTickCount() { return TICKS; }
     
     @Override public void keyTyped(KeyEvent e) {}
     @Override public void keyPressed(KeyEvent e) { keys[e.getKeyCode()] = true; }

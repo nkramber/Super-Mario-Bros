@@ -18,6 +18,19 @@ public class BreakableTile extends ItemBlockTile {
     }
 
     @Override
+    public void doAnimation() {
+        if (animationHeight < 0) {
+            super.resetAnimationState();
+        } else if (animatingDown) {
+            animationHeight--;
+        } else if (!animatingDown) {
+            if (animationHeight == 4) animatingDown = true;
+            else animationHeight++;
+        }
+    }
+
+
+    @Override
     public void doBottomCollision(boolean playerIsSmall) {
         if (playerIsSmall) {
             if (!animating) setAnimating();

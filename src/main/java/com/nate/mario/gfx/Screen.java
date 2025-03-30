@@ -11,6 +11,7 @@ import java.util.Map;
 
 import com.nate.mario.Main;
 import com.nate.mario.gfx.sprite.Sprite;
+import com.nate.mario.gfx.sprite.TileSprite;
 
 public class Screen {
 
@@ -102,7 +103,7 @@ public class Screen {
     }
 
     public void drawHudBase(int coinCount, int score, String levelName) {
-        drawHudIcon(new String[] {
+        drawHudIcons(new String[] {
             "coin",
             "x_icon",
             Integer.toString(coinCount / 10), //coins tenths place
@@ -122,8 +123,9 @@ public class Screen {
         }
     }
 
-    public void drawHudIcon(String[] hudText, int xHalfTile, int yHalfTile) {
+    public void drawHudIcons(String[] hudText, int xHalfTile, int yHalfTile) {
         for (int i = 0; i < hudText.length; i++) {
+            if (i == 0) g.drawImage(hudSprites.get(TileSprite.HUD_COIN[Sprite.getFlickerSprite()].getName()), xHalfTile + i * 8, yHalfTile * 8, null);
             g.drawImage(hudSprites.get(hudText[i]), (xHalfTile + i) * 8, yHalfTile * 8, null);
         }
     }

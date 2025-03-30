@@ -1,5 +1,7 @@
 sky_tile, 1, 1
 ground_tile, 2, 1
-qmark_block_tile, 3, 1
-empty_item_block_tile, 4, 1
-breakable_tile, 5, 1
+qmark_block_tile_1, 3, 1
+qmark_block_tile_2, 4, 1
+qmark_block_tile_3, 5, 1
+empty_item_block_tile, 6, 1
+breakable_tile, 7, 1

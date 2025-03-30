@@ -22,7 +22,7 @@ public abstract class Tile {
     //Variabled for animated tiles
     protected boolean animating = false;
     protected boolean animatingDown = false;
-    protected int animationFrame;
+    protected int animationHeight = 0;
 
     public Tile() {}
 
@@ -32,22 +32,15 @@ public abstract class Tile {
     }
 
     public void tick(Level level) {
-        if (isAnimating()) {
-            if (animationFrame < 0) {
-                resetAnimationState();
-            } else if (animatingDown) {
-                animationFrame--;
-            } else if (!animatingDown) {
-                if (animationFrame == 4) animatingDown = true;
-                else animationFrame++;
-            }
-        }
+        if (isAnimating()) doAnimation();
     }
+
+    public void doAnimation() {}
 
     public void doBottomCollision(boolean playerIsSmall) {}
 
-    private void resetAnimationState() {
-        animationFrame = 0;
+    protected void resetAnimationState() {
+        animationHeight = 0;
         animatingDown = false;
         animating = false;
     }
@@ -69,5 +62,5 @@ public abstract class Tile {
     public boolean isTickable() { return tickable; }
     public int getxTile() { return xTile; }
     public int getyTile() { return yTile; }
-    public int getAnimationFrame() { return animationFrame; }
+    public int getAnimationHeight() { return animationHeight; }
 }

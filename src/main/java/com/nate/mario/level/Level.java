@@ -128,16 +128,14 @@ public class Level {
     public void tick(boolean[] keys) {
         decrementLevelTime();
 
-        //If the player is dead or doing a power up animation, skip the rest of the tick
         player.tick(this, keys);
-
-        if (!player.isInDyingAnimation()) {
-            tickParticles();
-            tickItems();
-            tickTiles();
-            if (!player.isDoingPowerUpAnimation()) {
-                tickEntities();
-            }
+        tickParticles();
+        tickItems();
+        tickTiles();
+        
+        //If the player is dead or doing a power up animation, skip the rest of the entity tick
+        if (!player.isDead() && !player.isDoingPowerUpAnimation()) {
+            tickEntities();
         }
 
         doEntityCollisions();
@@ -285,7 +283,7 @@ public class Level {
                     onScreenTiles.add(tile);
 
                     //Don't draw SkyTiles as they will cover up our items
-                    if (!(tile instanceof SkyTile)) screen.drawTile(tile.getSprite(), x * 16, y * 16 - tile.getAnimationFrame());
+                    if (!(tile instanceof SkyTile)) screen.drawTile(tile.getSprite(), x * 16, y * 16 - tile.getAnimationHeight());
                 }
             }
         }

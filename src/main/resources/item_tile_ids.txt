@@ -1,9 +1,11 @@
-coin, 1, 1
-mushroom, 2, 1
-fire_flower_1, 3, 1
-fire_flower_2, 4, 1
-fire_flower_3, 5, 1
-fire_flower_4, 6, 1
+coin_1, 1, 1
+coin_2, 2, 1
+coin_3, 3, 1
+mushroom, 4, 1
+fire_flower_1, 5, 1
+fire_flower_2, 6, 1
+fire_flower_3, 7, 1
+fire_flower_4, 8, 1
 animated_coin_1, 1, 2
 animated_coin_2, 2, 2
 animated_coin_3, 3, 2
