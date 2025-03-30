@@ -25,6 +25,8 @@ public class Main extends Canvas implements Runnable, KeyListener {
     private static final String TITLE = "Super Mario Bros.";
     private static final double TARGET_FPS = 60.0;
     private static final double TIME_BETWEEN_FRAMES = 1000000000 / TARGET_FPS;
+
+    private static final int ENTER_KEY = KeyEvent.VK_ENTER;
     
     private static JFrame FRAME;
     private static Random RANDOM;
@@ -34,7 +36,9 @@ public class Main extends Canvas implements Runnable, KeyListener {
     private GameState currentState;
     private Screen screen;
     
-    private boolean running;
+    private boolean enterKeyPressed = false;
+    private boolean paused = false;
+    private boolean running = true;
     private boolean keys[];
 
     private void init() {
@@ -81,6 +85,9 @@ public class Main extends Canvas implements Runnable, KeyListener {
     // }
 
     private void tick() {
+        checkPauseKeyState();
+
+        if (paused) return;
         TICKS++;
         currentState.tick(keys);
     }
@@ -97,7 +104,6 @@ public class Main extends Canvas implements Runnable, KeyListener {
 
     private void start() {
         super.requestFocus();
-        running = true;
         new Thread(this).start();
     }
 
@@ -120,6 +126,15 @@ public class Main extends Canvas implements Runnable, KeyListener {
 
             main.start();
         });
+    }
+
+    private void checkPauseKeyState() {
+        if (keys[ENTER_KEY] && !enterKeyPressed) {
+            enterKeyPressed = true;
+            paused = !paused;
+        } else if (!keys[ENTER_KEY]) {
+            enterKeyPressed = false;
+        }
     }
 
     public void setState(GameState state) { currentState = state; }

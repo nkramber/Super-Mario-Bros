@@ -13,7 +13,7 @@ public class QMarkBlockTile extends ItemBlockTile {
     private static final Sprite EMPTY_SPRITE = new Sprite("empty_item_block_tile");
     private static final int ID = 60;
 
-    private boolean unused = true;
+    private boolean empty = false;
 
     public QMarkBlockTile(int xTile, int yTile) {
         super(xTile, yTile);
@@ -38,8 +38,8 @@ public class QMarkBlockTile extends ItemBlockTile {
 
     @Override
     public void doBottomCollision(boolean playerIsSmall) {
-        if (unused) {
-            unused = false;
+        if (!empty) {
+            empty = true;
             animating = true;
             super.createItem();
         }
@@ -51,8 +51,8 @@ public class QMarkBlockTile extends ItemBlockTile {
     }
 
     @Override public Sprite getSprite() {
-        if (unused) return QMARK_SPRITE[Sprite.getFlickerSprite()];
-        else return EMPTY_SPRITE;
+        if (!empty) return QMARK_SPRITE[Sprite.getFlickerSprite()];
+        return EMPTY_SPRITE;
     }
     
     @Override public int getID() { return ID; }

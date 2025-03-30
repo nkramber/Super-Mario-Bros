@@ -64,13 +64,13 @@ public class Player extends Entity {
         -0.5f
     };
 
-    private final int rightKey = KeyEvent.VK_D;
-    private final int leftKey = KeyEvent.VK_A;
-    // private final int crouchKey = KeyEvent.VK_S;
-    private final int jumpKey = KeyEvent.VK_SLASH;
-    private final int jumpKey2 = KeyEvent.VK_SPACE;
-    private final int actionKey = KeyEvent.VK_PERIOD;
-    private final int actionKey2 = KeyEvent.VK_SHIFT;
+    private static final int RIGHT_KEY = KeyEvent.VK_D;
+    private static final int LEFT_KEY = KeyEvent.VK_A;
+    // private static final int CROUCH_KEY = KeyEvent.VK_S;
+    private static final int JUMP_KEY = KeyEvent.VK_SLASH;
+    private static final int JUMP_KEY2 = KeyEvent.VK_SPACE;
+    private static final int ACTION_KEY = KeyEvent.VK_PERIOD;
+    private static final int ACTION_KEY2 = KeyEvent.VK_SHIFT;
 
     private float currentHorAccelRate = WALK_ACCEL_RATE;
     private float currentHorDecelRate = WALK_DECEL_RATE;
@@ -181,14 +181,14 @@ public class Player extends Entity {
         if (inDyingAnimation) return;
 
         //Check if our sprint state has changed since the last tick. If we were sprinting but are not pressing the action key, "un-sprint" the player and vice-versa
-        if ((keys[actionKey] || keys[actionKey2]) && !sprinting) isSprinting();
-        else if ((!keys[actionKey] && !keys[actionKey2]) && sprinting) isWalking();
+        if ((keys[ACTION_KEY] || keys[ACTION_KEY2]) && !sprinting) isSprinting();
+        else if ((!keys[ACTION_KEY] && !keys[ACTION_KEY2]) && sprinting) isWalking();
         
         //Either both sideways keys are being held or neither of them are, so slow down
-        if ((!keys[leftKey] && !keys[rightKey]) || (keys[leftKey] && keys[rightKey])) horizontalDeceleration();
+        if ((!keys[LEFT_KEY] && !keys[RIGHT_KEY]) || (keys[LEFT_KEY] && keys[RIGHT_KEY])) horizontalDeceleration();
 
-        else if (keys[leftKey]) moveLeft();
-        else if (keys[rightKey]) moveRight();
+        else if (keys[LEFT_KEY]) moveLeft();
+        else if (keys[RIGHT_KEY]) moveRight();
 
         //Only update the maxX variable if the player has advanced further to the right, and the player hasn't
         //reached the right edge of the screen. Without this the ability of the player to retreat to the left
@@ -205,10 +205,10 @@ public class Player extends Entity {
         preventClippingOutsideLevel(level.getTiles().length);
 
         //Jump
-        if (keys[jumpKey] || keys[jumpKey2]) doJump();
+        if (keys[JUMP_KEY] || keys[JUMP_KEY2]) doJump();
 
         //Stop jumping
-        if (!keys[jumpKey] && !keys[jumpKey2]) {
+        if (!keys[JUMP_KEY] && !keys[JUMP_KEY2]) {
             jumpTick = 0;
             if (onGround && hasJumped) hasJumped = false;
         }

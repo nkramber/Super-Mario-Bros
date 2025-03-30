@@ -17,6 +17,7 @@ public abstract class ItemBlockTile extends Tile {
         super.tick(level);
         if (readyToCreateItem()) {
             level.createItem(getItemToCreate(), getxTile(), getyTile());
+            item = null;
         }
     }
 

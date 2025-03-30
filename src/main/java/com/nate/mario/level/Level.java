@@ -26,6 +26,7 @@ import com.nate.mario.particle.Particle;
 public class Level {
 
     private static final int TIME_TICK_INTERVAL = 400; //Time in MS between in-game time decrementing
+
     private final int deathHeight; //Y coordinate where anything below this on screen (greater than this by value) triggers the death of the entity
     private final int deathHeightWhenAnimating; //Used when we are in the death animation - below this (greater than by value) triggers the level reset
 
@@ -50,9 +51,9 @@ public class Level {
     private int timeRemaining;
 
     //Track our current level state
-    private boolean resetLevel;
-    private boolean levelFinished;
-    private boolean gameOver;
+    private boolean resetLevel = false;
+    private boolean levelFinished = false;
+    private boolean gameOver = false;
 
     public Level(BufferedImage levelImage, String levelName) {
         this.levelImage = levelImage;

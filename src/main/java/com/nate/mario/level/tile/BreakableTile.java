@@ -5,8 +5,11 @@ import com.nate.mario.level.Level;
 
 public class BreakableTile extends ItemBlockTile {
 
-    private static final Sprite SPRITE = new Sprite("breakable_tile");
+    private static final Sprite REGULAR_SPRITE = new Sprite("breakable_tile");
+    private static final Sprite EMPTY_SPRITE = new Sprite("empty_item_block_tile");
     private static final int ID = 150;
+
+    private boolean empty = false;
 
     public BreakableTile(int tileX, int tileY) {
         super(tileX, tileY);
@@ -15,6 +18,7 @@ public class BreakableTile extends ItemBlockTile {
     @Override
     public void tick(Level level) {
         super.tick(level);
+        if (item != null) System.out.println(super.item.getClass());
     }
 
     @Override
@@ -32,7 +36,12 @@ public class BreakableTile extends ItemBlockTile {
 
     @Override
     public void doBottomCollision(boolean playerIsSmall) {
-        if (playerIsSmall) {
+        if (item != null) {
+            createItem();
+            animating = true;
+            empty = true;
+            //turn to empty item block
+        } else if (playerIsSmall) {
             if (!animating) setAnimating();
         } else {
             setToBeDeleted();
@@ -44,6 +53,9 @@ public class BreakableTile extends ItemBlockTile {
         return new BreakableTile(tileX, tileY);
     }
 
-    @Override public Sprite getSprite() { return SPRITE; }
+    @Override public Sprite getSprite() {
+        if (!empty) return REGULAR_SPRITE;
+        return EMPTY_SPRITE;
+    }
     @Override public int getID() { return ID; }
 }
