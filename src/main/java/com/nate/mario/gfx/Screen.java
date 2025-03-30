@@ -72,12 +72,13 @@ public class Screen {
         g.drawImage(particleSprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
     }
 
-    public void drawTile(String tileName, int x, int y) {
+    // public void drawTile(String tileName, int x, int y) {
+    public void drawTile(Sprite sprite, int x, int y) {
         //Make sure the tile is on screen before rendering
         if (!isOffScreen(x, y)) {
-            if (!tileSprites.containsKey(tileName)) throw new IllegalArgumentException(tileName + " - tile name does not exist!");
+            if (!tileSprites.containsKey(sprite.getName())) throw new IllegalArgumentException(sprite.getName() + " - tile name does not exist!");
             else {
-                g.drawImage(tileSprites.get(tileName), x + xScroll, y + VERTICAL_OFFSET, null);
+                g.drawImage(tileSprites.get(sprite.getName()), x + xScroll, y + VERTICAL_OFFSET, null);
             }
         }
     }

@@ -2,6 +2,7 @@ package com.nate.mario.level.tile;
 
 import java.util.Map;
 
+import com.nate.mario.gfx.sprite.Sprite;
 import com.nate.mario.level.Level;
 
 public abstract class Tile {
@@ -58,7 +59,7 @@ public abstract class Tile {
     public boolean isToBeDeleted() { return toBeDeleted; }
 
     public abstract Tile newTile(int xTile, int yTile);
-    public abstract String getName();
+    public abstract Sprite getSprite();
     public abstract int getID();
 
     public void setAnimating() { animating = true; }

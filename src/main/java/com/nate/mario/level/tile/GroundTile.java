@@ -1,8 +1,10 @@
 package com.nate.mario.level.tile;
 
+import com.nate.mario.gfx.sprite.Sprite;
+
 public class GroundTile extends Tile {
 
-    private static final String NAME = "ground_tile";
+    private static final Sprite SPRITE = new Sprite("ground_tile");
     private static final int ID = 255;
     
     public GroundTile(int x, int y) {
@@ -15,6 +17,6 @@ public class GroundTile extends Tile {
         return new GroundTile(x, y);
     }
 
-    @Override public String getName() { return NAME; }
+    @Override public Sprite getSprite() { return SPRITE; }
     @Override public int getID() { return ID; }
 }

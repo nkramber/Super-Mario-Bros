@@ -1,13 +1,14 @@
 package com.nate.mario.level.tile;
 
+import com.nate.mario.gfx.sprite.Sprite;
 import com.nate.mario.level.Level;
 
 public class QMarkBlockTile extends ItemBlockTile {
 
     //For when the QMark block has not been hit yet
-    private static final String UNUSED_NAME = "qmark_block_tile";
+    private static final Sprite QMARK_SPRITE = new Sprite("qmark_block_tile");
     //For when the QMark block has already been hit
-    private static final String USED_NAME = "empty_item_block_tile";
+    private static final Sprite EMPTY_SPRITE = new Sprite("empty_item_block_tile");
     private static final int ID = 60;
 
     private boolean unused = true;
@@ -35,9 +36,9 @@ public class QMarkBlockTile extends ItemBlockTile {
         return new QMarkBlockTile(xTile, yTile);
     }
 
-    @Override public String getName() {
-        if (unused) return UNUSED_NAME;
-        else return USED_NAME;
+    @Override public Sprite getSprite() {
+        if (unused) return QMARK_SPRITE;
+        else return EMPTY_SPRITE;
     }
     @Override public int getID() { return ID; }
 }

@@ -272,7 +272,7 @@ public class Level {
                 }
 
                 //Draw a blank sky tile below the block containing our item. This prevents the item from appearing below the animating block
-                if (powerUpItem.inSpawnAnimation()) screen.drawTile(SkyTile.NAME, (int) powerUpItem.getX(), powerUpItem.getInitialY());
+                if (powerUpItem.inSpawnAnimation()) screen.drawTile(SkyTile.SPRITE, (int) powerUpItem.getX(), powerUpItem.getInitialY());
             }
         }
 
@@ -284,13 +284,8 @@ public class Level {
                 if (!screen.isOffScreen(x * 16, 0)) {
                     onScreenTiles.add(tile);
 
-                    if (!(tile instanceof SkyTile)) screen.drawTile(tile.getName(), x * 16, y * 16 - tile.getAnimationFrame());
-                    // if (tile instanceof AnimatedTile && ((AnimatedTile)tile).isAnimating()) {
-                        // Subtract the animation frame from the Y coordinate
-                        // screen.drawTile(tile.getName(), x * 16, y * 16 - ((AnimatedTile)tile).getAnimationFrame());
-                    // }
-                    //Don't draw sky tiles or they'll cover up our items
-                    // else if (!(tile instanceof SkyTile)) screen.drawTile(tile.getName(), x * 16, y * 16);
+                    //Don't draw SkyTiles as they will cover up our items
+                    if (!(tile instanceof SkyTile)) screen.drawTile(tile.getSprite(), x * 16, y * 16 - tile.getAnimationFrame());
                 }
             }
         }

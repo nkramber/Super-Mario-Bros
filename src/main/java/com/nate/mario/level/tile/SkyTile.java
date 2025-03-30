@@ -1,8 +1,10 @@
 package com.nate.mario.level.tile;
 
+import com.nate.mario.gfx.sprite.Sprite;
+
 public class SkyTile extends Tile {
 
-    public static final String NAME = "sky_tile";
+    public static final Sprite SPRITE = new Sprite("sky_tile");
     public static final int ID = 0;
 
     public SkyTile(int xTile, int yTile) {
@@ -16,6 +18,6 @@ public class SkyTile extends Tile {
         return new SkyTile(x, y);
     }
 
-    @Override public String getName() { return NAME; }
+    @Override public Sprite getSprite() { return SPRITE; }
     @Override public int getID() { return ID; }
 }
