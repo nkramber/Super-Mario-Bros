@@ -125,7 +125,7 @@ public class Screen {
 
     public void drawHudIcons(String[] hudText, int xHalfTile, int yHalfTile) {
         for (int i = 0; i < hudText.length; i++) {
-            if (i == 0) g.drawImage(hudSprites.get(TileSprite.HUD_COIN[Sprite.getFlickerSprite()].getName()), xHalfTile + i * 8, yHalfTile * 8, null);
+            if (i == 0) g.drawImage(hudSprites.get(TileSprite.HUD_COIN[Sprite.getFlickerSprite()].getName()), (xHalfTile + i) * 8, yHalfTile * 8, null);
             g.drawImage(hudSprites.get(hudText[i]), (xHalfTile + i) * 8, yHalfTile * 8, null);
         }
     }

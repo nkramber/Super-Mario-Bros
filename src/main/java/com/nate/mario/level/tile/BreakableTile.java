@@ -18,7 +18,6 @@ public class BreakableTile extends ItemBlockTile {
     @Override
     public void tick(Level level) {
         super.tick(level);
-        if (item != null) System.out.println(super.item.getClass());
     }
 
     @Override
