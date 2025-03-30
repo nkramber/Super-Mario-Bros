@@ -10,8 +10,6 @@ import com.nate.mario.gfx.Screen;
 import com.nate.mario.gfx.sprite.PlayerSprite;
 import com.nate.mario.item.CoinItem;
 import com.nate.mario.item.Item;
-import com.nate.mario.item.powerupitem.FireFlowerItem;
-import com.nate.mario.item.powerupitem.MushroomItem;
 import com.nate.mario.item.powerupitem.PowerUpItem;
 import com.nate.mario.level.Level;
 import com.nate.mario.level.tile.Tile;
@@ -394,13 +392,10 @@ public class Player extends Entity {
                 if (item instanceof CoinItem) {
                     increaseCoinCount();
                     addToScore(CoinItem.SCORE);
-                } else if (item instanceof MushroomItem) {
-                    changePowerUpState(PowerUpState.BIG);
+                } else if (item instanceof PowerUpItem) {
                     addToScore(PowerUpItem.SCORE);
-                } else if (item instanceof FireFlowerItem) {
-                    if (PlayerSprite.MARIO_BIG.contains(currentSprite)) changePowerUpState(PowerUpState.FIRE);
-                    else changePowerUpState(PowerUpState.BIG);
-                    addToScore(PowerUpItem.SCORE);
+                    if (powerUpState == PowerUpState.SMALL) changePowerUpState(PowerUpState.BIG);
+                    else if (powerUpState == PowerUpState.BIG) changePowerUpState(PowerUpState.FIRE);
                 }
             }
         }
@@ -438,6 +433,7 @@ public class Player extends Entity {
         }
 
         if (growing) {
+            time = System.currentTimeMillis();
             animationFrame++;
             currentSprite = PlayerSprite.MARIO_GROW_ANIMATION.get(animationFrame / 5);
             if (animationFrame >= PlayerSprite.MARIO_GROW_ANIMATION.size() * 5 - 1) {
@@ -447,6 +443,7 @@ public class Player extends Entity {
             }
             return;
         } else if (shrinking) {
+            time = System.currentTimeMillis();
             animationFrame++;
             currentSprite = PlayerSprite.MARIO_SHRINK_ANIMATION.get(animationFrame / 5);
             if (animationFrame >= PlayerSprite.MARIO_SHRINK_ANIMATION.size() * 5 - 1) {
@@ -459,6 +456,7 @@ public class Player extends Entity {
                 return;
             }
         } else if (gainedFireFlower) {
+            time = System.currentTimeMillis();
             animationFrame++;
             currentSprite = PlayerSprite.MARIO_FIRE_ANIMATION.get(animationFrame / 5);
             if (animationFrame >= PlayerSprite.MARIO_FIRE_ANIMATION.size() * 5 - 1) {
