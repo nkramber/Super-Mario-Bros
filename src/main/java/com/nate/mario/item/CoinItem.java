@@ -15,6 +15,5 @@ public class CoinItem extends Item {
     }
 
     @Override public Item newItem(float x, float y) { return new CoinItem(x, y); }
-    @Override public int getID() { return ID; }
     @Override public ItemSprite getSprite() { return SPRITE[Sprite.getFlickerSprite()]; }
 }

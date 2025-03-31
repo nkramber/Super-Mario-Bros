@@ -1,4 +1,4 @@
-package com.nate.mario.item.powerupitem;
+package com.nate.mario.item.powerupitem.playerstateitem;
 
 import java.awt.Rectangle;
 import java.util.HashSet;
@@ -9,7 +9,7 @@ import com.nate.mario.level.Level;
 import com.nate.mario.level.tile.Tile;
 import com.nate.mario.util.Collision;
 
-public class MushroomItem extends PowerUpItem {
+public class MushroomItem extends PlayerStateItem {
 
     public static final int ID = 100;
     public static final ItemSprite SPRITE = ItemSprite.MUSHROOM;
@@ -97,6 +97,5 @@ public class MushroomItem extends PowerUpItem {
     }
 
     @Override public Item newItem(float x, float y) { return new MushroomItem(x, y); }
-    @Override public int getID() { return ID; }
     @Override public ItemSprite getSprite() { return SPRITE; }
 }

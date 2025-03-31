@@ -2,10 +2,11 @@ package com.nate.mario.item;
 
 import com.nate.mario.entity.player.Player;
 import com.nate.mario.gfx.sprite.ItemSprite;
+import com.nate.mario.level.Level;
 
 public class BlockCoinItem extends Item {
 
-    private static final int ID = -1;
+    public static final int ID = 1;
     private static final ItemSprite[] SPRITES = ItemSprite.ANIMATED_COIN;
 
     private static float VER_ACCEL_RATE = Player.VER_ACCEL_RATE;
@@ -19,7 +20,7 @@ public class BlockCoinItem extends Item {
     }
 
     @Override
-    public void tick() {
+    public void tick(Level level) {
         //Update the animation frame of the coin
         animationFrame++;
         if (animationFrame == 8) animationFrame = 0;
@@ -34,6 +35,5 @@ public class BlockCoinItem extends Item {
     }
 
     @Override public ItemSprite getSprite() { return SPRITES[animationFrame / 2]; }
-    @Override public Item newItem(float x, float y) { return null; }
-    @Override public int getID() { return ID; }
+    @Override public Item newItem(float x, float y) { return new BlockCoinItem(x, y); }
 }

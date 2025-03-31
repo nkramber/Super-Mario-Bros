@@ -5,7 +5,7 @@ import com.nate.mario.gfx.sprite.Sprite;
 
 public class Goomba extends Entity {
 
-    private static final int ID = 255;
+    public static final int ID = 255;
     private static final int SCORE = 100;
     public static final Sprite WALKING = new Sprite("goomba_walk");
     public static final Sprite DEAD = new Sprite("goomba_dead");
@@ -45,6 +45,5 @@ public class Goomba extends Entity {
     }
 
     @Override public Entity newEntity(int xTile, int yTile) { return new Goomba(xTile, yTile); }
-    @Override public int getID() { return ID; }
     public int getScore() { return SCORE; }
 }

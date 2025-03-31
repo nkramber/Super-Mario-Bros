@@ -11,6 +11,8 @@ import com.nate.mario.gfx.sprite.PlayerSprite;
 import com.nate.mario.item.CoinItem;
 import com.nate.mario.item.Item;
 import com.nate.mario.item.powerupitem.PowerUpItem;
+import com.nate.mario.item.powerupitem.playerstateitem.FireFlowerItem;
+import com.nate.mario.item.powerupitem.playerstateitem.MushroomItem;
 import com.nate.mario.level.Level;
 import com.nate.mario.level.tile.Tile;
 import com.nate.mario.util.Collision;
@@ -388,14 +390,19 @@ public class Player extends Entity {
             }
             
             if (playerRect.intersects(itemRect)) {
+                //rewrite here to handle stars properly
+
                 item.setToBeDeleted();
                 if (item instanceof CoinItem) {
                     increaseCoinCount();
                     addToScore(CoinItem.SCORE);
                 } else if (item instanceof PowerUpItem) {
                     addToScore(PowerUpItem.SCORE);
-                    if (powerUpState == PowerUpState.SMALL) changePowerUpState(PowerUpState.BIG);
-                    else if (powerUpState == PowerUpState.BIG) changePowerUpState(PowerUpState.FIRE);
+                    if (item instanceof MushroomItem && powerUpState == PowerUpState.SMALL) changePowerUpState(PowerUpState.BIG);
+                    if (item instanceof FireFlowerItem) {
+                        if (powerUpState == PowerUpState.SMALL) changePowerUpState(PowerUpState.BIG);
+                        else if (powerUpState == PowerUpState.BIG) changePowerUpState(PowerUpState.FIRE);
+                    }
                 }
             }
         }
@@ -574,5 +581,4 @@ public class Player extends Entity {
     }
 
     @Override public Entity newEntity(int xTile, int yTile) { return new Player(xTile, yTile, score); }
-    @Override public int getID() { return -1; }
 }

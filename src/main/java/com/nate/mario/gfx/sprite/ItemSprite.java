@@ -27,6 +27,13 @@ public class ItemSprite extends Sprite {
         new ItemSprite("animated_coin_4")
     };
 
+    public static final ItemSprite[] STAR = {
+        new ItemSprite("star_1"),
+        new ItemSprite("star_2"),
+        new ItemSprite("star_3"),
+        new ItemSprite("star_4")
+    };
+
     public ItemSprite(String name) {
         super(name);
     }

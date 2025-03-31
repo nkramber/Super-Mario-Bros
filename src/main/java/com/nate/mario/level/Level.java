@@ -12,9 +12,9 @@ import com.nate.mario.gfx.Screen;
 import com.nate.mario.item.BlockCoinItem;
 import com.nate.mario.item.CoinItem;
 import com.nate.mario.item.Item;
-import com.nate.mario.item.powerupitem.FireFlowerItem;
-import com.nate.mario.item.powerupitem.MushroomItem;
 import com.nate.mario.item.powerupitem.PowerUpItem;
+import com.nate.mario.item.powerupitem.playerstateitem.FireFlowerItem;
+import com.nate.mario.item.powerupitem.playerstateitem.PlayerStateItem;
 import com.nate.mario.level.tile.BreakableTile;
 import com.nate.mario.level.tile.GroundTile;
 import com.nate.mario.level.tile.ItemBlockTile;
@@ -103,10 +103,10 @@ public class Level {
                 //Green pixel data = item
                 if (tileData.getGreen() != 0) {
                     id = tileData.getGreen();
-                    if (id == CoinItem.ID) items.add(new CoinItem(x * 16, y * 16));
-                    if (id == MushroomItem.ID) {
-                        Tile tile = tiles[x][y];
-                        if (tile instanceof ItemBlockTile) ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(Item.items.get(id));
+                    if (tiles[x][y] instanceof ItemBlockTile) {
+                        ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(Item.items.get(id));
+                    } else {
+                        items.add(Item.items.get(id).newItem(x, y));
                     }
                 }
             }
@@ -222,18 +222,16 @@ public class Level {
     }
 
     public void createItem(Item item, int xTile, int yTile) {
-        //If it is a PowerUpItem, evaluate Mario's current PowerUpState and spawn a mushroom if we're small
-        if (item instanceof PowerUpItem) {
-            if (player.getPowerUpState(PowerUpState.SMALL)) items.add(new MushroomItem(xTile * 16, yTile * 16));
-            else items.add(new FireFlowerItem(xTile * 16, yTile * 16));
-        }
-
-        //If we aren't spawning a power up item, spawn an animated coin above the block and give a coin to the player
-        else {
-            items.add(new BlockCoinItem(xTile * 16, yTile * 16 - 16));
+        if (item instanceof BlockCoinItem) {
             player.increaseCoinCount();
             player.addToScore(CoinItem.SCORE);
+        } else if (item instanceof PlayerStateItem) {
+            if (!player.getPowerUpState(PowerUpState.SMALL)) {
+                item = Item.items.get(FireFlowerItem.ID);
+            }
         }
+
+        items.add(item.newItem(xTile * 16, yTile * 16));
     }
 
     private void decrementLevelTime() {

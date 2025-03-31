@@ -15,7 +15,7 @@ public abstract class Entity {
 
     //Blue color code, entity type
     public static Map<Integer, Entity> entities = Map.of(
-        255, new Goomba(-1, -1)
+        Goomba.ID, new Goomba(-1, -1)
     );
 
     private static final float VER_ACCEL_RATE = 0.35f;
@@ -148,7 +148,6 @@ public abstract class Entity {
     }
 
     public abstract Entity newEntity(int xTile, int yTile);
-    public abstract int getID();
     public abstract int getScore();
 
     public void setInDyingAnimation() {
