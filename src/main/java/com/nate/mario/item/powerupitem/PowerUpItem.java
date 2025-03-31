@@ -11,6 +11,8 @@ import com.nate.mario.level.tile.Tile;
 public abstract class PowerUpItem extends Item {
 
     public static final int SCORE = 1000;
+    protected static final float VER_ACCEL_RATE = 0.3f;
+    protected static final float VER_MAX_SPEED = 4.0f;
 
     protected final boolean hasSpriteArray;
     
@@ -18,7 +20,8 @@ public abstract class PowerUpItem extends Item {
     protected boolean onGround = true;
     protected int spriteFlickerFrame = 0;
     protected int initialY;
-    protected float dirX, dirY;
+    protected float dirX = 0.75f;
+    protected float dirY = 0f;
 
     public PowerUpItem(float x, float y, boolean hasSpriteArray) {
         super(x, y);
@@ -40,11 +43,14 @@ public abstract class PowerUpItem extends Item {
     }
 
     protected void doTileCollisions(Tile[][] tiles) {
+        int yOffset = 4;
+        int xOffset = 2;
+
         float newX = x;
         float newY = y;
 
-        Rectangle verticalItemRect = new Rectangle((int) x, (int) (y + dirY), 16, 16);
-        Rectangle horizontalItemRect = new Rectangle((int) (x + dirX), (int) y, 16, 16);
+        Rectangle verticalItemRect = new Rectangle((int) x + xOffset, (int) (y + dirY + yOffset), 16 - xOffset * 2, 16 - yOffset);
+        Rectangle horizontalItemRect = new Rectangle((int) (x + dirX + xOffset), (int) y + yOffset, 16 - xOffset * 2, 16 - yOffset);
         HashSet<Tile> floorTiles = new HashSet<>();
 
         for (int i = 0; i < tiles.length; i++) {
@@ -53,24 +59,37 @@ public abstract class PowerUpItem extends Item {
                 Rectangle tileRect = new Rectangle(tile.getxTile() * 16, tile.getyTile() * 16, 16, 16);
                 Rectangle tileFloorObserverRect = new Rectangle(tile.getxTile() * 16, tile.getyTile() * 16 - 1, 16, 16);
 
-                if (tile.getyTile() * 16 == y && verticalItemRect.intersects(tileFloorObserverRect)) {
-                    floorTiles.add(tile);
-                }
-
                 if (tile.isSolid()) {
+                    if (tile.getyTile() * 16 == y + 16 && verticalItemRect.intersects(tileFloorObserverRect)) {
+                        floorTiles.add(tile);
+                    }
+
                     if (verticalItemRect.intersects(tileRect)) newY = verticalTileCollision(tile, newY);
                     if (horizontalItemRect.intersects(tileRect)) newX = horizontalTileCollision(tile, newX);
                 }
             }
         }
 
-        if (!floorTiles.isEmpty()) {
-            onGround = false;
-            for (Tile floorTile : floorTiles) {
-                if (!floorTile.isSolid()) continue;
+        // System.out.println(onGround);
+
+        onGround = false;
+        for (Tile floorTile : floorTiles) {
+            if (floorTile.isSolid()) {
                 onGround = true;
+                break;
             }
         }
+
+        // if (!floorTiles.isEmpty()) {
+        //     onGround = false;
+        //     for (Tile floorTile : floorTiles) {
+        //         System.out.println(floorTile.getClass() + ", " + floorTile.isSolid());
+        //         if (!floorTile.isSolid()) continue;
+        //         onGround = true;
+        //     }
+        // }
+
+        // System.out.println(onGround);
 
         x = newX;
         y = newY;

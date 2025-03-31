@@ -11,31 +11,24 @@ public class MushroomItem extends PlayerStateItem {
     public static final int ID = 100;
     public static final ItemSprite SPRITE = ItemSprite.MUSHROOM;
 
-    private static final float VER_ACCEL_RATE = 0.35f;
-    private static final float VER_MAX_SPEED = 4.0f;
-
     public MushroomItem(float x, float y) {
         super(x, y, false);
-        dirX = 0.75f;
-        dirY = 0f;
     }
 
     @Override
     public void tick(Level level) {
         super.tick(level);
+        if (isSpawning) return;
 
-        //Don't collide with tiles or move while we're still rising out of our spawn block
-        if (!isSpawning) {
-            //If we are falling, then add gravity to the mushroom/set at terminal velocity
-            if (!onGround) {
-                if (dirY + VER_ACCEL_RATE > VER_MAX_SPEED) dirY = VER_MAX_SPEED;
-                else dirY += VER_ACCEL_RATE;
-            }
-
-            doTileCollisions(Collision.getLocalItemCollisionTiles(this, level.getTiles()));
-            x += dirX;
-            y += dirY;
+        //If we are falling, then add gravity to the mushroom/set at terminal velocity
+        if (!onGround) {
+            if (dirY + VER_ACCEL_RATE > VER_MAX_SPEED) dirY = VER_MAX_SPEED;
+            else dirY += VER_ACCEL_RATE;
         }
+
+        doTileCollisions(Collision.getLocalItemCollisionTiles(this, level.getTiles()));
+        x += dirX;
+        y += dirY;
     }
 
     @Override

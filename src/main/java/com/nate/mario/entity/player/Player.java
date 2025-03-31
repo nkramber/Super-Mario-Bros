@@ -346,6 +346,9 @@ public class Player extends Entity {
                             newY = tile.getyTile() * 16 - height;
                             onGround = true;
                         }
+
+                        //Prevents us from colliding with more than one block per tick
+                        verticalEntityRect = new Rectangle((int) (newX) + xOffset, (int) (newY + yOffset), width - xOffset * 2, height - yOffset);
                     }
     
                     if (horizontalEntityRect.intersects(tileRect)) {
