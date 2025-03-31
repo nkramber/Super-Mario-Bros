@@ -77,6 +77,8 @@ public class MarioGame extends GameState {
         setLevel(0);
     }
 
+    @Override public void adjustSpriteTimerWhenPaused() { currentLevel.adjustSpriteTimerWhenPaused(); }
+
     @Override
     public void render() {
         if (gameOver) screen.drawGameOver(player.getCoinCount(), player.getScore(), currentLevel.getLevelName());

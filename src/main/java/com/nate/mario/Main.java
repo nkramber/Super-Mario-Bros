@@ -87,7 +87,12 @@ public class Main extends Canvas implements Runnable, KeyListener {
     private void tick() {
         checkPauseKeyState();
 
-        if (paused) return;
+        if (paused) {
+            //This prevents the player's run animation from going too fast after returning from pause
+            currentState.adjustSpriteTimerWhenPaused();
+            return;
+        }
+
         TICKS++;
         currentState.tick(keys);
     }

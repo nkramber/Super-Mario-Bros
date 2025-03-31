@@ -309,8 +309,10 @@ public class Level {
         player.render(screen);
     }
 
+    public void adjustSpriteTimerWhenPaused() { player.adjustSpriteTimerWhenPaused(); }
     public void doResetLevel() { resetLevel = true; }
     public void setPlayer(Player player) { this.player = player; }
+
     public Tile[][] getTiles() { return tiles; }
     public List<Entity> getEntities() { return entities; }
     public List<Item> getItems() { return items; }

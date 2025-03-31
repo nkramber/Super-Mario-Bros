@@ -546,9 +546,6 @@ public class Player extends Entity {
         dirY = -5.0f;
     }
 
-    public void increaseCoinCount() { coinCount++; }
-    public void addToScore(int amountToAdd) { score = score + amountToAdd; }
-
     public int getCoinCount() { return coinCount; }
     public int getScore() { return score; }
     public boolean isDoingPowerUpAnimation() { return growing || shrinking || gainedFireFlower; }
@@ -559,6 +556,9 @@ public class Player extends Entity {
     public Timer getInvincibleTimer() { return invincibleTimer; }
     public boolean getPowerUpState(PowerUpState powerUpState) { return this.powerUpState == powerUpState; }
     
+    public void adjustSpriteTimerWhenPaused() { time = System.currentTimeMillis(); }
+    public void increaseCoinCount() { coinCount++; }
+    public void addToScore(int amountToAdd) { score = score + amountToAdd; }
     public void setNotOnGround() { onGround = false; }
     public void setHeight(int tiles) { height = tiles * PlayerSprite.TILE_HEIGHT; }
     public void setxDir(float xDir) { this.dirX = xDir; }
