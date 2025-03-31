@@ -91,6 +91,7 @@ public class Player extends Entity {
     private boolean inDyingAnimation;
     private boolean hasJumped;
     private boolean sprinting;
+    private boolean moving;
     private boolean skidding;
     private boolean growing;
     private boolean shrinking;
@@ -212,6 +213,8 @@ public class Player extends Entity {
             jumpTick = 0;
             if (onGround && hasJumped) hasJumped = false;
         }
+
+        moving = (dirX != 0 || dirY != 0);
     }
 
     private void doGravity() {
@@ -343,8 +346,6 @@ public class Player extends Entity {
                             newY = tile.getyTile() * 16 - height;
                             onGround = true;
                         }
-
-                        verticalEntityRect = new Rectangle((int) (newX) + xOffset, (int) (newY + yOffset), width - xOffset * 2, height - yOffset);
                     }
     
                     if (horizontalEntityRect.intersects(tileRect)) {
@@ -354,7 +355,6 @@ public class Player extends Entity {
                         } else { //Collide with tile to the right
                             newX = tile.getxTile() * 16 - width + xOffset;
                         }
-                        horizontalEntityRect = new Rectangle((int) (newX + xOffset), (int) y + yOffset, width - xOffset * 2, height - yOffset);
                     }
                 }
             }
@@ -386,7 +386,7 @@ public class Player extends Entity {
             Rectangle itemRect = new Rectangle(itemX, itemY, 12, 16);
 
             if (item instanceof PowerUpItem) {
-                if (((PowerUpItem)item).inSpawnAnimation()) itemRect = new Rectangle(itemX, itemY, 12, 12);
+                if (((PowerUpItem)item).isSpawning()) itemRect = new Rectangle(itemX, itemY, 12, 12);
             }
             
             if (playerRect.intersects(itemRect)) {
@@ -476,7 +476,7 @@ public class Player extends Entity {
         }
 
         //If we're still
-        if (dirX == 0 && dirY == 0 && onGround) {
+        if (!moving && onGround) {
             time = 0;
             if (powerUpState.equals(PowerUpState.SMALL)) currentSprite = PlayerSprite.MARIO_SMALL_STILL;
             else if (powerUpState.equals(PowerUpState.BIG)) currentSprite = PlayerSprite.MARIO_BIG_STILL;

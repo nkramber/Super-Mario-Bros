@@ -7,8 +7,8 @@ import com.nate.mario.level.Level;
 
 public abstract class PlayerStateItem extends PowerUpItem {
 
-    public PlayerStateItem(float x, float y) {
-        super(x, y);
+    public PlayerStateItem(float x, float y, boolean hasSpriteArray) {
+        super(x, y, hasSpriteArray);
     }
 
     @Override public void tick(Level level) {

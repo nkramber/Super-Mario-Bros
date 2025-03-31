@@ -267,9 +267,6 @@ public class Level {
                     powerUpItem.setToBeDeleted();
                     continue;
                 }
-
-                //Draw a blank sky tile below the block containing our item. This prevents the item from appearing below the animating block
-                if (powerUpItem.inSpawnAnimation()) screen.drawTile(SkyTile.SPRITE, (int) powerUpItem.getX(), powerUpItem.getInitialY());
             }
         }
 
@@ -281,7 +278,9 @@ public class Level {
                 if (!screen.isOffScreen(x * 16, 0)) {
                     onScreenTiles.add(tile);
 
-                    //Don't draw SkyTiles as they will cover up our items
+                    //Draw a SkyTile below ItemBlockTiles to prevent item from being visible below the animating block after block is hit
+                    if (tile instanceof ItemBlockTile) screen.drawTile(SkyTile.SPRITE, x * 16, y * 16);
+                    //Skip drawing all other SkyTiles, otherwise items will be covered up and not visible
                     if (!(tile instanceof SkyTile)) screen.drawTile(tile.getSprite(), x * 16, y * 16 - tile.getAnimationHeight());
                 }
             }

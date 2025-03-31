@@ -10,17 +10,17 @@ public class StarItem extends PowerUpItem {
     public static final ItemSprite[] SPRITE = ItemSprite.STAR;
 
     public StarItem(float x, float y) {
-        super(x, y);
+        super(x, y, true);
     }
 
     @Override
     public void tick(Level level) {
         super.tick(level);
-        if (inSpawnAnimation) return;
+        if (isSpawning) return;
 
         
     }
 
     @Override public Item newItem(float x, float y) { return new StarItem(x, y); }
-    @Override public ItemSprite getSprite() { return SPRITE[animationFrame / 2]; }
+    @Override public ItemSprite getSprite() { return SPRITE[spriteFlickerFrame / 2]; }
 }

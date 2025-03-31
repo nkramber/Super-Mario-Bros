@@ -9,9 +9,9 @@ public class FireFlowerItem extends PlayerStateItem {
     private static final ItemSprite[] SPRITES = ItemSprite.FIRE_FLOWER;
 
     public FireFlowerItem(float x, float y) {
-        super(x, y);
+        super(x, y, true);
     }
 
-    @Override public ItemSprite getSprite() { return SPRITES[animationFrame / 2]; }
+    @Override public ItemSprite getSprite() { return SPRITES[spriteFlickerFrame / 2]; }
     @Override public Item newItem(float x, float y) { return new FireFlowerItem(x, y); }
 }
