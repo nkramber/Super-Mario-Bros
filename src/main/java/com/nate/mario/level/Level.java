@@ -195,6 +195,7 @@ public class Level {
         List<Item> itemsToRemove = new ArrayList<>();
         for (Item item : items) {
             item.tick(this);
+            // if (item instanceof PowerUpItem) ((PowerUpItem)item.checkForTileBounce(Collision.getLocal))
             if (item.isToBeDeleted()) itemsToRemove.add(item);
         }
 

@@ -40,10 +40,9 @@ public class BreakableTile extends ItemBlockTile {
             animating = true;
             empty = true;
             //turn to empty item block
-        } else if (playerIsSmall) {
-            if (!animating) setAnimating();
         } else if (!empty) {
-            setToBeDeleted();
+            if (playerIsSmall && !animating) setAnimating();
+            else setToBeDeleted();
         }
     }
 

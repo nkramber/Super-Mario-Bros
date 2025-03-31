@@ -36,7 +36,6 @@ public abstract class Tile {
     }
 
     public void doAnimation() {}
-
     public void doBottomCollision(boolean playerIsSmall) {}
 
     protected void resetAnimationState() {

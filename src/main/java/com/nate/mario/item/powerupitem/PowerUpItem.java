@@ -70,26 +70,18 @@ public abstract class PowerUpItem extends Item {
             }
         }
 
-        // System.out.println(onGround);
-
         onGround = false;
         for (Tile floorTile : floorTiles) {
             if (floorTile.isSolid()) {
+                if (floorTile.isAnimating()) {
+                    dirY = -3.0f;
+                    onGround = false;
+                    break;
+                }
+                
                 onGround = true;
-                break;
             }
         }
-
-        // if (!floorTiles.isEmpty()) {
-        //     onGround = false;
-        //     for (Tile floorTile : floorTiles) {
-        //         System.out.println(floorTile.getClass() + ", " + floorTile.isSolid());
-        //         if (!floorTile.isSolid()) continue;
-        //         onGround = true;
-        //     }
-        // }
-
-        // System.out.println(onGround);
 
         x = newX;
         y = newY;
