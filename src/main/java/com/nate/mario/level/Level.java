@@ -64,7 +64,7 @@ public class Level {
         int width = levelImage.getWidth();
         int height = levelImage.getHeight();
         tiles = new Tile[width][height];
-
+ 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Color tileData = new Color(levelImage.getRGB(x, y));
@@ -106,7 +106,7 @@ public class Level {
                     if (tiles[x][y] instanceof ItemBlockTile) {
                         ((ItemBlockTile)tiles[x][y]).addItemToItemBlock(Item.items.get(id));
                     } else {
-                        items.add(Item.items.get(id).newItem(x, y));
+                        items.add(Item.items.get(id).newItem(x * 16, y * 16));
                     }
                 }
             }
