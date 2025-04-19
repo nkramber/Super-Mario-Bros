@@ -166,11 +166,11 @@ public class Level {
     private void tickParticles() {
         List<Particle> particlesToRemove = new ArrayList<>();
         for (Particle particle : particles) {
+            particle.tick();
             if (particle.isToBeDeleted()) {
                 particlesToRemove.add(particle);
                 continue;
             }
-            particle.tick();
         }
 
         for (Particle particle : particlesToRemove) particles.remove(particle);
@@ -180,11 +180,11 @@ public class Level {
         //Keep track of which entities need to be removed - can't remove inside our loop, so we remove after
         List<Entity> entitiesToRemove = new ArrayList<>();
         for (Entity entity : entities) {
+            entity.tick(this);
             if (!onScreenEntities.contains(entity) || entity.isToBeDeleted() || entity.getY() > deathHeight) {
                 entitiesToRemove.add(entity);
                 continue;
             }
-            entity.tick(this);
         }
 
         for (Entity entity : entitiesToRemove) entities.remove(entity); //add death animation to goombas
@@ -195,7 +195,6 @@ public class Level {
         List<Item> itemsToRemove = new ArrayList<>();
         for (Item item : items) {
             item.tick(this);
-            // if (item instanceof PowerUpItem) ((PowerUpItem)item.checkForTileBounce(Collision.getLocal))
             if (item.isToBeDeleted()) itemsToRemove.add(item);
         }
 
