@@ -20,7 +20,7 @@ mario_big_run2, 3, 2, 1, 2
 mario_big_run3, 4, 2, 1, 2
 mario_big_turn, 5, 2, 1, 2
 mario_big_jump, 6, 2, 1, 2
-mario_big_die, 7, 2, 1, 2
+mario_big_crouch, 7, 2, 1, 2
 mario_big_climb1, 8, 2, 1, 2
 mario_big_climb2, 9, 2, 1, 2
 mario_big_swim1, 10, 2, 1, 2
@@ -35,7 +35,7 @@ mario_fire_run2, 3, 4, 1, 2
 mario_fire_run3, 4, 4, 1, 2
 mario_fire_turn, 5, 4, 1, 2
 mario_fire_jump, 6, 4, 1, 2
-mario_fire_die, 7, 4, 1, 2
+mario_fire_crouch, 7, 4, 1, 2
 mario_fire_climb1, 8, 4, 1, 2
 mario_fire_climb2, 9, 4, 1, 2
 mario_fire_swim1, 10, 4, 1, 2
@@ -43,6 +43,51 @@ mario_fire_swim2, 11, 4, 1, 2
 mario_fire_swim3, 12, 4, 1, 2
 mario_fire_swim4, 13, 4, 1, 2
 mario_fire_swim5, 14, 4, 1, 2
+
+mario_big_green_still, 1, 6, 1, 2
+mario_big_green_run1, 2, 6, 1, 2
+mario_big_green_run2, 3, 6, 1, 2
+mario_big_green_run3, 4, 6, 1, 2
+mario_big_green_turn, 5, 6, 1, 2
+mario_big_green_jump, 6, 6, 1, 2
+mario_big_green_crouch, 7, 6, 1, 2
+mario_big_green_climb1, 8, 6, 1, 2
+mario_big_green_climb2, 9, 6, 1, 2
+mario_big_green_swim1, 10, 6, 1, 2
+mario_big_green_swim2, 11, 6, 1, 2
+mario_big_green_swim3, 12, 6, 1, 2
+mario_big_green_swim4, 13, 6, 1, 2
+mario_big_green_swim5, 14, 6, 1, 2
+
+mario_big_red_still, 1, 8, 1, 2
+mario_big_red_run1, 2, 8, 1, 2
+mario_big_red_run2, 3, 8, 1, 2
+mario_big_red_run3, 4, 8, 1, 2
+mario_big_red_turn, 5, 8, 1, 2
+mario_big_red_jump, 6, 8, 1, 2
+mario_big_red_crouch, 7, 8, 1, 2
+mario_big_red_climb1, 8, 8, 1, 2
+mario_big_red_climb2, 9, 8, 1, 2
+mario_big_red_swim1, 10, 8, 1, 2
+mario_big_red_swim2, 11, 8, 1, 2
+mario_big_red_swim3, 12, 8, 1, 2
+mario_big_red_swim4, 13, 8, 1, 2
+mario_big_red_swim5, 14, 8, 1, 2
+
+mario_big_black_still, 1, 10, 1, 2
+mario_big_black_run1, 2, 10, 1, 2
+mario_big_black_run2, 3, 10, 1, 2
+mario_big_black_run3, 4, 10, 1, 2
+mario_big_black_turn, 5, 10, 1, 2
+mario_big_black_jump, 6, 10, 1, 2
+mario_big_black_crouch, 7, 10, 1, 2
+mario_big_black_climb1, 8, 10, 1, 2
+mario_big_black_climb2, 9, 10, 1, 2
+mario_big_black_swim1, 10, 10, 1, 2
+mario_big_black_swim2, 11, 10, 1, 2
+mario_big_black_swim3, 12, 10, 1, 2
+mario_big_black_swim4, 13, 10, 1, 2
+mario_big_black_swim5, 14, 10, 1, 2
 
 mario_grow1, 16, 1, 1, 2
 mario_grow2, 17, 1, 1, 2

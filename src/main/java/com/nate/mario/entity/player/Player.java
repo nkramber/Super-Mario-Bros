@@ -10,6 +10,7 @@ import com.nate.mario.gfx.Screen;
 import com.nate.mario.gfx.sprite.PlayerSprite;
 import com.nate.mario.item.CoinItem;
 import com.nate.mario.item.Item;
+import com.nate.mario.item.StarItem;
 import com.nate.mario.item.powerupitem.PowerUpItem;
 import com.nate.mario.item.powerupitem.playerstateitem.FireFlowerItem;
 import com.nate.mario.item.powerupitem.playerstateitem.MushroomItem;
@@ -24,6 +25,7 @@ public class Player extends Entity {
     private static final int COLLISION_OFFSET_X = 3;
 
     private static final int POST_DAMAGE_INVINCIBLE_TIME = 2000;
+    private static final int HAS_STAR_TIME = 12000;
     private static final float WALK_DECEL_RATE = 0.06f;
     private static final float WALK_ACCEL_RATE = 0.035f;
     private static final float WALK_MAX_SPEED = 1.5f;
@@ -76,17 +78,19 @@ public class Player extends Entity {
     private float currentHorDecelRate = WALK_DECEL_RATE;
     private float currentHorMaxSpeed = WALK_MAX_SPEED;
 
-    private int invincibleFrame = 0;
+    private int hasBeenHitRecentlyFrame = 0;
+    private int hasStarFrame = 0;
     private int animationFrame = 0;
     private int runSpriteFrame = 0;
     private long time = 0;
 
     private Timer deathTimer = null;
-    private Timer invincibleTimer = null;
+    private Timer hasBeenHitRecentlyTimer = null;
+    private Timer hasStarTimer = null;
     private PowerUpState powerUpState = PowerUpState.SMALL;
 
     private boolean isDead;
-    private boolean invincible;
+    private boolean hasBeenHitRecently;
     private boolean skipRender;
     private boolean inDyingAnimation;
     private boolean hasJumped;
@@ -96,6 +100,7 @@ public class Player extends Entity {
     private boolean growing;
     private boolean shrinking;
     private boolean gainedFireFlower;
+    private boolean hasStar;
     
     private int score = 0;
     private int coinCount = 0;
@@ -142,7 +147,8 @@ public class Player extends Entity {
             return;
         }
 
-        if (invincible) tickInvincibleTimer();
+        if (hasBeenHitRecently) tickHasBeenHitRecentlyTimer();
+        if (hasStar) tickHasStarTimer();
 
         updateSprite();
         doMovement(level, keys);
@@ -159,11 +165,11 @@ public class Player extends Entity {
         if (y + 2 < entity.getY() && dirY > 0) {
             dirY = MONSTER_JUMPED_ON_SPEED;
             addToScore(entity.getScore());
-        } else if (!invincible) {
+        } else if (!hasBeenHitRecently) {
             if (powerUpState == PowerUpState.SMALL) isDead = true;
             else {
                 changePowerUpState(PowerUpState.SMALL);
-                setInvincible();
+                setHasBeenHitRecently();
             }
         }
     }
@@ -397,8 +403,11 @@ public class Player extends Entity {
 
                 item.setToBeDeleted();
                 if (item instanceof CoinItem) {
-                    increaseCoinCount();
                     addToScore(CoinItem.SCORE);
+                    increaseCoinCount();
+                } else if (item instanceof StarItem) {
+                    addToScore(StarItem.SCORE);
+                    setHasStar();
                 } else if (item instanceof PowerUpItem) {
                     addToScore(PowerUpItem.SCORE);
                     if (item instanceof MushroomItem && powerUpState == PowerUpState.SMALL) changePowerUpState(PowerUpState.BIG);
@@ -431,9 +440,9 @@ public class Player extends Entity {
     protected void updateSprite() {
         if (time == 0) time = System.currentTimeMillis();
 
-        if (invincible) {
-            invincibleFrame++;
-            if (invincibleFrame % 2 == 0) skipRender = true;
+        if (hasBeenHitRecently) {
+            hasBeenHitRecentlyFrame++;
+            if (hasBeenHitRecentlyFrame % 2 == 0) skipRender = true;
             else skipRender = false;
         }
 
@@ -499,6 +508,7 @@ public class Player extends Entity {
             else if (powerUpState.equals(PowerUpState.FIRE)) currentSprite = PlayerSprite.MARIO_FIRE_TURN;
         //Keep our old sprite if we are falling
         } else if (falling) {
+            //if we keep star sprite when falling add case code here
             time = System.currentTimeMillis();
             return;
         //Otherwise we are in our run animation
@@ -532,21 +542,35 @@ public class Player extends Entity {
             //Get our run sprite based on our PowerUpState and runSpriteFrame
             currentSprite = PlayerSprite.getRunSprite(powerUpState, runSpriteFrame);
         }
+
+        if (hasStar) {
+            if (hasStarTimer.getElapsedTime() < 9000) hasStarFrame += 5;
+            else hasStarFrame += 1;
+            currentSprite = PlayerSprite.getStarSprite(powerUpState, hasStarFrame, (PlayerSprite)currentSprite);
+        }
     }
 
     @Override
     public void render(Screen screen) {
-        //If skipRender it means we're invincible and we should skip a frame to present a flickering effect
+        //If skipRender it means we've been hit recently and we should skip a frame to present a flickering effect
         if (!skipRender) screen.drawSprite(currentSprite, facingLeft, (int) x, (int) y);
     }
 
-    private void tickInvincibleTimer() {
-        invincibleTimer.tick();
-        if (invincibleTimer.getElapsedTime() < POST_DAMAGE_INVINCIBLE_TIME) return;
-        invincibleTimer = null;
-        invincible = false;
-        invincibleFrame = 0;
+    private void tickHasBeenHitRecentlyTimer() {
+        hasBeenHitRecentlyTimer.tick();
+        if (hasBeenHitRecentlyTimer.getElapsedTime() < POST_DAMAGE_INVINCIBLE_TIME) return;
+        hasBeenHitRecentlyTimer = null;
+        hasBeenHitRecently = false;
+        hasBeenHitRecentlyFrame = 0;
         skipRender = false;
+    }
+
+    private void tickHasStarTimer() {
+        hasStarTimer.tick();
+        if (hasStarTimer.getElapsedTime() < HAS_STAR_TIME) return;
+        hasStarTimer = null;
+        hasStar = false;
+        hasStarFrame = 0;
     }
 
     private void tickDeathTimer() {
@@ -561,9 +585,9 @@ public class Player extends Entity {
     public boolean isDoingPowerUpAnimation() { return growing || shrinking || gainedFireFlower; }
     public boolean isDead() { return isDead; }
     public boolean isInDyingAnimation() { return inDyingAnimation; }
-    public boolean isInvincible() { return invincible; }
+    public boolean isHasBeenHitRecently() { return hasBeenHitRecently; }
     public Timer getDeathTimer() { return deathTimer; }
-    public Timer getInvincibleTimer() { return invincibleTimer; }
+    public Timer getHasBeenHitRecentlyTimer() { return hasBeenHitRecentlyTimer; }
     public boolean getPowerUpState(PowerUpState powerUpState) { return this.powerUpState == powerUpState; }
     
     public void adjustSpriteTimerWhenPaused() { time = System.currentTimeMillis(); }
@@ -577,11 +601,14 @@ public class Player extends Entity {
         inDyingAnimation = true;
         deathTimer = new Timer();
     }
-    public void setNotInvincible() { invincible = false; }
-    public void setInvincible() {
-        invincible = true;
-        invincibleTimer = new Timer();
+    public void setHasBeenHitRecently() {
+        hasBeenHitRecently = true;
+        hasBeenHitRecentlyTimer = new Timer();
     }
+    public void setHasStar() {
+        hasStar = true;
+        hasStarTimer = new Timer();
+    };
 
     @Override public Entity newEntity(int xTile, int yTile) { return new Player(xTile, yTile, score); }
 }
