@@ -89,6 +89,48 @@ mario_big_black_swim3, 12, 10, 1, 2
 mario_big_black_swim4, 13, 10, 1, 2
 mario_big_black_swim5, 14, 10, 1, 2
 
+mario_small_green_still, 1, 12, 1, 1
+mario_small_green_run1, 2, 12, 1, 1
+mario_small_green_run2, 3, 12, 1, 1
+mario_small_green_run3, 4, 12, 1, 1
+mario_small_green_turn, 5, 12, 1, 1
+mario_small_green_jump, 6, 12, 1, 1
+mario_small_green_climb1, 7, 12, 1, 1
+mario_small_green_climb2, 8, 12, 1, 1
+mario_small_green_swim1, 9, 12, 1, 1
+mario_small_green_swim2, 10, 12, 1, 1
+mario_small_green_swim3, 11, 12, 1, 1
+mario_small_green_swim4, 12, 12, 1, 1
+mario_small_green_swim5, 13, 12, 1, 1
+
+mario_small_red_still, 1, 13, 1, 1
+mario_small_red_run1, 2, 13, 1, 1
+mario_small_red_run2, 3, 13, 1, 1
+mario_small_red_run3, 4, 13, 1, 1
+mario_small_red_turn, 5, 13, 1, 1
+mario_small_red_jump, 6, 13, 1, 1
+mario_small_red_climb1, 7, 13, 1, 1
+mario_small_red_climb2, 8, 13, 1, 1
+mario_small_red_swim1, 9, 13, 1, 1
+mario_small_red_swim2, 10, 13, 1, 1
+mario_small_red_swim3, 11, 13, 1, 1
+mario_small_red_swim4, 12, 13, 1, 1
+mario_small_red_swim5, 13, 13, 1, 1
+
+mario_small_black_still, 1, 14, 1, 1
+mario_small_black_run1, 2, 14, 1, 1
+mario_small_black_run2, 3, 14, 1, 1
+mario_small_black_run3, 4, 14, 1, 1
+mario_small_black_turn, 5, 14, 1, 1
+mario_small_black_jump, 6, 14, 1, 1
+mario_small_black_climb1, 7, 14, 1, 1
+mario_small_black_climb2, 8, 14, 1, 1
+mario_small_black_swim1, 9, 14, 1, 1
+mario_small_black_swim2, 10, 14, 1, 1
+mario_small_black_swim3, 11, 14, 1, 1
+mario_small_black_swim4, 12, 14, 1, 1
+mario_small_black_swim5, 13, 14, 1, 1
+
 mario_grow1, 16, 1, 1, 2
 mario_grow2, 17, 1, 1, 2
 
