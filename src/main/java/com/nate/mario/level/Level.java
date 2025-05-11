@@ -181,7 +181,7 @@ public class Level {
         List<Entity> entitiesToRemove = new ArrayList<>();
         for (Entity entity : entities) {
             entity.tick(this);
-            if (!onScreenEntities.contains(entity) || entity.isToBeDeleted() || entity.getY() > deathHeight) {
+            if (entity.isToBeDeleted() || entity.getY() > deathHeight) {
                 entitiesToRemove.add(entity);
                 continue;
             }
