@@ -180,7 +180,8 @@ public class Level {
         //Keep track of which entities need to be removed - can't remove inside our loop, so we remove after
         List<Entity> entitiesToRemove = new ArrayList<>();
         for (Entity entity : entities) {
-            entity.tick(this);
+            if (onScreenEntities.contains(entity)) entity.tick(this);
+            else if (entity.getX() < player.getX()) entity.setToBeDeleted();
             if (entity.isToBeDeleted() || entity.getY() > deathHeight) {
                 entitiesToRemove.add(entity);
                 continue;
